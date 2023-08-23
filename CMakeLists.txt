@@ -21,6 +21,8 @@ add_subdirectory( quickjspp )
 set( CLEO-SRC
      src/cleo.cpp
      src/extern/glad.c
+     src/extern/stb_image.c
+     src/extern/miniaudio.c
      )
 
      
