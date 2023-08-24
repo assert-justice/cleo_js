@@ -23,6 +23,10 @@ set( CLEO-SRC
      src/extern/glad.c
      src/extern/stb_image.c
      src/extern/miniaudio.c
+     src/engine/engine.cpp
+     src/vm/vm.cpp
+     src/window/window.cpp
+     src/renderer/renderer.cpp
      )
 
      
