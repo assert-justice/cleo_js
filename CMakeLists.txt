@@ -6,32 +6,37 @@ set (OpenGL_GL_PREFERENCE GLVND)
 
 find_package( OpenGL REQUIRED )
 
-include_directories( ${OPENGL_INCLUDE_DIRS} ./include )
+include_directories( ${OPENGL_INCLUDE_DIRS} ./include quickjs ./src)
 
 set( GLFW_BUILD_DOCS OFF CACHE BOOL  "GLFW lib only" )
 set( GLFW_INSTALL OFF CACHE BOOL  "GLFW lib only" )
 
 add_subdirectory( glfw )
-add_subdirectory( quickjspp )
+add_subdirectory( quickjs )
 
 # if( MSVC )
 #     SET( CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /ENTRY:mainCRTStartup" )
 # endif()
 
 set( CLEO-SRC
+     # main
      src/cleo.cpp
+     # external
      src/extern/glad.c
      src/extern/stb_image.c
      src/extern/miniaudio.c
+     # engine and subsystems
      src/engine/engine.cpp
      src/vm/vm.cpp
      src/window/window.cpp
      src/renderer/renderer.cpp
+     # bindings
+     src/renderer/renderer_binding.cpp
      )
 
      
 add_executable( cleo ${CLEO-SRC} )
-target_link_libraries( cleo ${OPENGL_LIBRARIES} glfw quickjspp )
+target_link_libraries( cleo ${OPENGL_LIBRARIES} glfw quickjs )
 # target_link_libraries( cleo quickjspp glfw )
 # if( MSVC )
 #     if(${CMAKE_VERSION} VERSION_LESS "3.6.0") 

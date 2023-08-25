@@ -12,6 +12,7 @@ class Engine{
     bool running = true;
     Engine();
     ~Engine();
+    void init();
     void loop();
 };
 

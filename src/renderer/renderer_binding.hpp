@@ -1,0 +1,3 @@
+
+
+void bindRenderer(bool* hasError);

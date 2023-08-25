@@ -8,14 +8,13 @@ VM::VM(){
 VM::~VM(){
     // std::cout << "uninit vm" << std::endl;
     if(!initialized) return;
-    delete publicContext;
-    delete publicRuntime;
+    JS_FreeContext(context);
+    JS_FreeRuntime(runtime);
 }
 
 void VM::init(bool* hasError){
-    if(! *hasError) return;
-    std::cout << "init vm" << std::endl;
-    publicRuntime = new qjs::Runtime();
-    publicContext = new qjs::Context(publicRuntime->rt);
+    if(*hasError) return;
+    runtime = JS_NewRuntime();
+    context = JS_NewContext(runtime);
     initialized = true;
 }

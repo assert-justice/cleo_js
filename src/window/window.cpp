@@ -30,6 +30,8 @@ void Window::init(bool* hasError){
         *hasError = true;
         return;
     }
+    // enable vsync
+    glfwSwapInterval(1);
     this->window = window;
     initialized = true;
 }

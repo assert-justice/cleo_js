@@ -3,8 +3,11 @@
 // #include <quickjspp.hpp>
 // #include <glad/glad.h> 
 // #include <GLFW/glfw3.h>
+// #include "vm/vm.hpp"
 
 int main(){
+    // launch();
+    engine.init();
     return 0;
 }
 

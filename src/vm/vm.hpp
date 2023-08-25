@@ -1,10 +1,10 @@
 #pragma once
-#include "quickjspp.hpp"
+#include "quickjs.h"
 
 class VM{
     public:
-    qjs::Runtime* publicRuntime;
-    qjs::Context* publicContext;
+    JSRuntime* runtime;
+    JSContext* context;
     VM();
     ~VM();
     void init(bool* hasError);

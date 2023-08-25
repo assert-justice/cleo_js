@@ -8,6 +8,7 @@ class Renderer{
     ~Renderer();
     void init(bool* hasError);
     void update();
+    void setClearColor(float r, float g, float b);
     private:
     bool initalized = false;
 };
