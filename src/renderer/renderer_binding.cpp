@@ -46,7 +46,7 @@ void bindRenderer(bool* hasError){
     JS_AddModuleExport(engine.vm.context, renderMod, name.c_str());
     name = "setClearColor";
     JS_AddModuleExport(engine.vm.context, renderMod, name.c_str());
-    std::string src = "import {setClearColor} from 'cleo-renderer'; setClearColor(0,0);";
+    std::string src = "import {setClearColor} from 'cleo-renderer'; setClearColor(0,0,0);";
     auto val = JS_Eval(engine.vm.context, src.c_str(), src.size(), "temp", JS_EVAL_TYPE_MODULE);
     if(!isException(engine.vm.context, val)) JS_FreeValue(engine.vm.context, val);
 }
