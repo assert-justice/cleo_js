@@ -21,7 +21,7 @@ void Engine::init(){
     std::ifstream file("./main.js");
     if(file.is_open()){
         std::string src(std::istreambuf_iterator<char>{file}, {});
-        vm.bind(src);
+        vm.bind(&hasError, src);
     }
     else{
         std::cerr << "unable to open 'main.js'" << std::endl;
@@ -29,7 +29,9 @@ void Engine::init(){
     }
     window.init(&hasError);
     renderer.init(&hasError);
+    if(hasError) return;
     vm.launch();
+    vm.update();
     if(!hasError) loop();
     else running = false;
 }

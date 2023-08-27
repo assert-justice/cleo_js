@@ -7,11 +7,12 @@ class VM{
     JSRuntime* runtime;
     JSContext* context;
     JSValue initFn;
-    JSValue loopFn;
+    JSValue updateFn;
     ~VM();
     void init(bool* hasError);
-    void bind(std::string src);
+    void bind(bool* hasError, std::string src);
     void launch();
+    void update();
 
     private:
     bool initialized = false;

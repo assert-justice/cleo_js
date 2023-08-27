@@ -10,6 +10,14 @@ JSValue setInitBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
     return JS_UNDEFINED;
 }
 
+JSValue setUpdateBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
+    FnHelp help(ctx, argc, argv);
+    auto fn = help.getFunction();
+    engine.vm.updateFn = JS_DupValue(ctx, fn);
+    if(help.hasError) return JS_EXCEPTION;
+    return JS_UNDEFINED;
+}
+
 JSValue printlnBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
     FnHelp help(ctx, argc, argv);
     auto str = help.getString();
@@ -21,6 +29,8 @@ JSValue printlnBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
 int setMainMod(JSContext* ctx, JSModuleDef* mod){
     auto setInitFn = JS_NewCFunction(ctx, &setInitBind, "setInit", 0);
     JS_SetModuleExport(ctx, mod, "setInit", setInitFn);
+    auto setUpdateFn = JS_NewCFunction(ctx, &setUpdateBind, "setUpdate", 0);
+    JS_SetModuleExport(ctx, mod, "setUpdate", setUpdateFn);
     auto printlnFn = JS_NewCFunction(ctx, &printlnBind, "println", 0);
     JS_SetModuleExport(ctx, mod, "println", printlnFn);
     return 0;
@@ -29,6 +39,7 @@ int setMainMod(JSContext* ctx, JSModuleDef* mod){
 VM::~VM(){
     if(!initialized) return;
     JS_FreeValue(context, initFn);
+    JS_FreeValue(context, updateFn);
     JS_FreeContext(context);
     JS_FreeRuntime(runtime);
 }
@@ -40,17 +51,21 @@ void VM::init(bool* hasError){
     initialized = true;
 }
 
-void VM::bind(std::string src){
+void VM::bind(bool* hasError, std::string src){
     auto mainMod = JS_NewCModule(context, "cleo", &setMainMod);
     JS_AddModuleExport(context, mainMod, "setInit");
-    // JS_AddModuleExport(context, mainMod, "setLoop");
+    JS_AddModuleExport(context, mainMod, "setUpdate");
     JS_AddModuleExport(context, mainMod, "println");
     auto val = JS_Eval(context, src.c_str(), src.size(), "temp", JS_EVAL_TYPE_MODULE);
     if(!isException(context, val)) JS_FreeValue(context, val);
+    else{*hasError = true;}
 }
 
 void VM::launch(){
     JS_Call(context, initFn, JS_UNDEFINED, 0, NULL);
+}
+void VM::update(){
+    JS_Call(context, updateFn, JS_UNDEFINED, 0, NULL);
 }
 
 bool isException(JSContext* context, JSValue val){

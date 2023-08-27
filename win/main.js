@@ -1,9 +1,9 @@
-// import * as my from 'MyModule';
-// import {setInit} from 'MyModule';
-// println("hi");
-import{setInit,println} from 'cleo';
+import{setInit,setUpdate,println} from 'cleo';
+import {setClearColor} from 'cleo-renderer'; 
 println('yo');
-setInit(()=>{println('sup');});
-// import {setClearColor} from 'cleo-renderer'; 
-// setClearColor(0,0,0);
-// setClearColor(0,0,0);
+setInit(()=>{
+    println('sup');
+    setClearColor(0,0,1);
+});
+setUpdate(()=>{println('rad');});
+// setClearColor(0,0,1);

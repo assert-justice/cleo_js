@@ -9,6 +9,7 @@ class Renderer{
     void init(bool* hasError);
     void update();
     void setClearColor(float r, float g, float b);
+    bool isInitialized();
     private:
     bool initalized = false;
 };
