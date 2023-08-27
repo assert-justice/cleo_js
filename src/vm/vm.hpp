@@ -11,6 +11,7 @@ class VM{
     ~VM();
     void init(bool* hasError);
     void bind(std::string src);
+    void launch();
 
     private:
     bool initialized = false;

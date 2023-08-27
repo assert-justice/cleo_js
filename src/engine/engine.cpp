@@ -1,6 +1,7 @@
 #include "engine.hpp"
 #include <iostream>
 #include "renderer/renderer_binding.hpp"
+#include <fstream>
 
 Engine::Engine(){
     // bool hasError = false;
@@ -17,8 +18,18 @@ void Engine::init(){
     bool hasError = false;
     vm.init(&hasError);
     bindRenderer(&hasError);
+    std::ifstream file("./main.js");
+    if(file.is_open()){
+        std::string src(std::istreambuf_iterator<char>{file}, {});
+        vm.bind(src);
+    }
+    else{
+        std::cerr << "unable to open 'main.js'" << std::endl;
+        hasError = true;
+    }
     window.init(&hasError);
     renderer.init(&hasError);
+    vm.launch();
     if(!hasError) loop();
     else running = false;
 }

@@ -4,19 +4,31 @@
 
 JSValue setInitBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
     FnHelp help(ctx, argc, argv);
-    engine.vm.initFn = help.getFunction();
+    auto fn = help.getFunction();
+    engine.vm.initFn = JS_DupValue(ctx, fn);
     if(help.hasError) return JS_EXCEPTION;
+    return JS_UNDEFINED;
+}
+
+JSValue printlnBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
+    FnHelp help(ctx, argc, argv);
+    auto str = help.getString();
+    if(help.hasError) return JS_EXCEPTION;
+    std::cout << str << std::endl;
     return JS_UNDEFINED;
 }
 
 int setMainMod(JSContext* ctx, JSModuleDef* mod){
     auto setInitFn = JS_NewCFunction(ctx, &setInitBind, "setInit", 0);
     JS_SetModuleExport(ctx, mod, "setInit", setInitFn);
+    auto printlnFn = JS_NewCFunction(ctx, &printlnBind, "println", 0);
+    JS_SetModuleExport(ctx, mod, "println", printlnFn);
     return 0;
 }
 
 VM::~VM(){
     if(!initialized) return;
+    JS_FreeValue(context, initFn);
     JS_FreeContext(context);
     JS_FreeRuntime(runtime);
 }
@@ -31,7 +43,14 @@ void VM::init(bool* hasError){
 void VM::bind(std::string src){
     auto mainMod = JS_NewCModule(context, "cleo", &setMainMod);
     JS_AddModuleExport(context, mainMod, "setInit");
-    JS_AddModuleExport(context, mainMod, "setLoop");
+    // JS_AddModuleExport(context, mainMod, "setLoop");
+    JS_AddModuleExport(context, mainMod, "println");
+    auto val = JS_Eval(context, src.c_str(), src.size(), "temp", JS_EVAL_TYPE_MODULE);
+    if(!isException(context, val)) JS_FreeValue(context, val);
+}
+
+void VM::launch(){
+    JS_Call(context, initFn, JS_UNDEFINED, 0, NULL);
 }
 
 bool isException(JSContext* context, JSValue val){
@@ -79,8 +98,10 @@ double FnHelp::getFloat64(){
     JS_ToFloat64(ctx, &res, val);
     return res;
 }
+
 JSValue FnHelp::getFunction(){
     auto val = next();
+    // JS_ValueToAtom
     if(hasError) return JS_EXCEPTION;
     if(!JS_IsFunction(ctx, val)) {hasError = true; return JS_EXCEPTION;}
     return val;
