@@ -1,5 +1,19 @@
 #include "vm.hpp"
 #include <iostream>
+#include "../engine/engine.hpp"
+
+JSValue setInitBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
+    FnHelp help(ctx, argc, argv);
+    engine.vm.initFn = help.getFunction();
+    if(help.hasError) return JS_EXCEPTION;
+    return JS_UNDEFINED;
+}
+
+int setMainMod(JSContext* ctx, JSModuleDef* mod){
+    auto setInitFn = JS_NewCFunction(ctx, &setInitBind, "setInit", 0);
+    JS_SetModuleExport(ctx, mod, "setInit", setInitFn);
+    return 0;
+}
 
 VM::~VM(){
     if(!initialized) return;
@@ -14,9 +28,14 @@ void VM::init(bool* hasError){
     initialized = true;
 }
 
+void VM::bind(std::string src){
+    auto mainMod = JS_NewCModule(context, "cleo", &setMainMod);
+    JS_AddModuleExport(context, mainMod, "setInit");
+    JS_AddModuleExport(context, mainMod, "setLoop");
+}
+
 bool isException(JSContext* context, JSValue val){
     if(JS_IsException(val)){
-        //
         auto exception = JS_GetException(context);
         auto str = JS_ToCString(context, exception);
         std::cerr << str << std::endl;
@@ -54,12 +73,17 @@ JSValue FnHelp::next(){
 
 double FnHelp::getFloat64(){
     auto val = next();
-    // isException(ctx, val);
     if(hasError) return 0;
     if(!JS_IsNumber(val)) {hasError = true; return 0;}
     double res = 0;
     JS_ToFloat64(ctx, &res, val);
     return res;
+}
+JSValue FnHelp::getFunction(){
+    auto val = next();
+    if(hasError) return JS_EXCEPTION;
+    if(!JS_IsFunction(ctx, val)) {hasError = true; return JS_EXCEPTION;}
+    return val;
 }
 
 std::string FnHelp::getString(){

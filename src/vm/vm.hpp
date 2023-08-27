@@ -6,8 +6,11 @@ class VM{
     public:
     JSRuntime* runtime;
     JSContext* context;
+    JSValue initFn;
+    JSValue loopFn;
     ~VM();
     void init(bool* hasError);
+    void bind(std::string src);
 
     private:
     bool initialized = false;
@@ -22,6 +25,7 @@ class FnHelp{
     JSValue next();
     std::string getString();
     double getFloat64();
+    JSValue getFunction();
     private:
     JSContext* ctx;
     int argc;

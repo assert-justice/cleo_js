@@ -42,10 +42,10 @@ int setRenderMod(JSContext* ctx, JSModuleDef* mod){
 void bindRenderer(bool* hasError){
     if(*hasError) return;
     renderMod = JS_NewCModule(engine.vm.context, "cleo-renderer", &setRenderMod);
-    std::string name = "hello";
-    JS_AddModuleExport(engine.vm.context, renderMod, name.c_str());
-    name = "setClearColor";
-    JS_AddModuleExport(engine.vm.context, renderMod, name.c_str());
+    // std::string name = "hello";
+    JS_AddModuleExport(engine.vm.context, renderMod, "hello");
+    // name = "setClearColor";
+    JS_AddModuleExport(engine.vm.context, renderMod, "setClearColor");
     std::string src = "import {setClearColor} from 'cleo-renderer'; setClearColor(0,0,0);";
     auto val = JS_Eval(engine.vm.context, src.c_str(), src.size(), "temp", JS_EVAL_TYPE_MODULE);
     if(!isException(engine.vm.context, val)) JS_FreeValue(engine.vm.context, val);
