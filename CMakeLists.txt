@@ -25,6 +25,8 @@ set( CLEO-SRC
      src/extern/glad.c
      src/extern/stb_image.c
      src/extern/miniaudio.c
+     # utils
+     src/fs/fs.cpp
      # engine and subsystems
      src/engine/engine.cpp
      src/vm/vm.cpp
