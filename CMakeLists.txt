@@ -13,6 +13,7 @@ set( GLFW_INSTALL OFF CACHE BOOL  "GLFW lib only" )
 
 add_subdirectory( glfw )
 add_subdirectory( quickjs )
+add_subdirectory( glm )
 
 # if( MSVC )
 #     SET( CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /ENTRY:mainCRTStartup" )
@@ -38,7 +39,7 @@ set( CLEO-SRC
 
      
 add_executable( cleo ${CLEO-SRC} )
-target_link_libraries( cleo ${OPENGL_LIBRARIES} glfw quickjs )
+target_link_libraries( cleo ${OPENGL_LIBRARIES} glfw quickjs glm )
 # target_link_libraries( cleo quickjspp glfw )
 # if( MSVC )
 #     if(${CMAKE_VERSION} VERSION_LESS "3.6.0") 
