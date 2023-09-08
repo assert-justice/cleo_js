@@ -5,5 +5,5 @@ setInit(()=>{
     println('sup');
     setClearColor(0,0,1);
 });
-setUpdate(()=>{println('rad');});
+setUpdate((dt)=>{println('rad' + dt);});
 // setClearColor(0,0,1);

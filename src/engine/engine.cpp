@@ -33,7 +33,7 @@ void Engine::init(){
     renderer.init(&hasError);
     if(hasError) return;
     vm.launch();
-    vm.update();
+    vm.update(0);
     if(!hasError) loop();
     else running = false;
 }

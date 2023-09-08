@@ -63,10 +63,16 @@ void VM::bind(bool* hasError, std::string src){
 }
 
 void VM::launch(){
-    JS_Call(context, initFn, JS_UNDEFINED, 0, NULL);
+    if(!JS_IsUndefined(initFn)) JS_Call(context, initFn, JS_UNDEFINED, 0, NULL);
 }
-void VM::update(){
-    JS_Call(context, updateFn, JS_UNDEFINED, 0, NULL);
+
+void VM::update(double dt){
+    if(!JS_IsUndefined(updateFn)){
+        auto val = JS_NewFloat64(context, dt);
+        JS_Call(context, updateFn, JS_UNDEFINED, 1, &val);
+        // dunno if this is needed
+        JS_FreeValue(context, val);
+    }
 }
 
 bool isException(JSContext* context, JSValue val){
