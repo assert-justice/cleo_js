@@ -3,7 +3,7 @@
 
 class Shader{
     public:
-    unsigned int program;
+    unsigned int id;
     bool initialized = false;
     void initialize(bool* hasError, std::string vertexSrc, std::string fragmentSrc);
     // bool hasError = false;

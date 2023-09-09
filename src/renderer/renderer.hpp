@@ -2,7 +2,7 @@
 #include "shader.hpp"
 // #include <glad/glad.h> 
 // #include <GLFW/glfw3.h>
-#include <vector>
+#include <unordered_map>
 
 // typedef struct TextureData{
 //     unsigned int idx;
@@ -29,6 +29,7 @@ class Renderer{
     Shader imageShader;
     bool initalized = false;
     unsigned int VBO, VAO;
-    // unsigned int shaderProgram;
-    // std::vector<TextureData> textures;
+    unsigned int texture;
+    int maxTextureId = 0;
+    // std::unordered_map<int, TextureData> textureMap;
 };

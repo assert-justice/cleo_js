@@ -36,15 +36,15 @@ void Shader::initialize(bool* hasError, std::string vertexSrc, std::string fragm
         std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
     }
     // link shaders
-    program = glCreateProgram();
-    glAttachShader(program, vertexShader);
-    glAttachShader(program, fragmentShader);
-    glLinkProgram(program);
+    id = glCreateProgram();
+    glAttachShader(id, vertexShader);
+    glAttachShader(id, fragmentShader);
+    glLinkProgram(id);
     // check for linking errors
-    glGetProgramiv(program, GL_LINK_STATUS, &success);
+    glGetProgramiv(id, GL_LINK_STATUS, &success);
     if (!success) {
         *hasError = true;
-        glGetProgramInfoLog(program, 512, NULL, infoLog);
+        glGetProgramInfoLog(id, 512, NULL, infoLog);
         std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
     }
     if(!*hasError){
@@ -57,5 +57,5 @@ void Shader::initialize(bool* hasError, std::string vertexSrc, std::string fragm
 
 Shader::~Shader(){
     if(!initialized) return;
-    glDeleteProgram(program);
+    glDeleteProgram(id);
 }
