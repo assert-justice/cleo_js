@@ -1,8 +1,9 @@
 #pragma once
-#include "shader.hpp"
-// #include <glad/glad.h> 
-// #include <GLFW/glfw3.h>
 #include <unordered_map>
+#include "shader.hpp"
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 // typedef struct TextureData{
 //     unsigned int idx;
@@ -31,5 +32,7 @@ class Renderer{
     unsigned int VBO, VAO;
     unsigned int texture;
     int maxTextureId = 0;
+    glm::mat4 cameraTransform;
+    glm::mat4 spriteTransform;
     // std::unordered_map<int, TextureData> textureMap;
 };
