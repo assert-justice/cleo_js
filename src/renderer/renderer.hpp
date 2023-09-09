@@ -1,6 +1,7 @@
 #pragma once
-#include <glad/glad.h> 
-#include <GLFW/glfw3.h>
+#include "shader.hpp"
+// #include <glad/glad.h> 
+// #include <GLFW/glfw3.h>
 #include <vector>
 
 // typedef struct TextureData{
@@ -25,8 +26,9 @@ class Renderer{
     //     float sx, float sy, float sWidth, float sHeight,
     //     unsigned int targetTexture);
     private:
+    Shader imageShader;
     bool initalized = false;
     unsigned int VBO, VAO;
-    unsigned int shaderProgram;
+    // unsigned int shaderProgram;
     // std::vector<TextureData> textures;
 };

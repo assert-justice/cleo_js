@@ -33,6 +33,7 @@ set( CLEO-SRC
      src/vm/vm.cpp
      src/window/window.cpp
      src/renderer/renderer.cpp
+     src/renderer/shader.cpp
      # bindings
      src/renderer/renderer_binding.cpp
      )
