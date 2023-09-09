@@ -65,7 +65,7 @@ void Renderer::init(bool* hasError){
 
     int width, height, nrChannels;
     // stbi_set_flip_vertically_on_load(true);
-    unsigned char *data = stbi_load("character_0000.png", &width, &height, &nrChannels, 0); 
+    unsigned char *data = stbi_load("characters_packed.png", &width, &height, &nrChannels, 0); 
     
     glGenTextures(1, &texture);
     glBindTexture(GL_TEXTURE_2D, texture); 
@@ -79,9 +79,9 @@ void Renderer::init(bool* hasError){
     // glUniform1i(glGetUniformLocation(imageShader.id, "texture"), 0);
     // intentionally flipped
     cameraTransform = glm::ortho(0.0f, 800.0f, 600.0f, 0.0f, -0.1f, 100.0f);
-    cameraTransform = glm::translate(cameraTransform, glm::vec3(30.0f, 0.0f, 0.0f));
+    // cameraTransform = glm::translate(cameraTransform, glm::vec3(30.0f, 0.0f, 0.0f));
     spriteTransform = glm::mat4(1.0f);
-    spriteTransform = glm::scale(spriteTransform, glm::vec3(100));
+    spriteTransform = glm::scale(spriteTransform, glm::vec3(216.0f, 72.0f, 0.0f));
     // spriteTransform = glm::translate(spriteTransform, glm::vec3(-1.0f, 0.0f, 0.0f));
     // unsigned int transformLoc = glGetUniformLocation(imageShader.id, "camera");
     // glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(cameraTransform));
@@ -101,7 +101,10 @@ void Renderer::update(){
     glUniformMatrix4fv(cameraLoc, 1, GL_FALSE, glm::value_ptr(cameraTransform));
     unsigned int spriteLoc = glGetUniformLocation(imageShader.id, "sprite");
     glUniformMatrix4fv(spriteLoc, 1, GL_FALSE, glm::value_ptr(spriteTransform));
-
+    unsigned int dimensionsLoc = glGetUniformLocation(imageShader.id, "dimensions");
+    glUniform4fv(dimensionsLoc, 1, glm::value_ptr(
+        glm::vec4(0.0f, 0.0f, 1.0f/9, 1.0f/3))
+    );
     glDrawArrays(GL_TRIANGLES, 0, 6);
 }
 bool Renderer::isInitialized(){
