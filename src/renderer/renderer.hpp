@@ -3,6 +3,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include "utils/store.hpp"
 #include "shader.hpp"
 #include "texture.hpp"
 
@@ -28,13 +29,10 @@ class Renderer{
     //     float sx, float sy, float sWidth, float sHeight,
     //     unsigned int targetTexture);
     private:
-    // Texture imageTexture;
     Shader imageShader;
     bool initalized = false;
     unsigned int VBO, VAO;
-    // unsigned int texture;
-    int maxTextureId = 0;
-    std::unordered_map<int, Texture*> textureMap;
+    Store<Texture> textureStore;
     glm::mat4 cameraTransform;
     glm::mat4 spriteTransform;
 };

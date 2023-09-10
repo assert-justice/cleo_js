@@ -3,7 +3,7 @@
 #include <string>
 #include <glad/glad.h> 
 #include <GLFW/glfw3.h>
-#include "fs/fs.hpp"
+#include "utils/fs.hpp"
 #include "stb_image.h"
 
 const float quad[] = {
@@ -21,10 +21,10 @@ Renderer::~Renderer(){
     if(!initalized) return;
     glDeleteVertexArrays(1, &VAO);
     glDeleteBuffers(1, &VBO);
-    for(auto it=textureMap.begin();it!=textureMap.end();it++) {
-        delete it->second; 
-    }
-    textureMap.clear();
+    // for(auto it=textureMap.begin();it!=textureMap.end();it++) {
+    //     delete it->second; 
+    // }
+    // textureMap.clear();
 }
 void Renderer::init(bool* hasError){
     if(*hasError) return;
@@ -66,7 +66,7 @@ void Renderer::update(){
     glClear(GL_COLOR_BUFFER_BIT);
     // draw our first triangle
     glUseProgram(imageShader.id);
-    textureMap.at(0)->use();
+    textureStore.get(0)->use();
     glBindVertexArray(VAO);
     unsigned int cameraLoc = glGetUniformLocation(imageShader.id, "camera");
     glUniformMatrix4fv(cameraLoc, 1, GL_FALSE, glm::value_ptr(cameraTransform));
@@ -83,9 +83,7 @@ bool Renderer::isInitialized(){
 }
 int Renderer::newTexture(int width, int height, unsigned char* data){
     auto ptr = new Texture(width, height, data);
-    textureMap.insert(std::make_pair(maxTextureId, ptr));
-    maxTextureId++;
-    return maxTextureId - 1;
+    return textureStore.add(ptr);
 }
 
 int Renderer::newImage(const char* path){
