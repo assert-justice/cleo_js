@@ -1,9 +1,10 @@
 #pragma once
 #include <unordered_map>
-#include "shader.hpp"
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include "shader.hpp"
+#include "texture.hpp"
 
 // typedef struct TextureData{
 //     unsigned int idx;
@@ -19,20 +20,21 @@ class Renderer{
     void update();
     bool isInitialized();
     void setClearColor(float r, float g, float b);
-    // unsigned int newTexture(unsigned int width, unsigned int height);
-    // unsigned int newImage(const char* path);
+    int newTexture(int width, int height, unsigned char* data);
+    int newImage(const char* path);
     // void drawTexture(
     //     unsigned int texture, 
     //     float x, float y, float width, float height,
     //     float sx, float sy, float sWidth, float sHeight,
     //     unsigned int targetTexture);
     private:
+    // Texture imageTexture;
     Shader imageShader;
     bool initalized = false;
     unsigned int VBO, VAO;
-    unsigned int texture;
+    // unsigned int texture;
     int maxTextureId = 0;
+    std::unordered_map<int, Texture*> textureMap;
     glm::mat4 cameraTransform;
     glm::mat4 spriteTransform;
-    // std::unordered_map<int, TextureData> textureMap;
 };

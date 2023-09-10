@@ -34,6 +34,7 @@ set( CLEO-SRC
      src/window/window.cpp
      src/renderer/renderer.cpp
      src/renderer/shader.cpp
+     src/renderer/texture.cpp
      # bindings
      src/renderer/renderer_binding.cpp
      )

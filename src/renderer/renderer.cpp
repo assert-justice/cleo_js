@@ -16,30 +16,15 @@ const float quad[] = {
     0.0f, 0.0f, 0.0f,     0.0f, 0.0f, // bottom left
 };
 
-// std::string vertexShaderSource = "#version 330 core\n"
-//     "layout (location = 0) in vec3 aPos;\n"
-//     "void main()\n"
-//     "{\n"
-//     "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
-//     "}\0";
-// std::string fragmentShaderSource = "#version 330 core\n"
-//     "out vec4 FragColor;\n"
-//     "void main()\n"
-//     "{\n"
-//     "   FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
-//     "}\n\0";
-
 Renderer::Renderer(){}
 Renderer::~Renderer(){
     if(!initalized) return;
     glDeleteVertexArrays(1, &VAO);
     glDeleteBuffers(1, &VBO);
-    // glDeleteProgram(shaderProgram);
-    // for (size_t i = 0; i < textures.size(); i++)
-    // {
-    //     glDeleteTextures(1, &textures[i].idx);
-    // }
-    
+    for(auto it=textureMap.begin();it!=textureMap.end();it++) {
+        delete it->second; 
+    }
+    textureMap.clear();
 }
 void Renderer::init(bool* hasError){
     if(*hasError) return;
@@ -62,21 +47,7 @@ void Renderer::init(bool* hasError){
     glEnableVertexAttribArray(positionLoc);
     glVertexAttribPointer(textureLoc, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(textureLoc);
-
-    int width, height, nrChannels;
-    // stbi_set_flip_vertically_on_load(true);
-    unsigned char *data = stbi_load("characters_packed.png", &width, &height, &nrChannels, 0); 
-    
-    glGenTextures(1, &texture);
-    glBindTexture(GL_TEXTURE_2D, texture); 
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-    glGenerateMipmap(GL_TEXTURE_2D);
-    stbi_image_free(data);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST); 
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); 
-    // glUniform1i(glGetUniformLocation(imageShader.id, "texture"), 0);
+    newImage("./characters_packed.png");
     // intentionally flipped
     cameraTransform = glm::ortho(0.0f, 800.0f, 600.0f, 0.0f, -0.1f, 100.0f);
     // cameraTransform = glm::translate(cameraTransform, glm::vec3(30.0f, 0.0f, 0.0f));
@@ -95,7 +66,7 @@ void Renderer::update(){
     glClear(GL_COLOR_BUFFER_BIT);
     // draw our first triangle
     glUseProgram(imageShader.id);
-    glBindTexture(GL_TEXTURE_2D, texture);
+    textureMap.at(0)->use();
     glBindVertexArray(VAO);
     unsigned int cameraLoc = glGetUniformLocation(imageShader.id, "camera");
     glUniformMatrix4fv(cameraLoc, 1, GL_FALSE, glm::value_ptr(cameraTransform));
@@ -110,13 +81,17 @@ void Renderer::update(){
 bool Renderer::isInitialized(){
     return initalized;
 }
-// unsigned int Renderer::newTexture(unsigned int width, unsigned int height){
-//     TextureData data = {
-//         .idx = 0,
-//         .width = width,
-//         .height = height
-//     };
-//     glGenTextures(1, &data.idx);
-//     textures.emplace_back(data);
-//     return textures.size() - 1;
-// }
+int Renderer::newTexture(int width, int height, unsigned char* data){
+    auto ptr = new Texture(width, height, data);
+    textureMap.insert(std::make_pair(maxTextureId, ptr));
+    maxTextureId++;
+    return maxTextureId - 1;
+}
+
+int Renderer::newImage(const char* path){
+    int width, height, nrChannels;
+    unsigned char* data = stbi_load(path, &width, &height, &nrChannels, 0); 
+    int id = newTexture(width, height, data);
+    stbi_image_free(data);
+    return id;
+}
