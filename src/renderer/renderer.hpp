@@ -23,10 +23,10 @@ class Renderer{
     void setClearColor(float r, float g, float b);
     int newTexture(int width, int height, unsigned char* data);
     int newImage(const char* path);
-    // void drawTexture(
-    //     unsigned int texture, 
-    //     float x, float y, float width, float height,
-    //     float sx, float sy, float sWidth, float sHeight,
+    void drawImage(
+        int textureId, 
+        float x, float y, float width, float height,
+        float sx, float sy, float sWidth, float sHeight);
     //     unsigned int targetTexture);
     private:
     Shader imageShader;
@@ -34,5 +34,5 @@ class Renderer{
     unsigned int VBO, VAO;
     Store<Texture> textureStore;
     glm::mat4 cameraTransform;
-    glm::mat4 spriteTransform;
+    // glm::mat4 spriteTransform;
 };

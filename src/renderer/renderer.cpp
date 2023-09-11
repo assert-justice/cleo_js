@@ -51,8 +51,8 @@ void Renderer::init(bool* hasError){
     // intentionally flipped
     cameraTransform = glm::ortho(0.0f, 800.0f, 600.0f, 0.0f, -0.1f, 100.0f);
     // cameraTransform = glm::translate(cameraTransform, glm::vec3(30.0f, 0.0f, 0.0f));
-    spriteTransform = glm::mat4(1.0f);
-    spriteTransform = glm::scale(spriteTransform, glm::vec3(216.0f, 72.0f, 0.0f));
+    // spriteTransform = glm::mat4(1.0f);
+    // spriteTransform = glm::scale(spriteTransform, glm::vec3(216.0f, 72.0f, 0.0f));
     // spriteTransform = glm::translate(spriteTransform, glm::vec3(-1.0f, 0.0f, 0.0f));
     // unsigned int transformLoc = glGetUniformLocation(imageShader.id, "camera");
     // glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(cameraTransform));
@@ -64,19 +64,8 @@ void Renderer::setClearColor(float r, float g, float b){
 void Renderer::update(){
     /* Render here */
     glClear(GL_COLOR_BUFFER_BIT);
-    // draw our first triangle
-    glUseProgram(imageShader.id);
-    textureStore.get(0)->use();
-    glBindVertexArray(VAO);
-    unsigned int cameraLoc = glGetUniformLocation(imageShader.id, "camera");
-    glUniformMatrix4fv(cameraLoc, 1, GL_FALSE, glm::value_ptr(cameraTransform));
-    unsigned int spriteLoc = glGetUniformLocation(imageShader.id, "sprite");
-    glUniformMatrix4fv(spriteLoc, 1, GL_FALSE, glm::value_ptr(spriteTransform));
-    unsigned int dimensionsLoc = glGetUniformLocation(imageShader.id, "dimensions");
-    glUniform4fv(dimensionsLoc, 1, glm::value_ptr(
-        glm::vec4(0.0f, 0.0f, 1.0f/9, 1.0f/3))
-    );
-    glDrawArrays(GL_TRIANGLES, 0, 6);
+    drawImage(0, 0, 0, 24*4, 24*4, 0, 0, 24, 24);
+    drawImage(0, 24*4, 0, 24*4, 24*4, 24*2, 0, 24, 24);
 }
 bool Renderer::isInitialized(){
     return initalized;
@@ -92,4 +81,28 @@ int Renderer::newImage(const char* path){
     int id = newTexture(width, height, data);
     stbi_image_free(data);
     return id;
+}
+
+void Renderer::drawImage(
+    int textureId, 
+    float x, float y, float width, float height,
+    float sx, float sy, float sw, float sh)
+{
+    glUseProgram(imageShader.id);
+    auto tex = textureStore.get(textureId);
+    tex->use();
+    glBindVertexArray(VAO);
+    unsigned int cameraLoc = glGetUniformLocation(imageShader.id, "camera");
+    glUniformMatrix4fv(cameraLoc, 1, GL_FALSE, glm::value_ptr(cameraTransform));
+    unsigned int spriteLoc = glGetUniformLocation(imageShader.id, "sprite");
+    glm::mat4 spriteTransform = glm::mat4(1.0f);
+    spriteTransform = glm::translate(spriteTransform, glm::vec3(x, y, 0.0f));
+    spriteTransform = glm::scale(spriteTransform, glm::vec3(width, height, 0.0f));
+    
+    glUniformMatrix4fv(spriteLoc, 1, GL_FALSE, glm::value_ptr(spriteTransform));
+    unsigned int dimensionsLoc = glGetUniformLocation(imageShader.id, "dimensions");
+    glUniform4fv(dimensionsLoc, 1, glm::value_ptr(
+        glm::vec4(sx/tex->width, sy/tex->height, sw/tex->width, sh/tex->height))
+    );
+    glDrawArrays(GL_TRIANGLES, 0, 6);
 }
