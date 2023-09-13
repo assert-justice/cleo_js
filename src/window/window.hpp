@@ -10,6 +10,7 @@ class Window{
     void init(bool* hasError);
     void update();
     bool shouldClose();
+    void quit();
     private:
     bool initialized = false;
 };

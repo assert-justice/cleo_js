@@ -2,6 +2,7 @@
 #include <iostream>
 #include "renderer/renderer_binding.hpp"
 #include "input/input_binding.hpp"
+#include "window/window_binding.hpp"
 #include "utils/fs.hpp"
 #include <fstream>
 
@@ -21,6 +22,7 @@ void Engine::init(){
     vm.init(&hasError);
     bindRenderer(&hasError);
     bindInput(&hasError);
+    bindWindow(&hasError);
     auto src = readFile(&hasError, "./main.js");
     vm.bind(&hasError, src);
     window.init(&hasError);

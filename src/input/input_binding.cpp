@@ -28,6 +28,6 @@ int setInputMod(JSContext* ctx, JSModuleDef* mod){
 
 void bindInput(bool* hasError){
     if(*hasError) return;
-    auto renderMod = JS_NewCModule(engine.vm.context, "cleo-input", &setInputMod);
-    JS_AddModuleExport(engine.vm.context, renderMod, "getKey");
+    auto inputMod = JS_NewCModule(engine.vm.context, "cleo-input", &setInputMod);
+    JS_AddModuleExport(engine.vm.context, inputMod, "getKey");
 }

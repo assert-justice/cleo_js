@@ -47,3 +47,7 @@ void Window::update(){
 bool Window::shouldClose(){
     return glfwWindowShouldClose(window);
 }
+
+void Window::quit(){
+    glfwSetWindowShouldClose(window, true);
+}

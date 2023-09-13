@@ -1,6 +1,7 @@
 import{setInit,setUpdate,println} from 'cleo';
 import {setClearColor, loadImage, drawImage} from 'cleo-renderer';
 import {getKey} from 'cleo-input';
+import {quit} from 'cleo-window'
 // println('yo');
 let spriteSheet = 0;
 const player = {
@@ -14,6 +15,7 @@ setInit(()=>{
     // println(''+spriteSheet);
 });
 setUpdate((dt)=>{
+    if(getKey(256)) quit();
     // println('sup');
     if(getKey(262)) player.x += player.speed * dt;
     if(getKey(263)) player.x -= player.speed * dt;
