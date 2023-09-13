@@ -1,6 +1,7 @@
 #include "engine.hpp"
 #include <iostream>
 #include "renderer/renderer_binding.hpp"
+#include "input/input_binding.hpp"
 #include "utils/fs.hpp"
 #include <fstream>
 
@@ -19,14 +20,7 @@ void Engine::init(){
     bool hasError = false;
     vm.init(&hasError);
     bindRenderer(&hasError);
-    // std::ifstream file("./main.js");
-    // if(file.is_open()){
-    //     std::string src(std::istreambuf_iterator<char>{file}, {});
-    // }
-    // else{
-    //     std::cerr << "unable to open 'main.js'" << std::endl;
-    //     hasError = true;
-    // }
+    bindInput(&hasError);
     auto src = readFile(&hasError, "./main.js");
     vm.bind(&hasError, src);
     window.init(&hasError);
