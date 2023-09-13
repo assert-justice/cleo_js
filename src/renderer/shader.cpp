@@ -48,7 +48,7 @@ void Shader::initialize(bool* hasError, std::string vertexSrc, std::string fragm
         std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
     }
     if(!*hasError){
-        std::cout << "Shader compiled!" << std::endl;
+        // std::cout << "Shader compiled!" << std::endl;
         initialized = true;
     }
     glDeleteShader(vertexShader);

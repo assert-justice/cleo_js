@@ -33,13 +33,13 @@ void Engine::init(){
     renderer.init(&hasError);
     if(hasError) return;
     vm.launch();
-    vm.update(0);
     if(!hasError) loop();
     else running = false;
 }
 void Engine::loop(){
     while(running){
         renderer.update();
+        vm.update(0.16);
         window.update();
         if(window.shouldClose()) running = false;
     }

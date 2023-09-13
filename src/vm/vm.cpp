@@ -121,6 +121,15 @@ double FnHelp::getFloat64(){
     return res;
 }
 
+int FnHelp::getInt(){
+    auto val = next();
+    if(hasError) return 0;
+    if(!JS_IsNumber(val)) {hasError = true; return 0;}
+    int res = 0;
+    JS_ToInt32(ctx, &res, val);
+    return res;
+}
+
 JSValue FnHelp::getFunction(){
     auto val = next();
     // JS_ValueToAtom
@@ -137,4 +146,8 @@ std::string FnHelp::getString(){
     std::string res(str);
     JS_FreeCString(ctx, str);
     return res;
+}
+
+bool FnHelp::hasArgs(){
+    return argIdx < argc;
 }

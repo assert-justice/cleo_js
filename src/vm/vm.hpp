@@ -27,7 +27,9 @@ class FnHelp{
     JSValue next();
     std::string getString();
     double getFloat64();
+    int getInt();
     JSValue getFunction();
+    bool hasArgs();
     private:
     JSContext* ctx;
     int argc;

@@ -21,10 +21,6 @@ Renderer::~Renderer(){
     if(!initalized) return;
     glDeleteVertexArrays(1, &VAO);
     glDeleteBuffers(1, &VBO);
-    // for(auto it=textureMap.begin();it!=textureMap.end();it++) {
-    //     delete it->second; 
-    // }
-    // textureMap.clear();
 }
 void Renderer::init(bool* hasError){
     if(*hasError) return;
@@ -47,15 +43,8 @@ void Renderer::init(bool* hasError){
     glEnableVertexAttribArray(positionLoc);
     glVertexAttribPointer(textureLoc, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(textureLoc);
-    newImage("./characters_packed.png");
     // intentionally flipped
     cameraTransform = glm::ortho(0.0f, 800.0f, 600.0f, 0.0f, -0.1f, 100.0f);
-    // cameraTransform = glm::translate(cameraTransform, glm::vec3(30.0f, 0.0f, 0.0f));
-    // spriteTransform = glm::mat4(1.0f);
-    // spriteTransform = glm::scale(spriteTransform, glm::vec3(216.0f, 72.0f, 0.0f));
-    // spriteTransform = glm::translate(spriteTransform, glm::vec3(-1.0f, 0.0f, 0.0f));
-    // unsigned int transformLoc = glGetUniformLocation(imageShader.id, "camera");
-    // glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(cameraTransform));
     initalized = true;
 }
 void Renderer::setClearColor(float r, float g, float b){
@@ -64,8 +53,6 @@ void Renderer::setClearColor(float r, float g, float b){
 void Renderer::update(){
     /* Render here */
     glClear(GL_COLOR_BUFFER_BIT);
-    drawImage(0, 0, 0, 24*4, 24*4, 0, 0, 24, 24);
-    drawImage(0, 24*4, 0, 24*4, 24*4, 24*2, 0, 24, 24);
 }
 bool Renderer::isInitialized(){
     return initalized;
@@ -75,9 +62,10 @@ int Renderer::newTexture(int width, int height, unsigned char* data){
     return textureStore.add(ptr);
 }
 
-int Renderer::newImage(const char* path){
+int Renderer::loadImage(const char* path){
     int width, height, nrChannels;
     unsigned char* data = stbi_load(path, &width, &height, &nrChannels, 0); 
+    if(!data) return -1;
     int id = newTexture(width, height, data);
     stbi_image_free(data);
     return id;
