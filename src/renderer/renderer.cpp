@@ -94,3 +94,7 @@ void Renderer::drawImage(
     );
     glDrawArrays(GL_TRIANGLES, 0, 6);
 }
+
+void Renderer::freeTexture(int id){
+    textureStore.del(id);
+}

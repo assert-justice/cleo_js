@@ -22,6 +22,7 @@ class Renderer{
     bool isInitialized();
     void setClearColor(float r, float g, float b);
     int newTexture(int width, int height, unsigned char* data);
+    void freeTexture(int id);
     int loadImage(const char* path);
     void drawImage(
         int textureId, 

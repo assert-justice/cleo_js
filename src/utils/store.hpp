@@ -20,6 +20,11 @@ class Store{
     bool has(int id){
         return data.count(id) == 1;
     }
+    void del(int id){
+        if(!has(id)) return;
+        delete get(id);
+        data.erase(id);
+    }
     private:
     std::unordered_map<int, T*> data;
     int idCount = 0;

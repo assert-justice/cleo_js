@@ -3,12 +3,12 @@ import {setClearColor, loadImage, drawImage} from 'cleo-renderer';
 import {getKey} from 'cleo-input';
 import {quit} from 'cleo-window'
 // println('yo');
-let spriteSheet = 0;
 const player = {
     x: 0,
     y: 0,
     speed: 100,
 };
+let spriteSheet = 0;
 setInit(()=>{
     setClearColor(0,0,1);
     spriteSheet = loadImage('./characters_packed.png');
