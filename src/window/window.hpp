@@ -11,6 +11,6 @@ class Window{
     void update();
     bool shouldClose();
     void quit();
-    private:
     bool initialized = false;
+    private:
 };

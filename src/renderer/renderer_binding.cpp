@@ -1,5 +1,5 @@
 #include "renderer_binding.hpp"
-#include "quickjs.h"
+#include "vm/fn_help.hpp"
 #include "engine/engine.hpp"
 #include <iostream>
 

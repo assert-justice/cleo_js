@@ -10,7 +10,7 @@ const player = {
 };
 let spriteSheet = 0;
 setInit(()=>{
-    setClearColor(0,0,1);
+    // setClearColor(0,0,1);
     spriteSheet = loadImage('./characters_packed.png');
     // println(''+spriteSheet);
 });

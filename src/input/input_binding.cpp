@@ -1,11 +1,14 @@
 #include "input_binding.hpp"
-#include "quickjs.h"
+#include "vm/fn_help.hpp"
 #include "engine/engine.hpp"
 #include "glfw/glfw3.h"
 #include <iostream>
 
 JSValue setGetKeyBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
-    //
+    if(!engine.window.initialized){
+        JS_ThrowReferenceError(ctx, "method referenced before initialization!");
+        return JS_EXCEPTION;
+    }
     FnHelp help(ctx, argc, argv);
     int keyCode = help.getInt();
     if(help.hasError) return JS_EXCEPTION;

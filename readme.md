@@ -6,7 +6,7 @@ A game framework for JavaScript.
 
 ### Current
 
-- input system
+- widow options including borderless fullscreen
 
 ### Short Term
 
@@ -14,7 +14,6 @@ A game framework for JavaScript.
 - gamepad buttons and axes
 - render targets
 - simple audio api
-- widow options including borderless fullscreen
 - text rendering
 - working linux build
 - example game (top down shooter probably)

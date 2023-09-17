@@ -19,21 +19,3 @@ class VM{
 };
 
 bool isException(JSContext* ctx, JSValue val);
-
-class FnHelp{
-    public:
-    bool hasError = false;
-    FnHelp(JSContext* ctx, int argc, JSValue* argv);
-    JSValue next();
-    std::string getString();
-    double getFloat64();
-    int getInt();
-    JSValue getFunction();
-    bool hasArgs();
-    private:
-    JSContext* ctx;
-    int argc;
-    JSValue* argv;
-    std::string name;
-    int argIdx = 0;
-};
