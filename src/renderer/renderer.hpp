@@ -28,6 +28,7 @@ class Renderer{
         int textureId, 
         float x, float y, float width, float height,
         float sx, float sy, float sw, float sh);
+    void setCameraPosition(float x, float y);
     Store<Texture> textureStore;
     private:
     Shader imageShader;

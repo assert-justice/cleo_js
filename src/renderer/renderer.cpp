@@ -43,8 +43,7 @@ void Renderer::init(bool* hasError){
     glEnableVertexAttribArray(positionLoc);
     glVertexAttribPointer(textureLoc, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(textureLoc);
-    // intentionally flipped
-    cameraTransform = glm::ortho(0.0f, 800.0f, 600.0f, 0.0f, -0.1f, 100.0f);
+    setCameraPosition(0.0f, 0.0f);
     initalized = true;
 }
 void Renderer::setClearColor(float r, float g, float b){
@@ -97,4 +96,10 @@ void Renderer::drawImage(
 
 void Renderer::freeTexture(int id){
     textureStore.del(id);
+}
+
+void Renderer::setCameraPosition(float x, float y){
+    // intentionally flipped
+    cameraTransform = glm::ortho(0.0f, 800.0f, 600.0f, 0.0f, -0.1f, 100.0f);
+    cameraTransform = glm::translate(cameraTransform, glm::vec3(-x, -y, 0.0f));
 }

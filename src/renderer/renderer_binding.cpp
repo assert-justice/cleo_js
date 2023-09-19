@@ -43,6 +43,19 @@ static JSValue newJSTextureHandle(JSContext *ctx, int id, Texture* texture)
     return obj;
 }
 
+JSValue setCameraPositionBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
+    if(!engine.renderer.isInitialized()){
+        JS_ThrowReferenceError(ctx, "method referenced before initialization!");
+        return JS_EXCEPTION;
+    }
+    FnHelp help(ctx, argc, argv);
+    auto x = help.getFloat64();
+    auto y = help.getFloat64();
+    if(help.hasError) return JS_EXCEPTION;
+    engine.renderer.setCameraPosition(x, y);
+    return JS_UNDEFINED;
+}
+
 JSValue setClearColorBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
     if(!engine.renderer.isInitialized()){
         JS_ThrowReferenceError(ctx, "method referenced before initialization!");
@@ -138,6 +151,9 @@ int setRenderMod(JSContext* ctx, JSModuleDef* mod){
     name = "drawImage";
     fn = JS_NewCFunction(engine.vm.context, &setDrawImage, name.c_str(), 0);
     JS_SetModuleExport(engine.vm.context, mod, name.c_str(), fn);
+    name = "setCameraPosition";
+    fn = JS_NewCFunction(engine.vm.context, &setCameraPositionBind, name.c_str(), 0);
+    JS_SetModuleExport(engine.vm.context, mod, name.c_str(), fn);
     return 0;
 }
 
@@ -147,4 +163,5 @@ void bindRenderer(bool* hasError){
     JS_AddModuleExport(engine.vm.context, renderMod, "setClearColor");
     JS_AddModuleExport(engine.vm.context, renderMod, "loadImage");
     JS_AddModuleExport(engine.vm.context, renderMod, "drawImage");
+    JS_AddModuleExport(engine.vm.context, renderMod, "setCameraPosition");
 }

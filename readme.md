@@ -6,10 +6,13 @@ A game framework for JavaScript.
 
 ### Current
 
-- widow options including borderless fullscreen
+- camera control api
 
 ### Short Term
 
+- load js modules
+- refactor api with objects
+- widow options including borderless fullscreen
 - mouse input
 - gamepad buttons and axes
 - render targets
