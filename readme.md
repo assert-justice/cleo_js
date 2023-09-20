@@ -6,7 +6,7 @@ A game framework for JavaScript.
 
 ### Current
 
-- camera control api
+- render targets
 
 ### Short Term
 
@@ -15,7 +15,6 @@ A game framework for JavaScript.
 - widow options including borderless fullscreen
 - mouse input
 - gamepad buttons and axes
-- render targets
 - simple audio api
 - text rendering
 - working linux build
@@ -38,3 +37,5 @@ A game framework for JavaScript.
 - alternate rendering apis especially vulkan
 
 ### Completed
+
+- setCameraPosition

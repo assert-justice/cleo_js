@@ -7,12 +7,6 @@
 #include "shader.hpp"
 #include "texture.hpp"
 
-// typedef struct TextureData{
-//     unsigned int idx;
-//     unsigned int width;
-//     unsigned int height;
-// }TextureData;
-
 class Renderer{
     public:
     Renderer();
