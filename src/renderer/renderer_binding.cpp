@@ -14,7 +14,8 @@ static void jsTextureClassFinalizer(JSRuntime *rt, JSValue val)
 {
     JSTextureClass* s = (JSTextureClass*)JS_GetOpaque(val, jsTextureClassId);
     if (s) {
-        engine.renderer.freeTexture(s->id);
+        if(engine.renderer.isInitialized())
+            engine.renderer.freeTexture(s->id);
         // std::cout << "freed texture\n";
         js_free_rt(rt, s);
     }

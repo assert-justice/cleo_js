@@ -19,6 +19,7 @@ const float quad[] = {
 Renderer::Renderer(){}
 Renderer::~Renderer(){
     if(!initalized) return;
+    initalized = false;
     glDeleteVertexArrays(1, &VAO);
     glDeleteBuffers(1, &VBO);
 }

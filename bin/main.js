@@ -11,7 +11,7 @@ const player = {
 let spriteSheet = 0;
 setInit(()=>{
     // setClearColor(0,0,1);
-    // spriteSheet = loadImage('./characters_packed.png');
+    spriteSheet = loadImage('./characters_packed.png');
     // println(''+spriteSheet);
 });
 setUpdate((dt)=>{
@@ -20,6 +20,6 @@ setUpdate((dt)=>{
     if(getKey(262)) player.x += player.speed * dt;
     if(getKey(263)) player.x -= player.speed * dt;
     setCameraPosition(50, 50);
-    // drawImage(spriteSheet, player.x, player.y, 24*4, 24*4, 0, 0, 24, 24);
+    drawImage(spriteSheet, player.x, player.y, 24*4, 24*4, 0, 0, 24, 24);
     // drawImage(spriteSheet, 24*4, 0, 24*4, 24*4, 24*2, 0, 24, 24);
 });
