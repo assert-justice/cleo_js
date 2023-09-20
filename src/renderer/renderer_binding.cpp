@@ -71,7 +71,7 @@ JSValue setClearColorBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* ar
     return JS_UNDEFINED;
 }
 
-JSValue setLoadImage(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
+JSValue loadImageBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
     if(!engine.renderer.isInitialized()){
         JS_ThrowReferenceError(ctx, "method referenced before initialization!");
         return JS_EXCEPTION;
@@ -85,12 +85,11 @@ JSValue setLoadImage(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
         return JS_EXCEPTION;
     }
     auto texturePtr = engine.renderer.textureStore.get(textureId);
-    // auto res = JS_NewInt32(ctx, handle);
     auto res = newJSTextureHandle(ctx, textureId, texturePtr);
     return res;
 }
 
-JSValue setDrawImage(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
+JSValue drawImageBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
     if(!engine.renderer.isInitialized()){
         JS_ThrowReferenceError(ctx, "method referenced before initialization!");
         return JS_EXCEPTION;
@@ -98,18 +97,13 @@ JSValue setDrawImage(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
     FnHelp help(ctx, argc, argv);
     float x,y,width,height,sx,sy,sw,sh;
     auto handle = help.next();
+    if(help.hasError) return JS_EXCEPTION;
     auto s = (JSTextureClass*)JS_GetOpaque2(ctx, handle, jsTextureClassId);
     if(!s){
         JS_ThrowReferenceError(ctx, "invalid texture handle!");
         return JS_EXCEPTION;
     }
     auto tex = s->texture;
-    // if(help.hasError) return JS_EXCEPTION;
-    // if(!engine.renderer.textureStore.has(handle)){
-    //     JS_ThrowReferenceError(ctx, "invalid texture handle!");
-    //     return JS_EXCEPTION;
-    // }
-    // auto tex = engine.renderer.textureStore.get(handle);
     x = help.getFloat64();
     y = help.getFloat64();
     if(help.hasError) return JS_EXCEPTION;
@@ -117,40 +111,54 @@ JSValue setDrawImage(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
     height = help.hasArgs() ? help.getFloat64() : tex->height;
     sx = help.hasArgs() ? help.getFloat64() : 0; 
     sy = help.hasArgs() ? help.getFloat64() : 0;
-    sw = help.hasArgs() ? help.getFloat64() : width;
-    sh = help.hasArgs() ? help.getFloat64() : height;
+    sw = help.hasArgs() ? help.getFloat64() : tex->width;
+    sh = help.hasArgs() ? help.getFloat64() : tex->height;
     if(help.hasError) return JS_EXCEPTION;
     engine.renderer.drawImage(s->id, x,y,width,height,sx,sy,sw,sh);
     return JS_UNDEFINED;
 }
 
+JSValue setRenderTargetBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
+    if(!engine.renderer.isInitialized()){
+        JS_ThrowReferenceError(ctx, "method referenced before initialization!");
+        return JS_EXCEPTION;
+    }
+    if(argc == 0){
+        // reset render target
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        return JS_UNDEFINED;
+    }
+    FnHelp help(ctx, argc, argv);
+    auto handle = help.next();
+    if(help.hasError) return JS_EXCEPTION;
+    auto s = (JSTextureClass*)JS_GetOpaque2(ctx, handle, jsTextureClassId);
+    if(!s){
+        JS_ThrowReferenceError(ctx, "invalid texture handle!");
+        return JS_EXCEPTION;
+    }
+    s->texture->useTarget();
+    return JS_UNDEFINED;
+}
+
 int setRenderMod(JSContext* ctx, JSModuleDef* mod){
     JSValue proto;
-    /* FILE class */
     /* the class ID is created once */
     JS_NewClassID(&jsTextureClassId);
     /* the class is created once per runtime */
     JS_NewClass(JS_GetRuntime(ctx), jsTextureClassId, &jsTextureClassDef);
     proto = JS_NewObject(ctx);
-
-    // JS_SetPropertyFunctionList(ctx, proto, js_std_file_proto_funcs,
-    //                            countof(js_std_file_proto_funcs));
     JS_SetClassProto(ctx, jsTextureClassId, proto);
-
-    // JS_SetModuleExportList(ctx, m, js_std_funcs,
-    //                        countof(js_std_funcs));
-    // JS_SetModuleExport(ctx, m, "in", js_new_std_file(ctx, stdin, FALSE, FALSE));
-    // JS_SetModuleExport(ctx, m, "out", js_new_std_file(ctx, stdout, FALSE, FALSE));
-    // JS_SetModuleExport(ctx, m, "err", js_new_std_file(ctx, stderr, FALSE, FALSE));
-
     std::string name = "setClearColor";
     auto fn = JS_NewCFunction(engine.vm.context, &setClearColorBind, name.c_str(), 0);
     JS_SetModuleExport(engine.vm.context, mod, name.c_str(), fn);
     name = "loadImage";
-    fn = JS_NewCFunction(engine.vm.context, &setLoadImage, name.c_str(), 0);
+    fn = JS_NewCFunction(engine.vm.context, &loadImageBind, name.c_str(), 0);
     JS_SetModuleExport(engine.vm.context, mod, name.c_str(), fn);
     name = "drawImage";
-    fn = JS_NewCFunction(engine.vm.context, &setDrawImage, name.c_str(), 0);
+    fn = JS_NewCFunction(engine.vm.context, &drawImageBind, name.c_str(), 0);
+    JS_SetModuleExport(engine.vm.context, mod, name.c_str(), fn);
+    name = "setRenderTarget";
+    fn = JS_NewCFunction(engine.vm.context, &setRenderTargetBind, name.c_str(), 0);
     JS_SetModuleExport(engine.vm.context, mod, name.c_str(), fn);
     name = "setCameraPosition";
     fn = JS_NewCFunction(engine.vm.context, &setCameraPositionBind, name.c_str(), 0);
@@ -164,5 +172,6 @@ void bindRenderer(bool* hasError){
     JS_AddModuleExport(engine.vm.context, renderMod, "setClearColor");
     JS_AddModuleExport(engine.vm.context, renderMod, "loadImage");
     JS_AddModuleExport(engine.vm.context, renderMod, "drawImage");
+    JS_AddModuleExport(engine.vm.context, renderMod, "setRenderTarget");
     JS_AddModuleExport(engine.vm.context, renderMod, "setCameraPosition");
 }

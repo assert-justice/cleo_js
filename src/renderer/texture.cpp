@@ -27,5 +27,5 @@ void Texture::use(){
 }
 
 void Texture::useTarget(){
-    glBindFramebuffer(GL_TEXTURE_2D, frameBufferId);
+    glBindFramebuffer(GL_FRAMEBUFFER, frameBufferId);
 }
