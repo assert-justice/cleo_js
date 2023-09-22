@@ -1,5 +1,6 @@
 #include "texture.hpp"
 #include <glad/glad.h>
+#include <iostream>
 
 Texture::Texture(int width, int height, unsigned char* data = nullptr){
     this->width = width;
@@ -20,6 +21,7 @@ Texture::Texture(int width, int height, unsigned char* data = nullptr){
 
 Texture::~Texture(){
     glDeleteTextures(1, &textureId);
+    glDeleteFramebuffers(1, &frameBufferId);
 }
 
 void Texture::use(){
