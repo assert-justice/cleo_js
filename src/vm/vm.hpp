@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <vector>
 #include "quickjs.h"
 
 class VM{
@@ -13,6 +14,8 @@ class VM{
     void bind(bool* hasError, std::string src);
     void launch(bool* hasError);
     void update(double dt);
+    void addExport(std::string name, JSValue value);
+    std::vector<std::pair<std::string, JSValue>> exports;
 
     private:
     bool initialized = false;

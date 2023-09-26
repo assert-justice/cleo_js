@@ -129,3 +129,4 @@ bool isException(JSContext* context, JSValue val){
     return false;
 }
 
+void VM::addExport(std::string name, JSValue value){}
