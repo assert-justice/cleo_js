@@ -1,5 +1,6 @@
-import {Game, println} from 'cleo';
+import {Game, System} from 'cleo';
 
-Game.init = ()=>println("sup");
+Game.init = ()=>System.println("sup");
+// Game.init = ()=>println("sup: "+System.println);
 
-Game.update = ()=>println("yo");
+// Game.update = ()=>System.println("yo");

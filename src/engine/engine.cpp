@@ -5,6 +5,7 @@
 #include "window/window_binding.hpp"
 #include "utils/fs.hpp"
 #include "vm/bind_game.hpp"
+#include "vm/bind_system.hpp"
 #include <fstream>
 
 Engine::Engine(){
@@ -25,6 +26,7 @@ void Engine::init(){
     bindInput(&hasError);
     bindWindow(&hasError);
     bindGame(&hasError);
+    bindSystem(&hasError);
     auto src = readFile(&hasError, "./main.js");
     vm.bind(&hasError, src);
     window.init(&hasError);

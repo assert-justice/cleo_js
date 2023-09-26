@@ -38,6 +38,7 @@ set( CLEO-SRC
      src/renderer/texture.cpp
      # bindings
      src/vm/bind_game.cpp
+     src/vm/bind_system.cpp
      src/renderer/renderer_binding.cpp
      src/input/input_binding.cpp
      src/window/window_binding.cpp

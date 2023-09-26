@@ -28,13 +28,13 @@ JSModuleDef *jsModuleLoader(JSContext *ctx,
     return m;
 }
 
-JSValue printlnBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
-    FnHelp help(ctx, argc, argv);
-    auto str = help.getString();
-    if(help.hasError) return JS_EXCEPTION;
-    std::cout << str << std::endl;
-    return JS_UNDEFINED;
-}
+// JSValue printlnBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
+//     FnHelp help(ctx, argc, argv);
+//     auto str = help.getString();
+//     if(help.hasError) return JS_EXCEPTION;
+//     std::cout << str << std::endl;
+//     return JS_UNDEFINED;
+// }
 
 int setMainMod(JSContext* ctx, JSModuleDef* mod){
     for(auto it=engine.vm.exports.begin();it!=engine.vm.exports.end();it++) {
@@ -60,8 +60,8 @@ void VM::init(bool* hasError){
     context = JS_NewContext(runtime);
     JS_SetModuleLoaderFunc(runtime, NULL, jsModuleLoader, NULL);
     // JS_DefineProperty()
-    auto printlnFn = JS_NewCFunction(context, &printlnBind, "println", 0);
-    addExport("println", printlnFn);
+    // auto printlnFn = JS_NewCFunction(context, &printlnBind, "println", 0);
+    // addExport("println", printlnFn);
     // JS_FreeValue(context, printlnFn);
     initialized = true;
 }
