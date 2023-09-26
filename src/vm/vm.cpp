@@ -90,11 +90,13 @@ void VM::bind(bool* hasError, std::string src){
     else{*hasError = true;}
 }
 
-void VM::launch(){
-    if(!JS_IsUndefined(initFn)) {
-        auto val = JS_Call(context, initFn, JS_UNDEFINED, 0, NULL);
-        isException(context, val);
+void VM::launch(bool* hasError){
+    if(JS_IsUndefined(initFn)){
+        *hasError = true;
+        return;
     }
+    auto val = JS_Call(context, initFn, JS_UNDEFINED, 0, NULL);
+    if(isException(context, val)) *hasError = true;
 }
 
 void VM::update(double dt){

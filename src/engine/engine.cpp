@@ -28,7 +28,7 @@ void Engine::init(){
     window.init(&hasError);
     renderer.init(&hasError);
     if(hasError) return;
-    vm.launch();
+    vm.launch(&hasError);
     if(!hasError) loop();
     else running = false;
 }

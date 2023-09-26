@@ -11,7 +11,7 @@ class VM{
     ~VM();
     void init(bool* hasError);
     void bind(bool* hasError, std::string src);
-    void launch();
+    void launch(bool* hasError);
     void update(double dt);
 
     private:
