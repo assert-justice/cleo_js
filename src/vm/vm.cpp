@@ -53,6 +53,9 @@ JSValue printlnBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
 }
 
 int setMainMod(JSContext* ctx, JSModuleDef* mod){
+    for(auto it=engine.vm.exports.begin();it!=engine.vm.exports.end();it++) {
+        std::cout << "fffff\n";
+    }
     auto setInitFn = JS_NewCFunction(ctx, &setInitBind, "setInit", 0);
     JS_SetModuleExport(ctx, mod, "setInit", setInitFn);
     auto setUpdateFn = JS_NewCFunction(ctx, &setUpdateBind, "setUpdate", 0);
@@ -82,9 +85,9 @@ void VM::init(bool* hasError){
 void VM::bind(bool* hasError, std::string src){
     auto mainMod = JS_NewCModule(context, "cleo", &setMainMod);
     std::cout << "len: " << exports.size() << std::endl;
-    // for(auto it=.begin();it!=this->data.end();it++) {
-        //
-    // }
+    for(auto it=exports.begin();it!=exports.end();it++) {
+        std::cout << "grr\n";
+    }
     JS_AddModuleExport(context, mainMod, "setInit");
     JS_AddModuleExport(context, mainMod, "setUpdate");
     JS_AddModuleExport(context, mainMod, "println");
