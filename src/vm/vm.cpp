@@ -1,7 +1,32 @@
 #include "vm.hpp"
 #include <iostream>
 #include "../engine/engine.hpp"
+#include "utils/fs.hpp"
 #include "fn_help.hpp"
+
+JSModuleDef *jsModuleLoader(JSContext *ctx,
+                              const char *module_name, void *opaque)
+{
+    JSModuleDef *m;
+    bool hasError = false;
+    auto src = readFile(&hasError, module_name);
+    if(hasError){
+        JS_ThrowReferenceError(ctx, "could not load module filename '%s'",
+                                   module_name);
+            return NULL;
+    }
+    JSValue func_val = JS_Eval(ctx, src.c_str(), src.length(), module_name, 
+        JS_EVAL_TYPE_MODULE | JS_EVAL_FLAG_COMPILE_ONLY);
+    /* compile the module */
+    if (JS_IsException(func_val))
+        return NULL;
+    /* XXX: could propagate the exception */
+    // js_module_set_import_meta(ctx, func_val, TRUE, FALSE);
+    /* the module is already referenced, so we must free it */
+    m = (JSModuleDef*)JS_VALUE_GET_PTR(func_val);
+    JS_FreeValue(ctx, func_val);
+    return m;
+}
 
 JSValue setInitBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
     FnHelp help(ctx, argc, argv);
@@ -49,6 +74,7 @@ void VM::init(bool* hasError){
     if(*hasError) return;
     runtime = JS_NewRuntime();
     context = JS_NewContext(runtime);
+    JS_SetModuleLoaderFunc(runtime, NULL, jsModuleLoader, NULL);
     initialized = true;
 }
 
@@ -96,3 +122,4 @@ bool isException(JSContext* context, JSValue val){
     }
     return false;
 }
+

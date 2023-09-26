@@ -2,6 +2,7 @@ import{setInit,setUpdate,println} from 'cleo';
 import {setClearColor, loadImage, drawImage, setCameraPosition, setRenderTarget} from 'cleo-renderer';
 import {getKey} from 'cleo-input';
 import {quit} from 'cleo-window'
+import {message} from './greet.js';
 // println('yo');
 const player = {
     x: 0,
@@ -17,7 +18,7 @@ setInit(()=>{
     setRenderTarget(spriteSheet);
     drawImage(spr, 24, 24*2, 24*2, 24*2);
     setRenderTarget();
-    // println(''+spriteSheet);
+    println(message);
 });
 setUpdate((dt)=>{
     if(getKey(256)) quit();
