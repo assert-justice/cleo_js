@@ -54,7 +54,6 @@ JSValue printlnBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
 
 int setMainMod(JSContext* ctx, JSModuleDef* mod){
     for(auto it=engine.vm.exports.begin();it!=engine.vm.exports.end();it++) {
-        std::cout << "fffff\n";
         JS_SetModuleExport(ctx, mod, 
             it.base()->first.c_str(), 
             it.base()->second);
@@ -63,8 +62,8 @@ int setMainMod(JSContext* ctx, JSModuleDef* mod){
     JS_SetModuleExport(ctx, mod, "setInit", setInitFn);
     auto setUpdateFn = JS_NewCFunction(ctx, &setUpdateBind, "setUpdate", 0);
     JS_SetModuleExport(ctx, mod, "setUpdate", setUpdateFn);
-    auto printlnFn = JS_NewCFunction(ctx, &printlnBind, "println", 0);
-    JS_SetModuleExport(ctx, mod, "println", printlnFn);
+    // auto printlnFn = JS_NewCFunction(ctx, &printlnBind, "println", 0);
+    // JS_SetModuleExport(ctx, mod, "println", printlnFn);
     return 0;
 }
 
@@ -82,6 +81,9 @@ void VM::init(bool* hasError){
     context = JS_NewContext(runtime);
     JS_SetModuleLoaderFunc(runtime, NULL, jsModuleLoader, NULL);
     // JS_DefineProperty()
+    auto printlnFn = JS_NewCFunction(context, &printlnBind, "println", 0);
+    addExport("println", printlnFn);
+    // JS_FreeValue(context, printlnFn);
     initialized = true;
 }
 
@@ -89,12 +91,11 @@ void VM::bind(bool* hasError, std::string src){
     auto mainMod = JS_NewCModule(context, "cleo", &setMainMod);
     std::cout << "len: " << exports.size() << std::endl;
     for(auto it=exports.begin();it!=exports.end();it++) {
-        std::cout << "grr\n";
         JS_AddModuleExport(context, mainMod, it.base()->first.c_str());
     }
     JS_AddModuleExport(context, mainMod, "setInit");
     JS_AddModuleExport(context, mainMod, "setUpdate");
-    JS_AddModuleExport(context, mainMod, "println");
+    // JS_AddModuleExport(context, mainMod, "println");
     auto val = JS_Eval(context, src.c_str(), src.size(), "main", JS_EVAL_TYPE_MODULE);
     if(!isException(context, val)) JS_FreeValue(context, val);
     else{*hasError = true;}
@@ -139,4 +140,6 @@ bool isException(JSContext* context, JSValue val){
     return false;
 }
 
-void VM::addExport(std::string name, JSValue value){}
+void VM::addExport(std::string name, JSValue value){
+    exports.push_back(std::pair<std::string, JSValue>(name, value));
+}
