@@ -4,14 +4,18 @@ A game framework for JavaScript.
 
 ## Todo
 
+### Completed
+
+- setCameraPosition
+- render targets
+- load js modules
+
 ### Current
 
-- render targets
+- refactor api with objects
 
 ### Short Term
 
-- load js modules
-- refactor api with objects
 - widow options including borderless fullscreen
 - mouse input
 - gamepad buttons and axes
@@ -35,7 +39,3 @@ A game framework for JavaScript.
 - dll based generic api
 - in engine editors
 - alternate rendering apis especially vulkan
-
-### Completed
-
-- setCameraPosition

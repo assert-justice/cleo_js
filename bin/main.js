@@ -1,4 +1,5 @@
-import{setInit,setUpdate,println} from 'cleo';
+import{setInit,setUpdate} from 'cleo';
+// import{println} from 'cleo';
 import {setClearColor, loadImage, drawImage, setCameraPosition, setRenderTarget} from 'cleo-renderer';
 import {getKey} from 'cleo-input';
 import {quit} from 'cleo-window'
@@ -18,10 +19,10 @@ setInit(()=>{
     setRenderTarget(spriteSheet);
     drawImage(spr, 24, 24*2, 24*2, 24*2);
     setRenderTarget();
-    spr.width = 10;
-    println('width ' + spr.width);
-    println('height ' + spr.height);
-    println(JSON.stringify({test:"hope"}));
+    // spr.width = 10;
+    // println('width ' + spr.width);
+    // println('height ' + spr.height);
+    // println(JSON.stringify({test:"hope"}));
 });
 setUpdate((dt)=>{
     if(getKey(256)) quit();
