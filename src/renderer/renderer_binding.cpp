@@ -124,12 +124,6 @@ JSValue setRenderTargetBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* 
         return JS_EXCEPTION;
     }
     if(argc == 0){
-        // reset render target
-        // engine.renderer.camWidth = 800;
-        // engine.renderer.camHeight = 600;
-        //     engine.renderer.setCameraPosition(0, 0);
-
-        // glBindFramebuffer(GL_FRAMEBUFFER, 0);
         engine.renderer.setTarget(nullptr);
         return JS_UNDEFINED;
     }
@@ -141,24 +135,56 @@ JSValue setRenderTargetBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* 
         JS_ThrowReferenceError(ctx, "invalid texture handle!");
         return JS_EXCEPTION;
     }
-    // engine.renderer.camWidth = s->texture->width;
-    // engine.renderer.camHeight = s->texture->height;
-    // s->texture->useTarget();
-    // engine.renderer.setCameraPosition(0, 0);
     engine.renderer.setTarget(s->texture);
     return JS_UNDEFINED;
 }
 
+JSValue getTextureWidthBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
+    if(!engine.renderer.isInitialized()){
+        JS_ThrowReferenceError(ctx, "method referenced before initialization!");
+        return JS_EXCEPTION;
+    }
+    auto s = (JSTextureClass*)JS_GetOpaque2(ctx, thisVal, jsTextureClassId);
+    if(!s){
+        JS_ThrowReferenceError(ctx, "invalid texture handle!");
+        return JS_EXCEPTION;
+    }
+    auto val = JS_NewFloat64(ctx, s->texture->width);
+    return val;
+}
+JSValue getTextureHeightBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
+    if(!engine.renderer.isInitialized()){
+        JS_ThrowReferenceError(ctx, "method referenced before initialization!");
+        return JS_EXCEPTION;
+    }
+    auto s = (JSTextureClass*)JS_GetOpaque2(ctx, thisVal, jsTextureClassId);
+    if(!s){
+        JS_ThrowReferenceError(ctx, "invalid texture handle!");
+        return JS_EXCEPTION;
+    }
+    auto val = JS_NewFloat64(ctx, s->texture->height);
+    return val;
+}
+
 int setRenderMod(JSContext* ctx, JSModuleDef* mod){
     JSValue proto;
+    JSValue fn;
     /* the class ID is created once */
     JS_NewClassID(&jsTextureClassId);
     /* the class is created once per runtime */
     JS_NewClass(JS_GetRuntime(ctx), jsTextureClassId, &jsTextureClassDef);
     proto = JS_NewObject(ctx);
     JS_SetClassProto(ctx, jsTextureClassId, proto);
+    fn = JS_NewCFunction(ctx, &getTextureWidthBind, "getTextureWidth", 0);
+    JS_DefineProperty(ctx, proto, JS_NewAtom(ctx, "width"), 
+        JS_UNDEFINED, fn, JS_UNDEFINED, JS_PROP_HAS_GET);
+    JS_FreeValue(ctx, fn);
+    fn = JS_NewCFunction(ctx, &getTextureWidthBind, "getTextureHeight", 0);
+    JS_DefineProperty(ctx, proto, JS_NewAtom(ctx, "height"), 
+        JS_UNDEFINED, fn, JS_UNDEFINED, JS_PROP_HAS_GET);
+    JS_FreeValue(ctx, fn);
     std::string name = "setClearColor";
-    auto fn = JS_NewCFunction(engine.vm.context, &setClearColorBind, name.c_str(), 0);
+    fn = JS_NewCFunction(engine.vm.context, &setClearColorBind, name.c_str(), 0);
     JS_SetModuleExport(engine.vm.context, mod, name.c_str(), fn);
     name = "loadImage";
     fn = JS_NewCFunction(engine.vm.context, &loadImageBind, name.c_str(), 0);

@@ -18,7 +18,10 @@ setInit(()=>{
     setRenderTarget(spriteSheet);
     drawImage(spr, 24, 24*2, 24*2, 24*2);
     setRenderTarget();
-    println(message);
+    spr.width = 10;
+    println('width ' + spr.width);
+    println('height ' + spr.height);
+    println(JSON.stringify({test:"hope"}));
 });
 setUpdate((dt)=>{
     if(getKey(256)) quit();

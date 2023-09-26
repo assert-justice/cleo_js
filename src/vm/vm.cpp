@@ -75,6 +75,7 @@ void VM::init(bool* hasError){
     runtime = JS_NewRuntime();
     context = JS_NewContext(runtime);
     JS_SetModuleLoaderFunc(runtime, NULL, jsModuleLoader, NULL);
+    // JS_DefineProperty()
     initialized = true;
 }
 
@@ -84,13 +85,16 @@ void VM::bind(bool* hasError, std::string src){
     JS_AddModuleExport(context, mainMod, "setInit");
     JS_AddModuleExport(context, mainMod, "setUpdate");
     JS_AddModuleExport(context, mainMod, "println");
-    auto val = JS_Eval(context, src.c_str(), src.size(), "temp", JS_EVAL_TYPE_MODULE);
+    auto val = JS_Eval(context, src.c_str(), src.size(), "main", JS_EVAL_TYPE_MODULE);
     if(!isException(context, val)) JS_FreeValue(context, val);
     else{*hasError = true;}
 }
 
 void VM::launch(){
-    if(!JS_IsUndefined(initFn)) JS_Call(context, initFn, JS_UNDEFINED, 0, NULL);
+    if(!JS_IsUndefined(initFn)) {
+        auto val = JS_Call(context, initFn, JS_UNDEFINED, 0, NULL);
+        isException(context, val);
+    }
 }
 
 void VM::update(double dt){
