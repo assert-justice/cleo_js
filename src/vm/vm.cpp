@@ -81,7 +81,10 @@ void VM::init(bool* hasError){
 
 void VM::bind(bool* hasError, std::string src){
     auto mainMod = JS_NewCModule(context, "cleo", &setMainMod);
-    // JS_seto
+    std::cout << "len: " << exports.size() << std::endl;
+    // for(auto it=.begin();it!=this->data.end();it++) {
+        //
+    // }
     JS_AddModuleExport(context, mainMod, "setInit");
     JS_AddModuleExport(context, mainMod, "setUpdate");
     JS_AddModuleExport(context, mainMod, "println");

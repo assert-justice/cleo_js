@@ -5,9 +5,9 @@ template <typename T>
 class Store{
     public:
     ~Store(){
-        for(auto it=data.begin();it!=this->data.end();it++) {
-        delete it->second; 
-    }
+        for(auto it=data.begin();it!=data.end();it++) {
+            delete it->second; 
+        }
     }
     int add(T* ptr){
         data.insert(std::make_pair(idCount, ptr));
