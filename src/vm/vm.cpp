@@ -28,22 +28,6 @@ JSModuleDef *jsModuleLoader(JSContext *ctx,
     return m;
 }
 
-JSValue setInitBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
-    FnHelp help(ctx, argc, argv);
-    auto fn = help.getFunction();
-    engine.vm.initFn = JS_DupValue(ctx, fn);
-    if(help.hasError) return JS_EXCEPTION;
-    return JS_UNDEFINED;
-}
-
-JSValue setUpdateBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
-    FnHelp help(ctx, argc, argv);
-    auto fn = help.getFunction();
-    engine.vm.updateFn = JS_DupValue(ctx, fn);
-    if(help.hasError) return JS_EXCEPTION;
-    return JS_UNDEFINED;
-}
-
 JSValue printlnBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
     FnHelp help(ctx, argc, argv);
     auto str = help.getString();
@@ -54,16 +38,11 @@ JSValue printlnBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
 
 int setMainMod(JSContext* ctx, JSModuleDef* mod){
     for(auto it=engine.vm.exports.begin();it!=engine.vm.exports.end();it++) {
+        // std::cout << "grrr\n";
         JS_SetModuleExport(ctx, mod, 
             it.base()->first.c_str(), 
             it.base()->second);
     }
-    auto setInitFn = JS_NewCFunction(ctx, &setInitBind, "setInit", 0);
-    JS_SetModuleExport(ctx, mod, "setInit", setInitFn);
-    auto setUpdateFn = JS_NewCFunction(ctx, &setUpdateBind, "setUpdate", 0);
-    JS_SetModuleExport(ctx, mod, "setUpdate", setUpdateFn);
-    // auto printlnFn = JS_NewCFunction(ctx, &printlnBind, "println", 0);
-    // JS_SetModuleExport(ctx, mod, "println", printlnFn);
     return 0;
 }
 
@@ -93,19 +72,17 @@ void VM::bind(bool* hasError, std::string src){
     for(auto it=exports.begin();it!=exports.end();it++) {
         JS_AddModuleExport(context, mainMod, it.base()->first.c_str());
     }
-    JS_AddModuleExport(context, mainMod, "setInit");
-    JS_AddModuleExport(context, mainMod, "setUpdate");
-    // JS_AddModuleExport(context, mainMod, "println");
     auto val = JS_Eval(context, src.c_str(), src.size(), "main", JS_EVAL_TYPE_MODULE);
     if(!isException(context, val)) JS_FreeValue(context, val);
     else{*hasError = true;}
 }
 
 void VM::launch(bool* hasError){
-    if(JS_IsUndefined(initFn)){
-        *hasError = true;
-        return;
-    }
+    // not having an init function is fine actually
+    // if(JS_IsUndefined(initFn)){
+    //     *hasError = true;
+    //     return;
+    // }
     auto val = JS_Call(context, initFn, JS_UNDEFINED, 0, NULL);
     if(isException(context, val)) *hasError = true;
 }
