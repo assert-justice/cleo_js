@@ -6,7 +6,8 @@ class Texture{
     unsigned int frameBufferId;
     int width;
     int height;
-    Texture(int width, int height, unsigned char* data);
+    float camX, camY;
+    Texture(int width, int height, unsigned char* data = nullptr, int channels = 4);
     ~Texture();
     void use();
     void useTarget();

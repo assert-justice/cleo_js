@@ -5,6 +5,7 @@
 #include <GLFW/glfw3.h>
 #include "utils/fs.hpp"
 #include "stb_image.h"
+#include "engine/engine.hpp"
 
 const float quad[] = {
     1.0f, 1.0f, 0.0f,     1.0f, 1.0f, // top right
@@ -22,6 +23,8 @@ Renderer::~Renderer(){
     initalized = false;
     glDeleteVertexArrays(1, &VAO);
     glDeleteBuffers(1, &VBO);
+    glDeleteFramebuffers(1, &fbo); 
+    glDeleteTextures(1, &fbt);
 }
 void Renderer::init(bool* hasError){
     if(*hasError) return;
@@ -45,6 +48,18 @@ void Renderer::init(bool* hasError){
     glVertexAttribPointer(textureLoc, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(textureLoc);
     setCameraPosition(0.0f, 0.0f);
+
+    glGenFramebuffers(1, &fbo);
+    glBindFramebuffer(GL_FRAMEBUFFER, fbo);   
+    glGenTextures(1, &fbt);
+    glBindTexture(GL_TEXTURE_2D, fbt);
+    
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 800, 600, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);  
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, fbt, 0); 
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
     initalized = true;
 }
 void Renderer::setClearColor(float r, float g, float b){
@@ -52,7 +67,25 @@ void Renderer::setClearColor(float r, float g, float b){
 }
 void Renderer::update(){
     /* Render here */
+    // glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glClear(GL_COLOR_BUFFER_BIT);
+    // glUseProgram(imageShader.id);
+    // glBindTexture(GL_TEXTURE_2D, fbt);
+    // glBindVertexArray(VAO);
+    // unsigned int cameraLoc = glGetUniformLocation(imageShader.id, "camera");
+    // glUniformMatrix4fv(cameraLoc, 1, GL_FALSE, glm::value_ptr(cameraTransform));
+    // unsigned int spriteLoc = glGetUniformLocation(imageShader.id, "sprite");
+    // glm::mat4 spriteTransform = glm::mat4(1.0f);
+    // // spriteTransform = glm::translate(spriteTransform, glm::vec3(x, y, 0.0f));
+    // spriteTransform = glm::scale(spriteTransform, glm::vec3(800, 600, 0.0f));
+    
+    // glUniformMatrix4fv(spriteLoc, 1, GL_FALSE, glm::value_ptrglBindFramebuffer(GL_FRAMEBUFFER, 0)ader.id, "dimensions");
+    // // glUniform4fv(dimensionsLoc, 1, glm::value_ptr(
+    // //     glm::vec4(sx/tex->width, sy/tex->height, sw/tex->width, sh/tex->height))
+    // // );
+    // glDrawArrays(GL_TRIANGLES, 0, 6);
+    // glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+    
 }
 bool Renderer::isInitialized(){
     return initalized;
@@ -101,6 +134,22 @@ void Renderer::freeTexture(int id){
 
 void Renderer::setCameraPosition(float x, float y){
     // intentionally flipped
-    cameraTransform = glm::ortho(0.0f, 800.0f, 600.0f, 0.0f, -0.1f, 100.0f);
+    float top = engine.window.height;
+    float bottom = 0.0f;
+    if(target != nullptr){
+        bottom = top;
+        top = 0.0f;
+    }
+    // cameraTransform = glm::ortho(0.0f, camWidth, camHeight, 0.0f, -0.1f, 100.0f);
+    cameraTransform = glm::ortho(0.0f, engine.window.width, top, bottom, -0.1f, 100.0f);
     cameraTransform = glm::translate(cameraTransform, glm::vec3(-x, -y, 0.0f));
+}
+
+void Renderer::setTarget(Texture* target){
+    this->target = target;
+    if(target == nullptr) glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    else{
+        target->useTarget();
+    }
+    setCameraPosition(0, 0);
 }

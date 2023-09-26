@@ -9,12 +9,13 @@ const player = {
     speed: 100,
 };
 let spriteSheet = 0;
+let spr = 0;
 setInit(()=>{
     // setClearColor(0,0,1);
     spriteSheet = loadImage('./characters_packed.png');
-    const spr = loadImage('./character_0000.png');
+    spr = loadImage('./character_0000.png');
     setRenderTarget(spriteSheet);
-    drawImage(spr, 0, 0, 24*4, 24*4);
+    drawImage(spr, 24, 24*2, 24*2, 24*2);
     setRenderTarget();
     // println(''+spriteSheet);
 });

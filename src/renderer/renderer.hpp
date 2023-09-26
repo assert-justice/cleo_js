@@ -23,10 +23,15 @@ class Renderer{
         float x, float y, float width, float height,
         float sx, float sy, float sw, float sh);
     void setCameraPosition(float x, float y);
+    void setTarget(Texture* target);
     Store<Texture> textureStore;
+    float camWidth = 800;
+    float camHeight = 600;
+    Texture* target = nullptr;
     private:
     Shader imageShader;
     bool initalized = false;
     unsigned int VBO, VAO;
+    unsigned int fbo, fbt;
     glm::mat4 cameraTransform;
 };

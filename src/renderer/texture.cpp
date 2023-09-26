@@ -2,7 +2,7 @@
 #include <glad/glad.h>
 #include <iostream>
 
-Texture::Texture(int width, int height, unsigned char* data = nullptr){
+Texture::Texture(int width, int height, unsigned char* data, int channels){
     this->width = width;
     this->height = height;
     glGenFramebuffers(1, &frameBufferId);

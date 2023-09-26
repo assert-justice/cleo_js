@@ -125,7 +125,12 @@ JSValue setRenderTargetBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* 
     }
     if(argc == 0){
         // reset render target
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        // engine.renderer.camWidth = 800;
+        // engine.renderer.camHeight = 600;
+        //     engine.renderer.setCameraPosition(0, 0);
+
+        // glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        engine.renderer.setTarget(nullptr);
         return JS_UNDEFINED;
     }
     FnHelp help(ctx, argc, argv);
@@ -136,7 +141,11 @@ JSValue setRenderTargetBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* 
         JS_ThrowReferenceError(ctx, "invalid texture handle!");
         return JS_EXCEPTION;
     }
-    s->texture->useTarget();
+    // engine.renderer.camWidth = s->texture->width;
+    // engine.renderer.camHeight = s->texture->height;
+    // s->texture->useTarget();
+    // engine.renderer.setCameraPosition(0, 0);
+    engine.renderer.setTarget(s->texture);
     return JS_UNDEFINED;
 }
 
