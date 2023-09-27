@@ -146,6 +146,7 @@ static JSValue drawImageBind(JSContext* ctx, JSValue thisVal, int argc, JSValue*
     originY = objHelp.getNumber("originY", 0.0);
     angle = objHelp.getNumber("angle", 0.0);
     if(objHelp.hasError) return JS_EXCEPTION;
+    // calculate sprite transform
     // scale, offset, scale2, rotate, move
     // have to do it in reverse because matrix math is Like That
     glm::mat4 spriteTransform = glm::mat4(1.0f);
@@ -155,7 +156,13 @@ static JSValue drawImageBind(JSContext* ctx, JSValue thisVal, int argc, JSValue*
     spriteTransform = glm::translate(spriteTransform, glm::vec3(-originX, -originY, 0.0f));
     spriteTransform = glm::scale(spriteTransform, glm::vec3(tex->width,tex->height, 0.0f));
 
-    engine.renderer.drawImage(s->id,spriteTransform,sx,sy,sw,sh);
+    // calculate texture coord transform
+    // scale, translate
+    glm::mat4 coordTransform = glm::mat4(1.0f);
+    coordTransform = glm::translate(coordTransform, glm::vec3(glm::vec3(sx/tex->width, sy/tex->height, 0.0)));
+    coordTransform = glm::scale(coordTransform, glm::vec3(sw/tex->width, sh/tex->height, 0.0));
+
+    engine.renderer.drawImage(s->id,spriteTransform,coordTransform);
     return JS_UNDEFINED;
 }
 

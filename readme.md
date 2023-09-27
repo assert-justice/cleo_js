@@ -9,17 +9,18 @@ A game framework for JavaScript.
 - setCameraPosition
 - render targets
 - load js modules
+- refactor api with objects
 
 ### Current
 
-- refactor api with objects
+- simple audio api
 
 ### Short Term
 
 - widow options including borderless fullscreen
 - mouse input
 - gamepad buttons and axes
-- simple audio api
+- add sprite/texture distinction to api
 - text rendering
 - working linux build
 - example game (top down shooter probably)

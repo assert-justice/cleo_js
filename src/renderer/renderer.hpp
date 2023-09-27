@@ -22,12 +22,8 @@ class Renderer{
     void drawImage(
         int textureId,
         glm::mat4 spriteTransform,
-        float sx, float sy, float sw, float sh
+        glm::mat4 coordTransform
     );
-    // void drawImage(
-    //     int textureId, 
-    //     float x, float y, float width, float height,
-    //     float sx, float sy, float sw, float sh);
     void setCameraPosition(float x, float y);
     void setTarget(Texture* target);
     Store<Texture> textureStore;

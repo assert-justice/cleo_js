@@ -107,8 +107,7 @@ int Renderer::loadImage(const char* path){
     return id;
 }
 
-void Renderer::drawImage(int textureId,glm::mat4 spriteTransform,
-        float sx, float sy, float sw, float sh){
+void Renderer::drawImage(int textureId, glm::mat4 spriteTransform, glm::mat4 coordTransform){
     glUseProgram(imageShader.id);
     auto tex = textureStore.get(textureId);
     tex->use();
@@ -117,10 +116,6 @@ void Renderer::drawImage(int textureId,glm::mat4 spriteTransform,
     glUniformMatrix4fv(cameraLoc, 1, GL_FALSE, glm::value_ptr(cameraTransform));
     unsigned int spriteLoc = glGetUniformLocation(imageShader.id, "sprite");
     glUniformMatrix4fv(spriteLoc, 1, GL_FALSE, glm::value_ptr(spriteTransform));
-    // scale, translate
-    glm::mat4 coordTransform = glm::mat4(1.0f);
-    coordTransform = glm::translate(coordTransform, glm::vec3(glm::vec3(sx/tex->width, sy/tex->height, 0.0)));
-    coordTransform = glm::scale(coordTransform, glm::vec3(sw/tex->width, sh/tex->height, 0.0));
     unsigned int coordLoc = glGetUniformLocation(imageShader.id, "coord");
     glUniformMatrix4fv(coordLoc, 1, GL_FALSE, glm::value_ptr(coordTransform));
     // spriteTransform = glm::translate(spriteTransform, glm::vec3(x, y, 0.0f));
