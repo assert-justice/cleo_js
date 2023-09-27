@@ -78,7 +78,7 @@ void VM::init(bool* hasError){
 
 void VM::bind(bool* hasError, std::string src){
     auto mainMod = JS_NewCModule(context, "cleo", &setMainMod);
-    std::cout << "len: " << exports.size() << std::endl;
+    // std::cout << "len: " << exports.size() << std::endl;
     for(auto it=exports.begin();it!=exports.end();it++) {
         JS_AddModuleExport(context, mainMod, it.base()->first.c_str());
     }

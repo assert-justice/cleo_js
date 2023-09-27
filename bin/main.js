@@ -6,8 +6,8 @@ Game.init = ()=>{
     // System.println(''+Texture);
     // tex = Texture.fromFile('characters_packed.png');
     tex = Texture.new(200,100);
-    System.println(''+tex.width);
-    System.println(''+tex.height);
+    System.println('tex width:', tex.width);
+    System.println('tex height:', tex.height);
     // System.println(''+Window.width);
     // System.println(''+Window.height);
     // Graphics.setClearColor(1,0,0);
