@@ -107,19 +107,29 @@ static JSValue textureFromFileBind(JSContext* ctx, JSValue thisVal, int argc, JS
     return res;
 }
 
+static JSValue textureConstructorBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
+    if(JS_IsException(rendererInitalized(ctx))) return JS_EXCEPTION;
+    FnHelp help(ctx, argc, argv);
+    auto width = help.getFloat64();
+    auto height = help.getFloat64();
+    if(help.hasError) return JS_EXCEPTION;
+    auto textureId = engine.renderer.newTexture(width, height, NULL);
+    // auto textureId = engine.renderer.loadImage(path.c_str());
+    if(textureId == -1){
+        JS_ThrowReferenceError(ctx, "unable to load image at path!");
+        return JS_EXCEPTION;
+    }
+    auto texturePtr = engine.renderer.textureStore.get(textureId);
+    auto res = newJSTextureHandle(ctx, textureId, texturePtr);
+    return res;
+}
+
 static JSValue drawImageBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
     if(JS_IsException(rendererInitalized(ctx))) return JS_EXCEPTION;
     auto s = getTexture(thisVal);
     if(!s) return JS_EXCEPTION;
     FnHelp help(ctx, argc, argv);
     float x,y,width,height,sx,sy,sw,sh;
-    // auto handle = help.next();
-    // if(help.hasError) return JS_EXCEPTION;
-    // auto s = (JSTextureClass*)JS_GetOpaque2(ctx, handle, jsTextureClassId);
-    // if(!s){
-    //     JS_ThrowReferenceError(ctx, "invalid texture handle!");
-    //     return JS_EXCEPTION;
-    // }
     auto tex = s->texture;
     x = help.getFloat64();
     y = help.getFloat64();
@@ -150,10 +160,7 @@ void bindGraphics(){
     JS_SetClassProto(ctx, jsTextureClassId, textureProto);
     // static fromFile(path: string)
     fn = JS_NewCFunction(ctx, &textureFromFileBind, "fromFile", 0);
-    JS_DefinePropertyValueStr(ctx, textureProto, "fromFile", fn, JS_PROP_VARREF);
-    // draw()
-    fn = JS_NewCFunction(ctx, &drawImageBind, "drawImage", 0);
-    JS_DefinePropertyValueStr(ctx, textureProto, "draw", fn, JS_PROP_VARREF);
+    JS_DefinePropertyValueStr(ctx, textureProto, "fromFile", fn, 0);
     // get width: number
     fn = JS_NewCFunction(ctx, &getTextureWidthBind, "getTextureWidth", 0);
     JS_DefineProperty(ctx, textureProto, JS_NewAtom(ctx, "width"), 
@@ -164,9 +171,21 @@ void bindGraphics(){
     JS_DefineProperty(ctx, textureProto, JS_NewAtom(ctx, "height"), 
         JS_UNDEFINED, fn, JS_UNDEFINED, JS_PROP_HAS_GET);
     JS_FreeValue(ctx, fn);
+    // draw()
+    fn = JS_NewCFunction(ctx, &drawImageBind, "drawImage", 0);
+    JS_DefinePropertyValueStr(ctx, textureProto, "draw", fn, 0);
+    // constructor(width, height)
+    // not working, getting 'not a constructor' error for some reason
+    // fn = JS_NewCFunction(ctx, &textureConstructorBind, "textureConstructor", 0);
+    // JS_SetConstructorBit(ctx, fn, true);
+    // JS_SetConstructor(ctx, fn, textureProto);
+    // JS_FreeValue(ctx, fn);
+    // new(with: number, height: number)
+    fn = JS_NewCFunction(ctx, &textureConstructorBind, "textureConstructor", 0);
+    JS_DefinePropertyValueStr(ctx, textureProto, "new", fn, 0);
     // setting the class prototype consumes the prototype object so we need to reacquire it
     textureProto = JS_GetClassProto(ctx, jsTextureClassId);
-    JS_DefinePropertyValueStr(ctx, proto, "Texture", textureProto, JS_PROP_VARREF);
+    JS_DefinePropertyValueStr(ctx, proto, "Texture", textureProto, 0);
     // setClearColor
     fn = JS_NewCFunction(ctx, &setClearColorBind, "setClearColor", 0);
     JS_DefinePropertyValueStr(ctx, proto, "setClearColor", fn, 0);

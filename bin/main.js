@@ -4,7 +4,8 @@ const {Texture} = Graphics;
 let tex;
 Game.init = ()=>{
     // System.println(''+Texture);
-    tex = Texture.fromFile('characters_packed.png');
+    // tex = Texture.fromFile('characters_packed.png');
+    tex = Texture.new(200,100);
     System.println(''+tex.width);
     System.println(''+tex.height);
     // System.println(''+Window.width);
