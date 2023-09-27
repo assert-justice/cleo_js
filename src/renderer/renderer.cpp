@@ -154,5 +154,4 @@ void Renderer::setTarget(Texture* target){
     else{
         target->useTarget();
     }
-    setCameraPosition(0, 0);
 }

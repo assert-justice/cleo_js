@@ -1,6 +1,5 @@
 #include "engine.hpp"
 #include <iostream>
-#include "renderer/renderer_binding.hpp"
 #include "utils/fs.hpp"
 #include "vm/bind_game.hpp"
 #include "vm/bind_system.hpp"
@@ -21,11 +20,6 @@ Engine::~Engine(){
 void Engine::init(){
     bool hasError = false;
     vm.init(&hasError);
-    bindRenderer(&hasError);
-    // bindWindow(&hasError);
-    // bindInput(&hasError);
-    // bindGame(&hasError);
-    // bindSystem(&hasError);
     auto src = readFile(&hasError, "./main.js");
     vm.bind(&hasError, src);
     window.init(&hasError);
