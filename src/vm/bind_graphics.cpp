@@ -130,7 +130,7 @@ static JSValue drawImageBind(JSContext* ctx, JSValue thisVal, int argc, JSValue*
     auto s = getTexture(thisVal);
     if(!s) return JS_EXCEPTION;
     FnHelp help(ctx, argc, argv);
-    float x,y,scaleX,scaleY,sx,sy,sw,sh;
+    float x,y,scaleX,scaleY,sx,sy,sw,sh,originX, originY, angle;
     auto tex = s->texture;
     x = help.getFloat64();
     y = help.getFloat64();
@@ -142,20 +142,20 @@ static JSValue drawImageBind(JSContext* ctx, JSValue thisVal, int argc, JSValue*
     sy = objHelp.getNumber("sy", 0.0);
     sw = objHelp.getNumber("sw", tex->width);
     sh = objHelp.getNumber("sh", tex->height);
+    originX = objHelp.getNumber("originX", 0.0);
+    originY = objHelp.getNumber("originY", 0.0);
+    angle = objHelp.getNumber("angle", 0.0);
+    if(objHelp.hasError) return JS_EXCEPTION;
+    // scale, offset, scale2, rotate, move
+    // have to do it in reverse because matrix math is Like That
     glm::mat4 spriteTransform = glm::mat4(1.0f);
     spriteTransform = glm::translate(spriteTransform, glm::vec3(x, y, 0.0f));
-    spriteTransform = glm::scale(spriteTransform, glm::vec3(tex->width * scaleX,tex->height * scaleY, 0.0f));
+    spriteTransform = glm::rotate(spriteTransform, glm::radians(angle), glm::vec3(0.0f, 0.0f, 1.0f));
+    spriteTransform = glm::scale(spriteTransform, glm::vec3(scaleX,scaleY, 0.0f));
+    spriteTransform = glm::translate(spriteTransform, glm::vec3(-originX, -originY, 0.0f));
+    spriteTransform = glm::scale(spriteTransform, glm::vec3(tex->width,tex->height, 0.0f));
 
-    // width = help.hasArgs() ? help.getFloat64() : tex->width;
-    // height = help.hasArgs() ? help.getFloat64() : tex->height;
-    // sx = help.hasArgs() ? help.getFloat64() : 0; 
-    // sy = help.hasArgs() ? help.getFloat64() : 0;
-    // sw = help.hasArgs() ? help.getFloat64() : tex->width;
-    // sh = help.hasArgs() ? help.getFloat64() : tex->height;
-    // std::cout << "sw: " << sw << std::endl;
-    if(objHelp.hasError) return JS_EXCEPTION;
-    // engine.renderer.drawImage(s->id, x,y,tex->width * scaleX,tex->height * scaleY,sx,sy,sw,sh);
-    engine.renderer.drawImage(s->id,spriteTransform ,sx,sy,sw,sh);
+    engine.renderer.drawImage(s->id,spriteTransform,sx,sy,sw,sh);
     return JS_UNDEFINED;
 }
 
