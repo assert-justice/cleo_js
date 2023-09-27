@@ -107,11 +107,8 @@ int Renderer::loadImage(const char* path){
     return id;
 }
 
-void Renderer::drawImage(
-    int textureId, 
-    float x, float y, float width, float height,
-    float sx, float sy, float sw, float sh)
-{
+void Renderer::drawImage(int textureId,glm::mat4 spriteTransform,
+        float sx, float sy, float sw, float sh){
     glUseProgram(imageShader.id);
     auto tex = textureStore.get(textureId);
     tex->use();
@@ -119,9 +116,9 @@ void Renderer::drawImage(
     unsigned int cameraLoc = glGetUniformLocation(imageShader.id, "camera");
     glUniformMatrix4fv(cameraLoc, 1, GL_FALSE, glm::value_ptr(cameraTransform));
     unsigned int spriteLoc = glGetUniformLocation(imageShader.id, "sprite");
-    glm::mat4 spriteTransform = glm::mat4(1.0f);
-    spriteTransform = glm::translate(spriteTransform, glm::vec3(x, y, 0.0f));
-    spriteTransform = glm::scale(spriteTransform, glm::vec3(width, height, 0.0f));
+    // glm::mat4 spriteTransform = glm::mat4(1.0f);
+    // spriteTransform = glm::translate(spriteTransform, glm::vec3(x, y, 0.0f));
+    // spriteTransform = glm::scale(spriteTransform, glm::vec3(width, height, 0.0f));
     
     glUniformMatrix4fv(spriteLoc, 1, GL_FALSE, glm::value_ptr(spriteTransform));
     unsigned int dimensionsLoc = glGetUniformLocation(imageShader.id, "dimensions");
@@ -129,7 +126,32 @@ void Renderer::drawImage(
         glm::vec4(sx/tex->width, sy/tex->height, sw/tex->width, sh/tex->height))
     );
     glDrawArrays(GL_TRIANGLES, 0, 6);
+
 }
+
+// void Renderer::drawImage(
+//     int textureId, 
+//     float x, float y, float width, float height,
+//     float sx, float sy, float sw, float sh)
+// {
+//     glUseProgram(imageShader.id);
+//     auto tex = textureStore.get(textureId);
+//     tex->use();
+//     glBindVertexArray(VAO);
+//     unsigned int cameraLoc = glGetUniformLocation(imageShader.id, "camera");
+//     glUniformMatrix4fv(cameraLoc, 1, GL_FALSE, glm::value_ptr(cameraTransform));
+//     unsigned int spriteLoc = glGetUniformLocation(imageShader.id, "sprite");
+//     glm::mat4 spriteTransform = glm::mat4(1.0f);
+//     spriteTransform = glm::translate(spriteTransform, glm::vec3(x, y, 0.0f));
+//     spriteTransform = glm::scale(spriteTransform, glm::vec3(width, height, 0.0f));
+    
+//     glUniformMatrix4fv(spriteLoc, 1, GL_FALSE, glm::value_ptr(spriteTransform));
+//     unsigned int dimensionsLoc = glGetUniformLocation(imageShader.id, "dimensions");
+//     glUniform4fv(dimensionsLoc, 1, glm::value_ptr(
+//         glm::vec4(sx/tex->width, sy/tex->height, sw/tex->width, sh/tex->height))
+//     );
+//     glDrawArrays(GL_TRIANGLES, 0, 6);
+// }
 
 void Renderer::freeTexture(int id){
     textureStore.del(id);

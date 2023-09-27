@@ -142,6 +142,10 @@ static JSValue drawImageBind(JSContext* ctx, JSValue thisVal, int argc, JSValue*
     sy = objHelp.getNumber("sy", 0.0);
     sw = objHelp.getNumber("sw", tex->width);
     sh = objHelp.getNumber("sh", tex->height);
+    glm::mat4 spriteTransform = glm::mat4(1.0f);
+    spriteTransform = glm::translate(spriteTransform, glm::vec3(x, y, 0.0f));
+    spriteTransform = glm::scale(spriteTransform, glm::vec3(tex->width * scaleX,tex->height * scaleY, 0.0f));
+
     // width = help.hasArgs() ? help.getFloat64() : tex->width;
     // height = help.hasArgs() ? help.getFloat64() : tex->height;
     // sx = help.hasArgs() ? help.getFloat64() : 0; 
@@ -150,7 +154,8 @@ static JSValue drawImageBind(JSContext* ctx, JSValue thisVal, int argc, JSValue*
     // sh = help.hasArgs() ? help.getFloat64() : tex->height;
     // std::cout << "sw: " << sw << std::endl;
     if(objHelp.hasError) return JS_EXCEPTION;
-    engine.renderer.drawImage(s->id, x,y,tex->width * scaleX,tex->height * scaleY,sx,sy,sw,sh);
+    // engine.renderer.drawImage(s->id, x,y,tex->width * scaleX,tex->height * scaleY,sx,sy,sw,sh);
+    engine.renderer.drawImage(s->id,spriteTransform ,sx,sy,sw,sh);
     return JS_UNDEFINED;
 }
 

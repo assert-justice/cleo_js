@@ -20,9 +20,14 @@ class Renderer{
     void freeTexture(int id);
     int loadImage(const char* path);
     void drawImage(
-        int textureId, 
-        float x, float y, float width, float height,
-        float sx, float sy, float sw, float sh);
+        int textureId,
+        glm::mat4 spriteTransform,
+        float sx, float sy, float sw, float sh
+    );
+    // void drawImage(
+    //     int textureId, 
+    //     float x, float y, float width, float height,
+    //     float sx, float sy, float sw, float sh);
     void setCameraPosition(float x, float y);
     void setTarget(Texture* target);
     Store<Texture> textureStore;
