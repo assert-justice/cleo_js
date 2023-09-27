@@ -17,7 +17,6 @@ void bindSystem(bool* hasError){
     proto = JS_NewObject(engine.vm.context);
     // println
     fn = JS_NewCFunction(engine.vm.context, &printlnBind, "println", 0);
-    // fn = JS_NewFloat64(engine.vm.context, 0.0);
     JS_DefinePropertyValue(engine.vm.context, proto, JS_NewAtom(engine.vm.context, "println"), 
         fn, 0);
     // JS_FreeValue(engine.vm.context, fn);

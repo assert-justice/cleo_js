@@ -4,5 +4,5 @@ Game.init = ()=>System.println("sup");
 // Game.init = ()=>println("sup: "+System.println);
 
 Game.update = ()=>{
-    if(Input.getKey(256)) System.println("yo");
+    if(Input.getKey(256)) Game.quit();
 }
