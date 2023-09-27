@@ -6,6 +6,7 @@
 #include "utils/fs.hpp"
 #include "vm/bind_game.hpp"
 #include "vm/bind_system.hpp"
+#include "vm/bind_input.hpp"
 #include <fstream>
 
 Engine::Engine(){
