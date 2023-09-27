@@ -1,3 +1,3 @@
 #pragma once
 
-void bindInput(bool* hasError);
+void bindInput();

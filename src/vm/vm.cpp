@@ -6,6 +6,7 @@
 #include "vm/bind_game.hpp"
 #include "vm/bind_system.hpp"
 #include "vm/bind_input.hpp"
+#include "vm/bind_window.hpp"
 
 JSModuleDef *jsModuleLoader(JSContext *ctx,
                               const char *module_name, void *opaque)
@@ -62,9 +63,10 @@ void VM::init(bool* hasError){
     runtime = JS_NewRuntime();
     context = JS_NewContext(runtime);
     JS_SetModuleLoaderFunc(runtime, NULL, jsModuleLoader, NULL);
-    bindInput(hasError);
-    bindGame(hasError);
-    bindSystem(hasError);
+    bindInput();
+    bindGame();
+    bindSystem();
+    bindWindow();
     // JS_DefineProperty()
     // auto printlnFn = JS_NewCFunction(context, &printlnBind, "println", 0);
     // addExport("println", printlnFn);

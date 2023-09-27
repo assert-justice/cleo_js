@@ -15,7 +15,7 @@ JSValue getKeyBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
     return JS_NewBool(ctx, state);
 }
 
-void bindInput(bool* hasError){
+void bindInput(){
     JSValue proto;
     JSValue fn;
     proto = JS_NewObject(engine.vm.context);

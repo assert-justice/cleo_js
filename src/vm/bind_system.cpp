@@ -11,7 +11,7 @@ static JSValue printlnBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* a
     return JS_UNDEFINED;
 }
 
-void bindSystem(bool* hasError){
+void bindSystem(){
     JSValue proto;
     JSValue fn;
     proto = JS_NewObject(engine.vm.context);

@@ -28,7 +28,7 @@ JSValue updateBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
     return JS_UNDEFINED;
 }
 
-void bindGame(bool* hasError){
+void bindGame(){
     JSValue proto;
     JSValue fn;
 
