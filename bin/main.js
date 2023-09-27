@@ -6,6 +6,7 @@ let spr;
 Game.init = ()=>{
     // System.println(''+Texture);
     spr = Texture.fromFile('character_0000.png');
+    spr.scaleX = 4;
     tex = Texture.new(200,100);
     System.println('tex width:', tex.width);
     System.println('tex height:', tex.height);
@@ -20,5 +21,5 @@ Game.init = ()=>{
 
 Game.update = ()=>{
     if(Input.getKey(256)) Game.quit();
-    tex.draw(0, 0);
+    spr.draw(0, 0);
 }

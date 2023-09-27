@@ -1,6 +1,7 @@
 #include "bind_graphics.hpp"
 #include "engine/engine.hpp"
 #include "fn_help.hpp"
+#include "object_help.hpp"
 #include <iostream>
 
 typedef struct {
@@ -129,19 +130,27 @@ static JSValue drawImageBind(JSContext* ctx, JSValue thisVal, int argc, JSValue*
     auto s = getTexture(thisVal);
     if(!s) return JS_EXCEPTION;
     FnHelp help(ctx, argc, argv);
-    float x,y,width,height,sx,sy,sw,sh;
+    float x,y,scaleX,scaleY,sx,sy,sw,sh;
     auto tex = s->texture;
     x = help.getFloat64();
     y = help.getFloat64();
     if(help.hasError) return JS_EXCEPTION;
-    width = help.hasArgs() ? help.getFloat64() : tex->width;
-    height = help.hasArgs() ? help.getFloat64() : tex->height;
-    sx = help.hasArgs() ? help.getFloat64() : 0; 
-    sy = help.hasArgs() ? help.getFloat64() : 0;
-    sw = help.hasArgs() ? help.getFloat64() : tex->width;
-    sh = help.hasArgs() ? help.getFloat64() : tex->height;
-    if(help.hasError) return JS_EXCEPTION;
-    engine.renderer.drawImage(s->id, x,y,width,height,sx,sy,sw,sh);
+    ObjectHelp objHelp(ctx, thisVal);
+    scaleX = objHelp.getNumber("scaleX", 1.0);
+    scaleY = objHelp.getNumber("scaleY", 1.0);
+    sx = objHelp.getNumber("sx", 0.0);
+    sy = objHelp.getNumber("sy", 0.0);
+    sw = objHelp.getNumber("sw", tex->width);
+    sh = objHelp.getNumber("sh", tex->height);
+    // width = help.hasArgs() ? help.getFloat64() : tex->width;
+    // height = help.hasArgs() ? help.getFloat64() : tex->height;
+    // sx = help.hasArgs() ? help.getFloat64() : 0; 
+    // sy = help.hasArgs() ? help.getFloat64() : 0;
+    // sw = help.hasArgs() ? help.getFloat64() : tex->width;
+    // sh = help.hasArgs() ? help.getFloat64() : tex->height;
+    // std::cout << "sw: " << sw << std::endl;
+    if(objHelp.hasError) return JS_EXCEPTION;
+    engine.renderer.drawImage(s->id, x,y,tex->width * scaleX,tex->height * scaleY,sx,sy,sw,sh);
     return JS_UNDEFINED;
 }
 

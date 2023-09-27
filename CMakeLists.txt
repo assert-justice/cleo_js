@@ -32,6 +32,7 @@ set( CLEO-SRC
      src/engine/engine.cpp
      src/vm/vm.cpp
      src/vm/fn_help.cpp
+     src/vm/object_help.cpp
      src/window/window.cpp
      src/renderer/renderer.cpp
      src/renderer/shader.cpp
