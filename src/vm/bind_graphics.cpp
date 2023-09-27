@@ -145,6 +145,19 @@ static JSValue drawImageBind(JSContext* ctx, JSValue thisVal, int argc, JSValue*
     return JS_UNDEFINED;
 }
 
+static JSValue setRenderTargetBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
+    if(JS_IsException(rendererInitalized(ctx))) return JS_EXCEPTION;
+    auto s = getTexture(thisVal);
+    if(!s) return JS_EXCEPTION;
+    engine.renderer.setTarget(s->texture);
+    return JS_UNDEFINED;
+}
+static JSValue resetRenderTargetBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
+    if(JS_IsException(rendererInitalized(ctx))) return JS_EXCEPTION;
+    engine.renderer.setTarget(nullptr);
+    return JS_UNDEFINED;
+}
+
 void bindGraphics(){
     JSValue proto, textureProto;
     JSValue fn;
@@ -174,6 +187,11 @@ void bindGraphics(){
     // draw()
     fn = JS_NewCFunction(ctx, &drawImageBind, "drawImage", 0);
     JS_DefinePropertyValueStr(ctx, textureProto, "draw", fn, 0);
+    // setTarget()
+    fn = JS_NewCFunction(ctx, &setRenderTargetBind, "setRenderTarget", 0);
+    JS_DefinePropertyValueStr(ctx, textureProto, "setTarget", fn, 0);
+    fn = JS_NewCFunction(ctx, &resetRenderTargetBind, "resetRenderTarget", 0);
+    JS_DefinePropertyValueStr(ctx, textureProto, "resetTarget", fn, 0);
     // constructor(width, height)
     // not working, getting 'not a constructor' error for some reason
     // fn = JS_NewCFunction(ctx, &textureConstructorBind, "textureConstructor", 0);
