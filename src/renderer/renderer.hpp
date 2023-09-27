@@ -14,7 +14,8 @@ class Renderer{
     void init(bool* hasError);
     void update();
     bool isInitialized();
-    void setClearColor(float r, float g, float b);
+    void setClearColor(float r, float g, float b, float a);
+    void clear();
     int newTexture(int width, int height, unsigned char* data);
     void freeTexture(int id);
     int loadImage(const char* path);

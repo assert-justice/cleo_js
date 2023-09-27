@@ -67,7 +67,7 @@ JSValue setClearColorBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* ar
     auto g = help.getFloat64();
     auto b = help.getFloat64();
     if(help.hasError) return JS_EXCEPTION;
-    engine.renderer.setClearColor(r, g, b);
+    engine.renderer.setClearColor(r, g, b, 0.0f);
     return JS_UNDEFINED;
 }
 

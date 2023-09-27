@@ -7,6 +7,7 @@
 #include "vm/bind_system.hpp"
 #include "vm/bind_input.hpp"
 #include "vm/bind_window.hpp"
+#include "vm/bind_graphics.hpp"
 
 JSModuleDef *jsModuleLoader(JSContext *ctx,
                               const char *module_name, void *opaque)
@@ -67,6 +68,7 @@ void VM::init(bool* hasError){
     bindGame();
     bindSystem();
     bindWindow();
+    bindGraphics();
     // JS_DefineProperty()
     // auto printlnFn = JS_NewCFunction(context, &printlnBind, "println", 0);
     // addExport("println", printlnFn);

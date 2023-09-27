@@ -62,8 +62,11 @@ void Renderer::init(bool* hasError){
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     initalized = true;
 }
-void Renderer::setClearColor(float r, float g, float b){
-    glClearColor(r, g, b, 0.0f);
+void Renderer::setClearColor(float r, float g, float b, float a){
+    glClearColor(r, g, b, a);
+}
+void Renderer::clear(){
+    glClear(GL_COLOR_BUFFER_BIT);
 }
 void Renderer::update(){
     /* Render here */
