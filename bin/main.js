@@ -15,7 +15,7 @@ Game.update = ()=>{
     lastSpaceDown = spaceDown;
     spaceDown = Input.getKey(32);
     if(spaceDown && !lastSpaceDown){
-        Window.setStats("yo", 600, 400);
+        Window.setStats("yo", 600, 400, "borderless");
     }
     tex.draw(100,100);
 }

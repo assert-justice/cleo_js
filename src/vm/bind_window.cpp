@@ -21,14 +21,26 @@ JSValue getHeightBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
     auto val = JS_NewFloat64(ctx, (float)engine.window.height);
     return val;
 }
+static int getMode(std::string mode){
+    if(mode == "windowed") return 0;
+    else if(mode == "borderless") return 1;
+    else if(mode == "fullscreen") return 2;
+    else return -1;
+}
+
 JSValue setStatsBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
     FnHelp fnHelp(ctx, argc, argv);
     // it is ok to use this function before the window is initalized
-    // if(JS_IsException(windowInitalized(ctx))) return JS_EXCEPTION;
     auto name = fnHelp.getString();
     auto width = (int)fnHelp.getFloat64();
     auto height = (int)fnHelp.getFloat64();
-    engine.window.setStats(name, width, height, 0);
+    std::string modeStr = fnHelp.hasArgs() ? fnHelp.getString() : "windowed";
+    auto mode = getMode(modeStr);
+    if(mode == -1){
+        JS_ThrowTypeError(ctx, "unexpected mode value '%s'!", modeStr.c_str());
+        return JS_EXCEPTION;
+    }
+    engine.window.setStats(name, width, height, mode);
     return JS_UNDEFINED;
 }
 

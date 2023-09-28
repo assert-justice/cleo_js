@@ -19,6 +19,7 @@ A game framework for JavaScript.
 
 ### Short Term
 
+- fix the timestep
 - mouse input
 - gamepad buttons and axes
 - example game (top down shooter probably)

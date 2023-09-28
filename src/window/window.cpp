@@ -25,7 +25,6 @@ void Window::init(bool* hasError){
         return;
     }
     setWindow();
-    // window = glfwCreateWindow(width, height, name.c_str(), NULL, NULL);
     if (window == NULL){
         std::cout << "Failed to create GLFW window" << std::endl;
         glfwTerminate();
@@ -79,10 +78,24 @@ void Window::setVsync(bool vsync){
 
 void Window::setWindow(){
     GLFWmonitor* monitor = NULL;
+    int refreshRate = GLFW_DONT_CARE;
+    if(mode != 0) monitor = glfwGetPrimaryMonitor();
+    if(mode == 1){
+        const GLFWvidmode* mode = glfwGetVideoMode(monitor);
+ 
+        glfwWindowHint(GLFW_RED_BITS, mode->redBits);
+        glfwWindowHint(GLFW_GREEN_BITS, mode->greenBits);
+        glfwWindowHint(GLFW_BLUE_BITS, mode->blueBits);
+        glfwWindowHint(GLFW_REFRESH_RATE, mode->refreshRate);
+
+        width = mode->width;
+        height = mode->height;
+        refreshRate = mode->refreshRate;
+    }
     if(window == NULL){
         window = glfwCreateWindow(width, height, name.c_str(), monitor, NULL);
     }
     else{
-        glfwSetWindowMonitor(window, monitor, 0, 0, width, height, GLFW_DONT_CARE);
+        glfwSetWindowMonitor(window, monitor, 0, 0, width, height, refreshRate);
     }
 }
