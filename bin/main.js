@@ -11,11 +11,12 @@ Game.init = ()=>{
 }
 
 Game.update = (dt)=>{
-    if(Input.getKey(256)) Game.quit();
+    if(Input.keyIsDown(256)) Game.quit();
     lastSpaceDown = spaceDown;
-    spaceDown = Input.getKey(32);
+    spaceDown = Input.mouseButtonIsDown(0);
     if(spaceDown && !lastSpaceDown){
-        System.println(1/dt);
+        System.println(Input.mouseX, Input.mouseY);
+        // System.println(1/dt);
         // Window.setStats("yo", 600, 400, "borderless");
     }
 }

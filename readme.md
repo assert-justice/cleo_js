@@ -13,16 +13,16 @@ A game framework for JavaScript.
 - working linux build
 - simple audio api
 - widow options including borderless fullscreen
+- add draw method
+- fix the timestep
+- mouse input
 
 ### Current
 
-- add draw method
-- fix the timestep
+- gamepad buttons and axes
 
 ### Short Term
 
-- mouse input
-- gamepad buttons and axes
 - example game (top down shooter probably)
 - clean up c++ api, make stuff private
 
@@ -37,6 +37,7 @@ A game framework for JavaScript.
 - virtual file system
 - ui system
 - input overhaul/button remapping
+- custom cursors
 
 ### Long Term
 

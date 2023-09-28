@@ -137,9 +137,6 @@ static JSValue textureConstructorBind(JSContext* ctx, JSValue thisVal, int argc,
 static JSValue drawImageBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
     if(!canRender(ctx)) return JS_EXCEPTION;
     FnHelp help(ctx, argc, argv);
-    // auto s = getTexture(thisVal);
-    // if(!s) return JS_EXCEPTION;
-    // float x,y,scaleX,scaleY,sx,sy,sw,sh,originX, originY, angle;
     float x,y,width,height,sx,sy,sw,sh,originX, originY, angle;
     x = help.getFloat64();
     y = help.getFloat64();
@@ -189,49 +186,6 @@ static JSValue setRenderTargetBind(JSContext* ctx, JSValue thisVal, int argc, JS
 static JSValue resetRenderTargetBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
     if(!canRender(ctx)) return JS_EXCEPTION;
     engine.renderer.setTarget(nullptr);
-    return JS_UNDEFINED;
-}
-
-static JSValue spriteDrawBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
-    if(!canRender(ctx)) return JS_EXCEPTION;
-    FnHelp help(ctx, argc, argv);
-    float x,y,scaleX,scaleY,sx,sy,sw,sh,originX, originY, angle;
-    auto handle = help.next();
-    auto s = getTexture(handle);
-    if(!s) return JS_EXCEPTION;
-    auto tex = s->texture;
-    x = help.getFloat64();
-    y = help.getFloat64();
-    auto obj = help.hasArgs() ? help.next() : JS_UNDEFINED;
-    if(help.hasError) return JS_EXCEPTION;
-    ObjectHelp objHelp(ctx, thisVal);
-    scaleX = objHelp.getNumber("scaleX", 1.0);
-    scaleY = objHelp.getNumber("scaleY", 1.0);
-    sx = objHelp.getNumber("sx", 0.0);
-    sy = objHelp.getNumber("sy", 0.0);
-    sw = objHelp.getNumber("sw", tex->width);
-    sh = objHelp.getNumber("sh", tex->height);
-    originX = objHelp.getNumber("originX", 0.0);
-    originY = objHelp.getNumber("originY", 0.0);
-    angle = objHelp.getNumber("angle", 0.0);
-    if(objHelp.hasError) return JS_EXCEPTION;
-    // calculate sprite transform
-    // scale, offset, scale2, rotate, move
-    // have to do it in reverse because matrix math is Like That
-    glm::mat4 spriteTransform = glm::mat4(1.0f);
-    spriteTransform = glm::translate(spriteTransform, glm::vec3(x, y, 0.0f));
-    spriteTransform = glm::rotate(spriteTransform, glm::radians(angle), glm::vec3(0.0f, 0.0f, 1.0f));
-    spriteTransform = glm::scale(spriteTransform, glm::vec3(scaleX,scaleY, 0.0f));
-    spriteTransform = glm::translate(spriteTransform, glm::vec3(-originX, -originY, 0.0f));
-    spriteTransform = glm::scale(spriteTransform, glm::vec3(tex->width,tex->height, 0.0f));
-
-    // calculate texture coord transform
-    // scale, translate
-    glm::mat4 coordTransform = glm::mat4(1.0f);
-    coordTransform = glm::translate(coordTransform, glm::vec3(glm::vec3(sx/tex->width, sy/tex->height, 0.0)));
-    coordTransform = glm::scale(coordTransform, glm::vec3(sw/tex->width, sh/tex->height, 0.0));
-
-    engine.renderer.drawImage(s->id,spriteTransform,coordTransform);
     return JS_UNDEFINED;
 }
 
