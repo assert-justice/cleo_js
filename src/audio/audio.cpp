@@ -23,7 +23,8 @@ int Audio::soundLoad(const char* path){
     ma_result result;
     auto sound = new ma_sound();
     result = ma_sound_init_from_file(&audioEngine, path, 
-        MA_SOUND_FLAG_DECODE | MA_SOUND_FLAG_STREAM, NULL, NULL, 
+        MA_SOUND_FLAG_NO_SPATIALIZATION | 
+        MA_SOUND_FLAG_STREAM, NULL, NULL, 
         sound);
     if (result != MA_SUCCESS) {
         std::cout << "Failed to load sound '" << path << "'\n";
@@ -54,14 +55,14 @@ bool Audio::soundIsPlaying(int idx){
     if(!validIdx(idx)) return false;
     return ma_sound_is_playing(soundStore.get(idx));
 }
-void Audio::soundSetVolume(int idx, double volume){
+void Audio::soundSetVolume(int idx, float volume){
     if(!validIdx(idx)) return;
-    ma_sound_set_volume(soundStore.get(idx), (float)volume);
+    ma_sound_set_volume(soundStore.get(idx), volume);
 }
 
-double Audio::soundGetVolume(int idx){
+float Audio::soundGetVolume(int idx){
     if(!validIdx(idx)) return 0.0;
-    return (double)ma_sound_get_volume(soundStore.get(idx));
+    return ma_sound_get_volume(soundStore.get(idx));
 }
 
 void Audio::soundLoop(int idx, bool shouldLoop){

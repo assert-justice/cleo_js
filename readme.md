@@ -10,6 +10,7 @@ A game framework for JavaScript.
 - render targets
 - load js modules
 - refactor api with objects
+- working linux build
 
 ### Current
 
@@ -21,12 +22,12 @@ A game framework for JavaScript.
 - mouse input
 - gamepad buttons and axes
 - add sprite/texture distinction to api
-- text rendering
-- working linux build
+- add audio groups
 - example game (top down shooter probably)
 
 ### Medium Term
 
+- text rendering
 - web target with emscripten
 - dev logs
 - transform, mesh, shader api

@@ -13,8 +13,8 @@ class Audio{
     void soundPause(int idx);
     void soundStop(int idx);
     bool soundIsPlaying(int idx);
-    void soundSetVolume(int idx, double volume);
-    double soundGetVolume(int idx);
+    void soundSetVolume(int idx, float volume);
+    float soundGetVolume(int idx);
     void soundLoop(int idx, bool shouldLoop);
     bool soundIsLooping(int idx);
     bool initalized = false;

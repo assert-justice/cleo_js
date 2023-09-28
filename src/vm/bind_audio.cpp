@@ -82,10 +82,62 @@ static JSValue soundPlayBind(JSContext* ctx, JSValue thisVal, int argc, JSValue*
     engine.audio.soundPlay(s->id);
     return JS_UNDEFINED;
 }
+static JSValue soundPauseBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
+    if(JS_IsException(audioInitalized(ctx))) return JS_EXCEPTION;
+    auto s = getSound(thisVal);
+    if(!s) return JS_EXCEPTION;
+    engine.audio.soundPause(s->id);
+    return JS_UNDEFINED;
+}
+static JSValue soundStopBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
+    if(JS_IsException(audioInitalized(ctx))) return JS_EXCEPTION;
+    auto s = getSound(thisVal);
+    if(!s) return JS_EXCEPTION;
+    engine.audio.soundStop(s->id);
+    return JS_UNDEFINED;
+}
+static JSValue soundIsPlayingBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
+    if(JS_IsException(audioInitalized(ctx))) return JS_EXCEPTION;
+    auto s = getSound(thisVal);
+    if(!s) return JS_EXCEPTION;
+    return JS_NewBool(ctx, engine.audio.soundIsPlaying(s->id));
+}
+static JSValue soundSetVolumeBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
+    if(JS_IsException(audioInitalized(ctx))) return JS_EXCEPTION;
+    auto s = getSound(thisVal);
+    if(!s) return JS_EXCEPTION;
+    FnHelp fnHelp(ctx, argc, argv);
+    auto val = fnHelp.getFloat64();
+    if(fnHelp.hasError) return JS_EXCEPTION;
+    engine.audio.soundSetVolume(s->id, val);
+    return JS_UNDEFINED;
+}
+static JSValue soundGetVolumeBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
+    if(JS_IsException(audioInitalized(ctx))) return JS_EXCEPTION;
+    auto s = getSound(thisVal);
+    if(!s) return JS_EXCEPTION;
+    return JS_NewFloat64(ctx, engine.audio.soundGetVolume(s->id));
+}
+static JSValue soundSetIsLoopingBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
+    if(JS_IsException(audioInitalized(ctx))) return JS_EXCEPTION;
+    auto s = getSound(thisVal);
+    if(!s) return JS_EXCEPTION;
+    FnHelp fnHelp(ctx, argc, argv);
+    auto val = fnHelp.getBool();
+    if(fnHelp.hasError) return JS_EXCEPTION;
+    engine.audio.soundLoop(s->id, val);
+    return JS_UNDEFINED;
+}
+static JSValue soundGetIsLoopingBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
+    if(JS_IsException(audioInitalized(ctx))) return JS_EXCEPTION;
+    auto s = getSound(thisVal);
+    if(!s) return JS_EXCEPTION;
+    return JS_NewBool(ctx, engine.audio.soundIsLooping(s->id));
+}
 
 void bindAudio(){
     JSValue proto, soundProto;
-    JSValue fn;
+    JSValue fn, fn2;
     auto ctx = engine.vm.context;
     proto = JS_NewObject(ctx);
 
@@ -101,6 +153,27 @@ void bindAudio(){
     // play()
     fn = JS_NewCFunction(ctx, &soundPlayBind, "soundPlay", 0);
     JS_DefinePropertyValueStr(ctx, soundProto, "play", fn, 0);
+    // pause()
+    fn = JS_NewCFunction(ctx, &soundPauseBind, "soundPause", 0);
+    JS_DefinePropertyValueStr(ctx, soundProto, "pause", fn, 0);
+    // stop()
+    fn = JS_NewCFunction(ctx, &soundStopBind, "soundStop", 0);
+    JS_DefinePropertyValueStr(ctx, soundProto, "stop", fn, 0);
+    // get isPlaying: boolean
+    fn = JS_NewCFunction(ctx, &soundIsPlayingBind, "soundIsPlaying", 0);
+    JS_DefineProperty(ctx, soundProto, JS_NewAtom(ctx, "isPlaying"), 
+        JS_UNDEFINED, fn, JS_UNDEFINED, JS_PROP_HAS_GET);
+    JS_FreeValue(ctx, fn);
+    // get set volume: number
+    fn = JS_NewCFunction(ctx, &soundGetVolumeBind, "soundGetVolume", 0);
+    fn2 = JS_NewCFunction(ctx, &soundSetVolumeBind, "soundSetVolume", 0);
+    JS_DefinePropertyGetSet(ctx, soundProto, JS_NewAtom(ctx, "volume"), 
+        fn, fn2, 0);
+    // get set volume: number
+    fn = JS_NewCFunction(ctx, &soundGetIsLoopingBind, "soundGetIsLooping", 0);
+    fn2 = JS_NewCFunction(ctx, &soundSetIsLoopingBind, "soundSetVolume", 0);
+    JS_DefinePropertyGetSet(ctx, soundProto, JS_NewAtom(ctx, "isLooping"), 
+        fn, fn2, 0);
 
     // setting the class prototype consumes the prototype object so we need to reacquire it
     JS_SetClassProto(ctx, jsSoundClassId, soundProto);

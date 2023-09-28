@@ -24,6 +24,12 @@ double FnHelp::getFloat64(){
     JS_ToFloat64(ctx, &res, val);
     return res;
 }
+bool FnHelp::getBool(){
+    auto val = next();
+    if(hasError) return 0;
+    if(!JS_IsBool(val)) {hasError = true; return 0;}
+    return JS_ToBool(ctx, val);
+}
 
 int FnHelp::getInt(){
     auto val = next();

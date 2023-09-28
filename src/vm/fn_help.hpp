@@ -10,6 +10,7 @@ class FnHelp{
     std::string getString();
     double getFloat64();
     int getInt();
+    bool getBool();
     JSValue getFunction();
     bool hasArgs();
     private:
