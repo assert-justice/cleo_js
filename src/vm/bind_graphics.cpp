@@ -55,16 +55,24 @@ static JSTextureClass* getTexture(JSValue val){
     return s;
 }
 
-static JSValue rendererInitalized(JSContext* ctx){
+static bool rendererInitalized(JSContext* ctx){
     if(!engine.window.initialized){
         JS_ThrowReferenceError(ctx, "method referenced before initialization!");
-        return JS_EXCEPTION;
+        return false;
     }
-    return JS_UNDEFINED;
+    return true;
+}
+static bool canRender(JSContext* ctx){
+    if(!rendererInitalized(ctx)) return false;
+    if(!engine.renderer.enabled){
+        JS_ThrowReferenceError(ctx, "method called outside of draw function!");
+        return false;
+    }
+    return true;
 }
 
 static JSValue setClearColorBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
-    if(JS_IsException(rendererInitalized(ctx))) return JS_EXCEPTION;
+    if(!canRender(ctx)) return JS_EXCEPTION;
     FnHelp help(ctx, argc, argv);
     auto r = help.getFloat64();
     auto g = help.getFloat64();
@@ -76,26 +84,26 @@ static JSValue setClearColorBind(JSContext* ctx, JSValue thisVal, int argc, JSVa
 }
 
 static JSValue clearBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
-    if(JS_IsException(rendererInitalized(ctx))) return JS_EXCEPTION;
+    if(!canRender(ctx)) return JS_EXCEPTION;
     engine.renderer.clear();
     return JS_UNDEFINED;
 }
 
 static JSValue getTextureWidthBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
-    if(JS_IsException(rendererInitalized(ctx))) return JS_EXCEPTION;
+    if(!canRender(ctx)) return JS_EXCEPTION;
     auto s = getTexture(thisVal);
     if(!s) return JS_EXCEPTION;
     return JS_NewFloat64(engine.vm.context, s->texture->width);
 }
 static JSValue getTextureHeightBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
-    if(JS_IsException(rendererInitalized(ctx))) return JS_EXCEPTION;
+    if(!canRender(ctx)) return JS_EXCEPTION;
     auto s = getTexture(thisVal);
     if(!s) return JS_EXCEPTION;
     return JS_NewFloat64(engine.vm.context, s->texture->height);
 }
 
 static JSValue textureFromFileBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
-    if(JS_IsException(rendererInitalized(ctx))) return JS_EXCEPTION;
+    if(!rendererInitalized) return JS_EXCEPTION;
     FnHelp help(ctx, argc, argv);
     auto path = help.getString();
     if(help.hasError) return JS_EXCEPTION;
@@ -110,7 +118,7 @@ static JSValue textureFromFileBind(JSContext* ctx, JSValue thisVal, int argc, JS
 }
 
 static JSValue textureConstructorBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
-    if(JS_IsException(rendererInitalized(ctx))) return JS_EXCEPTION;
+    if(!rendererInitalized) return JS_EXCEPTION;
     FnHelp help(ctx, argc, argv);
     auto width = help.getFloat64();
     auto height = help.getFloat64();
@@ -127,7 +135,7 @@ static JSValue textureConstructorBind(JSContext* ctx, JSValue thisVal, int argc,
 }
 
 static JSValue drawImageBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
-    if(JS_IsException(rendererInitalized(ctx))) return JS_EXCEPTION;
+    if(!canRender(ctx)) return JS_EXCEPTION;
     FnHelp help(ctx, argc, argv);
     // auto s = getTexture(thisVal);
     // if(!s) return JS_EXCEPTION;
@@ -172,20 +180,20 @@ static JSValue drawImageBind(JSContext* ctx, JSValue thisVal, int argc, JSValue*
 }
 
 static JSValue setRenderTargetBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
-    if(JS_IsException(rendererInitalized(ctx))) return JS_EXCEPTION;
+    if(!canRender(ctx)) return JS_EXCEPTION;
     auto s = getTexture(thisVal);
     if(!s) return JS_EXCEPTION;
     engine.renderer.setTarget(s->texture);
     return JS_UNDEFINED;
 }
 static JSValue resetRenderTargetBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
-    if(JS_IsException(rendererInitalized(ctx))) return JS_EXCEPTION;
+    if(!canRender(ctx)) return JS_EXCEPTION;
     engine.renderer.setTarget(nullptr);
     return JS_UNDEFINED;
 }
 
 static JSValue spriteDrawBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
-    if(JS_IsException(rendererInitalized(ctx))) return JS_EXCEPTION;
+    if(!canRender(ctx)) return JS_EXCEPTION;
     FnHelp help(ctx, argc, argv);
     float x,y,scaleX,scaleY,sx,sy,sw,sh,originX, originY, angle;
     auto handle = help.next();

@@ -17,5 +17,8 @@ Game.update = ()=>{
     if(spaceDown && !lastSpaceDown){
         Window.setStats("yo", 600, 400, "borderless");
     }
+}
+
+Game.draw = ()=>{
     tex.draw(100,100);
 }

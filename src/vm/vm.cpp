@@ -56,6 +56,7 @@ VM::~VM(){
     if(!initialized) return;
     JS_FreeValue(context, initFn);
     JS_FreeValue(context, updateFn);
+    JS_FreeValue(context, drawFn);
     JS_FreeContext(context);
     JS_FreeRuntime(runtime);
 }
@@ -90,22 +91,17 @@ void VM::bind(bool* hasError, std::string src){
 }
 
 void VM::launch(bool* hasError){
-    // not having an init function is fine actually
-    // if(JS_IsUndefined(initFn)){
-    //     *hasError = true;
-    //     return;
-    // }
+    // not having an init function is fine
     auto val = JS_Call(context, initFn, JS_UNDEFINED, 0, NULL);
     if(isException(context, val)) *hasError = true;
 }
 
 void VM::update(double dt){
-    if(!JS_IsUndefined(updateFn)){
-        auto val = JS_NewFloat64(context, dt);
-        JS_Call(context, updateFn, JS_UNDEFINED, 1, &val);
-        // dunno if this is needed
-        JS_FreeValue(context, val);
-    }
+    auto val = JS_NewFloat64(context, dt);
+    JS_Call(context, updateFn, JS_UNDEFINED, 1, &val);
+}
+void VM::draw(){
+    JS_Call(context, drawFn, JS_UNDEFINED, 0, NULL);
 }
 
 bool isException(JSContext* context, JSValue val){

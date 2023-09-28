@@ -4,6 +4,7 @@
 
 - init: ()=>{}
 - update: (dt:number)=>{}
+- draw: ()=>{}
 - quit()
 
 ## Graphics

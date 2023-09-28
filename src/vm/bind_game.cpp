@@ -10,6 +10,13 @@ JSValue initBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
     if(help.hasError) return JS_EXCEPTION;
     return JS_UNDEFINED;
 }
+JSValue drawBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
+    FnHelp help(ctx, argc, argv);
+    auto fn = help.getFunction();
+    engine.vm.drawFn = JS_DupValue(ctx, fn);
+    if(help.hasError) return JS_EXCEPTION;
+    return JS_UNDEFINED;
+}
 
 JSValue quitBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
     engine.window.quit();
@@ -41,6 +48,11 @@ void bindGame(){
     // update
     fn = JS_NewCFunction(engine.vm.context, &updateBind, "update", 0);
     JS_DefineProperty(engine.vm.context, proto, JS_NewAtom(engine.vm.context, "update"), 
+        JS_UNDEFINED, JS_UNDEFINED, fn, JS_PROP_HAS_SET);
+    JS_FreeValue(engine.vm.context, fn);
+    // draw
+    fn = JS_NewCFunction(engine.vm.context, &drawBind, "draw", 0);
+    JS_DefineProperty(engine.vm.context, proto, JS_NewAtom(engine.vm.context, "draw"), 
         JS_UNDEFINED, JS_UNDEFINED, fn, JS_PROP_HAS_SET);
     JS_FreeValue(engine.vm.context, fn);
     // quit

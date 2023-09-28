@@ -31,6 +31,9 @@ void Engine::loop(){
     while(running){
         renderer.update();
         vm.update(0.16);
+        renderer.enabled = true;
+        vm.draw();
+        renderer.enabled = false;
         window.update();
         if(window.shouldClose()) running = false;
     }

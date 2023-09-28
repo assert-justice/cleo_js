@@ -12,14 +12,15 @@ A game framework for JavaScript.
 - refactor api with objects
 - working linux build
 - simple audio api
+- widow options including borderless fullscreen
 
 ### Current
 
-- widow options including borderless fullscreen
+- add draw method
+- fix the timestep
 
 ### Short Term
 
-- fix the timestep
 - mouse input
 - gamepad buttons and axes
 - example game (top down shooter probably)

@@ -30,6 +30,7 @@ class Renderer{
     float camWidth = 800;
     float camHeight = 600;
     Texture* target = nullptr;
+    bool enabled = false;
     private:
     Shader imageShader;
     bool initalized = false;
