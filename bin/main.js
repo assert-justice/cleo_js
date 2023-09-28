@@ -1,15 +1,17 @@
 import {Game, System, Input, Window, Graphics} from 'cleo';
-const {Texture} = Graphics;
+const {Texture, drawSprite} = Graphics;
 
 let tex;
 let spr,spr2;
 Game.init = ()=>{
     tex = Texture.fromFile('characters_packed.png');
-    tex.sx = 24*2;
+    // tex.sx = 24*2;
     // tex.sy = 24;
-    tex.sw = 24;
-    tex.sh = 24;
+    // tex.sw = 24;
+    // tex.sh = 24;
     System.println(tex.width, tex.height);
+    // drawSprite(tex, 0, 0);
+    // spr = new Texture(100, 100);
     // System.println(''+Texture);
     // spr = Texture.fromFile('character_0000.png');
     // spr2 = Texture.fromFile('character_0000.png');
@@ -31,7 +33,9 @@ Game.init = ()=>{
 
 Game.update = ()=>{
     if(Input.getKey(256)) Game.quit();
-    tex.draw(0,0);
+    tex.draw(100,100,{width: 24, height: 24, sx: 24*2, sw: 24, sh: 24, originX: 12, originY: 12, angle: 30});
+    tex.draw(100,100,{width: 24, height: 24, sx: 24*2, sw: 24, sh: 24, originX: 0, originY: 0, angle: 0});
+    // drawSprite(tex, 0, 0, {});
     // spr.draw(100, 100);
     // spr2.draw(100, 100);
 }

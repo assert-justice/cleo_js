@@ -9,6 +9,13 @@ JSValue ObjectHelp::getVal(const char* name){
     if(!JS_HasProperty(ctx, obj, JS_NewAtom(ctx, name))) return JS_UNDEFINED;
     return JS_GetPropertyStr(ctx, obj, name);
 }
+JSValue ObjectHelp::getValRequired(const char* name){
+    if(!JS_HasProperty(ctx, obj, JS_NewAtom(ctx, name))) {
+        JS_ThrowTypeError(ctx, "required field '%s' does not exist!", name);
+        return JS_EXCEPTION;
+    }
+    return JS_GetPropertyStr(ctx, obj, name);
+}
 
 double ObjectHelp::getNumber(const char* name, double defaultVal){
     auto val = getVal(name);
