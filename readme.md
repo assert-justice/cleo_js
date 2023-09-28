@@ -22,6 +22,7 @@ A game framework for JavaScript.
 - mouse input
 - gamepad buttons and axes
 - example game (top down shooter probably)
+- clean up c++ api, make stuff private
 
 ### Medium Term
 

@@ -165,14 +165,14 @@ void Renderer::freeTexture(int id){
 
 void Renderer::setCameraPosition(float x, float y){
     // intentionally flipped
-    float top = engine.window.height;
+    float top = (float)engine.window.height;
     float bottom = 0.0f;
     if(target != nullptr){
         bottom = top;
         top = 0.0f;
     }
     // cameraTransform = glm::ortho(0.0f, camWidth, camHeight, 0.0f, -0.1f, 100.0f);
-    cameraTransform = glm::ortho(0.0f, engine.window.width, top, bottom, -0.1f, 100.0f);
+    cameraTransform = glm::ortho(0.0f, (float)engine.window.width, top, bottom, -0.1f, 100.0f);
     cameraTransform = glm::translate(cameraTransform, glm::vec3(-x, -y, 0.0f));
 }
 

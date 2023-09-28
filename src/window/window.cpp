@@ -1,21 +1,31 @@
 #include "window.hpp"
 #include <iostream>
+#include "engine/engine.hpp"
+
+static void framebufferCallback(GLFWwindow* window, int width, int height){
+    window = window;
+    glViewport(0, 0, width, height);
+    engine.window.width = width;
+    engine.window.height = height;
+    engine.renderer.setCameraPosition(0,0);
+}
 
 Window::Window(){}
 Window::~Window(){
     if(!initialized) return;
+    initialized = false;
     glfwTerminate();
 }
 
 void Window::init(bool* hasError){
     if(*hasError) return;
-    // GLFWwindow* window;
     if(!glfwInit()){
         std::cout << "Failed to init glfw" << std::endl;
         *hasError = true;
         return;
     }
-    GLFWwindow* window = glfwCreateWindow(800, 600, "hi glfw", NULL, NULL);
+    setWindow();
+    // window = glfwCreateWindow(width, height, name.c_str(), NULL, NULL);
     if (window == NULL){
         std::cout << "Failed to create GLFW window" << std::endl;
         glfwTerminate();
@@ -30,9 +40,8 @@ void Window::init(bool* hasError){
         *hasError = true;
         return;
     }
-    // enable vsync
-    glfwSwapInterval(1);
-    this->window = window;
+    glfwSetFramebufferSizeCallback(window, framebufferCallback);
+    glfwSwapInterval(vsync);
     initialized = true;
 }
 
@@ -50,4 +59,30 @@ bool Window::shouldClose(){
 
 void Window::quit(){
     glfwSetWindowShouldClose(window, true);
+}
+
+void Window::setStats(std::string name, int width, int height, int mode){
+    this->name = name; 
+    this->width = width; this->height = height; 
+    this->mode = mode;
+    // if the window isn't yet initialized we're done
+    if(!initialized) return;
+    // regenerate the window
+    setWindow();
+}
+
+void Window::setVsync(bool vsync){
+    this->vsync = vsync;
+    if(!initialized) return;
+    glfwSwapInterval(vsync);
+}
+
+void Window::setWindow(){
+    GLFWmonitor* monitor = NULL;
+    if(window == NULL){
+        window = glfwCreateWindow(width, height, name.c_str(), monitor, NULL);
+    }
+    else{
+        glfwSetWindowMonitor(window, monitor, 0, 0, width, height, GLFW_DONT_CARE);
+    }
 }
