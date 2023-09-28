@@ -275,10 +275,7 @@ void bindGraphics(){
     JS_DefinePropertyValueStr(ctx, proto, "Texture", textureProto, 0);
 
     // standalone functions
-    // drawSprite(texture: Texture, x: number, y: number)
-    fn = JS_NewCFunction(ctx, &spriteDrawBind, "drawSprite", 0);
-    JS_DefinePropertyValueStr(ctx, proto, "drawSprite", fn, 0);
-    // setClearColor(r: number, g: number, b: number, a: number = 0);
+    // setClearColor(r: number, g: number, b: number, a: number = 0)
     fn = JS_NewCFunction(ctx, &setClearColorBind, "setClearColor", 0);
     JS_DefinePropertyValueStr(ctx, proto, "setClearColor", fn, 0);
     // clear

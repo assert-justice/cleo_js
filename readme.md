@@ -11,28 +11,30 @@ A game framework for JavaScript.
 - load js modules
 - refactor api with objects
 - working linux build
+- simple audio api
 
 ### Current
 
-- simple audio api
+- set texture object properties to default values on creation
 
 ### Short Term
 
 - widow options including borderless fullscreen
 - mouse input
 - gamepad buttons and axes
-- add sprite/texture distinction to api
-- add audio groups
 - example game (top down shooter probably)
 
 ### Medium Term
 
+- add audio groups
 - text rendering
 - web target with emscripten
 - dev logs
 - transform, mesh, shader api
 - 3d example game (probably doom clone)
 - virtual file system
+- ui system
+- input overhaul/button remapping
 
 ### Long Term
 

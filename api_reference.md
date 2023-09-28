@@ -8,6 +8,9 @@
 
 ## Graphics
 
+- setClearColor(r: number, g: number, b: number, a: number = 0)
+- clear()
+
 ### Texture
 
 - constructor(width: number, height: number)
@@ -15,6 +18,9 @@
 - get width:number
 - get height:number
 - draw(x: number, y:number, options:any)
+- setTarget()
+- resetTarget()
+- new(with: number, height: number)
 
 ## Window
 
@@ -34,4 +40,17 @@
 - get set mode: string
 
 ## Audio
+
+### Sound
+
+- static fromFile(path: string)
+- play()
+- pause()
+- stop()
+- get isPlaying: boolean
+- get set volume: number
+- get set isLooping: boolean
+
 ## System
+
+- println(...string[])
