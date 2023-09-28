@@ -44,9 +44,20 @@ JSValue setStatsBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
     return JS_UNDEFINED;
 }
 
+static JSValue vsyncSetBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
+    FnHelp fnHelp(ctx, argc, argv);
+    auto val = fnHelp.getBool();
+    if(fnHelp.hasError) return JS_EXCEPTION;
+    engine.window.setVsync(val);
+    return JS_UNDEFINED;
+}
+static JSValue vsyncGetBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
+    return JS_NewBool(ctx, engine.window.vsync);
+}
+
 void bindWindow(){
     JSValue proto;
-    JSValue fn;
+    JSValue fn, fn2;
     auto ctx = engine.vm.context;
 
     proto = JS_NewObject(ctx);
@@ -63,5 +74,10 @@ void bindWindow(){
     // set(name: string, width: number, height: number, mode: string, vsync: bool)
     fn = JS_NewCFunction(ctx, &setStatsBind, "setStats", 0);
     JS_DefinePropertyValueStr(ctx, proto, "setStats", fn, 0);
+    // get set vsync: number
+    fn = JS_NewCFunction(ctx, &vsyncGetBind, "vsyncGet", 0);
+    fn2 = JS_NewCFunction(ctx, &vsyncSetBind, "vsyncSet", 0);
+    JS_DefinePropertyGetSet(ctx, proto, JS_NewAtom(ctx, "vsync"), 
+        fn, fn2, 0);
     engine.vm.addExport("Window", proto);
 }

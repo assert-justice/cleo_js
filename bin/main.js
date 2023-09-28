@@ -10,12 +10,13 @@ Game.init = ()=>{
     tex = Texture.fromFile('characters_packed.png');
 }
 
-Game.update = ()=>{
+Game.update = (dt)=>{
     if(Input.getKey(256)) Game.quit();
     lastSpaceDown = spaceDown;
     spaceDown = Input.getKey(32);
     if(spaceDown && !lastSpaceDown){
-        Window.setStats("yo", 600, 400, "borderless");
+        System.println(1/dt);
+        // Window.setStats("yo", 600, 400, "borderless");
     }
 }
 
