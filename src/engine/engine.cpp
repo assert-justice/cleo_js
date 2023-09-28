@@ -19,9 +19,9 @@ void Engine::init(){
     vm.init(&hasError);
     auto src = readFile(&hasError, "./main.js");
     vm.bind(&hasError, src);
+    audio.init(&hasError);
     window.init(&hasError);
     renderer.init(&hasError);
-    audio.init(&hasError);
     if(hasError) return;
     vm.launch(&hasError);
     if(!hasError) loop();

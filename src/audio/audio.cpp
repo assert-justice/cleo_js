@@ -14,8 +14,8 @@ void Audio::init(bool* hasError){
         *hasError = true;
         return;  // Failed to initialize the engine.
     }
-    int idx = soundLoad("Jump__001.wav");
-    soundPlay(idx);
+    // int idx = soundLoad("Jump__001.wav");
+    // soundPlay(idx);
     initalized = true;
 }
 
@@ -26,10 +26,14 @@ int Audio::soundLoad(const char* path){
         MA_SOUND_FLAG_DECODE | MA_SOUND_FLAG_STREAM, NULL, NULL, 
         sound);
     if (result != MA_SUCCESS) {
-        std::cout << "Failed to load sound'" << "'\n";
+        std::cout << "Failed to load sound '" << path << "'\n";
         return -1;
     }
     return soundStore.add(sound);
+}
+
+void Audio::soundFree(int idx){
+    soundStore.del(idx);
 }
 
 void Audio::soundPlay(int idx){

@@ -8,6 +8,7 @@ class Audio{
     ~Audio();
     void init(bool* hasError);
     int soundLoad(const char* path);
+    void soundFree(int idx);
     void soundPlay(int idx);
     void soundPause(int idx);
     void soundStop(int idx);

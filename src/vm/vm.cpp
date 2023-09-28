@@ -3,11 +3,12 @@
 #include "engine/engine.hpp"
 #include "utils/fs.hpp"
 #include "fn_help.hpp"
-#include "vm/bind_game.hpp"
-#include "vm/bind_system.hpp"
-#include "vm/bind_input.hpp"
-#include "vm/bind_window.hpp"
-#include "vm/bind_graphics.hpp"
+#include "bind_game.hpp"
+#include "bind_system.hpp"
+#include "bind_input.hpp"
+#include "bind_window.hpp"
+#include "bind_graphics.hpp"
+#include "bind_audio.hpp"
 
 JSModuleDef *jsModuleLoader(JSContext *ctx,
                               const char *module_name, void *opaque)
@@ -69,6 +70,7 @@ void VM::init(bool* hasError){
     bindSystem();
     bindWindow();
     bindGraphics();
+    bindAudio();
     // JS_DefineProperty()
     // auto printlnFn = JS_NewCFunction(context, &printlnBind, "println", 0);
     // addExport("println", printlnFn);

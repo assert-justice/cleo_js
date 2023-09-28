@@ -1,9 +1,13 @@
-import {Game, System, Input, Window, Graphics} from 'cleo';
+import {Game, System, Input, Window, Graphics, Audio} from 'cleo';
 const {Texture, drawSprite} = Graphics;
+const {Sound} = Audio;
 
 let tex;
 let spr,spr2;
+let sound;
 Game.init = ()=>{
+    sound = Sound.fromFile('Jump__001.wav');
+    sound.play();
     tex = Texture.fromFile('characters_packed.png');
     // tex.sx = 24*2;
     // tex.sy = 24;

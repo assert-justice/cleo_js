@@ -228,7 +228,7 @@ static JSValue spriteDrawBind(JSContext* ctx, JSValue thisVal, int argc, JSValue
 }
 
 void bindGraphics(){
-    JSValue proto, textureProto, spriteProto;
+    JSValue proto, textureProto;
     JSValue fn;
     auto ctx = engine.vm.context;
     proto = JS_NewObject(ctx);
