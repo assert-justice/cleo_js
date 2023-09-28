@@ -15,6 +15,7 @@ class Store{
         return idCount - 1;
     }
     T* get(int id){
+        if(!has(id)) return nullptr;
         return data.at(id);
     }
     bool has(int id){

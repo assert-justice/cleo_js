@@ -1,7 +1,8 @@
 #pragma once
-#include "../vm/vm.hpp"
-#include "../window/window.hpp"
-#include "../renderer/renderer.hpp"
+#include "vm/vm.hpp"
+#include "window/window.hpp"
+#include "renderer/renderer.hpp"
+#include "audio/audio.hpp"
 #include <stack>
 
 class Engine{
@@ -9,6 +10,7 @@ class Engine{
     VM vm;
     Window window;
     Renderer renderer;
+    Audio audio;
     bool running = true;
     Engine();
     ~Engine();

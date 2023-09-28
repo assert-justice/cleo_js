@@ -1,9 +1,6 @@
 #include "engine.hpp"
 #include <iostream>
 #include "utils/fs.hpp"
-#include "vm/bind_game.hpp"
-#include "vm/bind_system.hpp"
-#include "vm/bind_input.hpp"
 #include <fstream>
 
 Engine::Engine(){
@@ -24,6 +21,7 @@ void Engine::init(){
     vm.bind(&hasError, src);
     window.init(&hasError);
     renderer.init(&hasError);
+    audio.init(&hasError);
     if(hasError) return;
     vm.launch(&hasError);
     if(!hasError) loop();

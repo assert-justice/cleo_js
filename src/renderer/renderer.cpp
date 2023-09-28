@@ -60,6 +60,7 @@ void Renderer::init(bool* hasError){
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);  
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, fbt, 0); 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    clear();
     initalized = true;
 }
 void Renderer::setClearColor(float r, float g, float b, float a){
@@ -110,6 +111,10 @@ int Renderer::loadImage(const char* path){
 void Renderer::drawImage(int textureId, glm::mat4 spriteTransform, glm::mat4 coordTransform){
     glUseProgram(imageShader.id);
     auto tex = textureStore.get(textureId);
+    if(tex == nullptr){
+        // TODO: actually handle this error
+        return;
+    }
     tex->use();
     glBindVertexArray(VAO);
     unsigned int cameraLoc = glGetUniformLocation(imageShader.id, "camera");
