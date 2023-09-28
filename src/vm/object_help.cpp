@@ -29,3 +29,7 @@ double ObjectHelp::getNumber(const char* name, double defaultVal){
     JS_ToFloat64(ctx, &res, val);
     return res;
 }
+void ObjectHelp::setNumber(const char* name, double val){
+    auto num = JS_NewFloat64(ctx, val);
+    JS_DefinePropertyValueStr(ctx, obj, name, num, 0);
+}

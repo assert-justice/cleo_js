@@ -4,6 +4,7 @@
 
 Audio::~Audio(){
     if(!initalized) return;
+    initalized = false;
     ma_engine_uninit(&audioEngine);
 }
 

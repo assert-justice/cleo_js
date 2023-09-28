@@ -15,11 +15,10 @@ A game framework for JavaScript.
 
 ### Current
 
-- set texture object properties to default values on creation
+- widow options including borderless fullscreen
 
 ### Short Term
 
-- widow options including borderless fullscreen
 - mouse input
 - gamepad buttons and axes
 - example game (top down shooter probably)
