@@ -7,17 +7,18 @@ class Audio{
     // Audio();
     ~Audio();
     void init(bool* hasError);
-    int loadSound(const char* path);
-    void playSound(int idx);
-    void pauseSound(int idx);
-    void stopSound(int idx);
-    int soundIsPlaying(int idx);
-    void setVolumeSound(int idx, double volume);
-    double getVolumeSound(int idx);
-    void loopSound(int idx, int shouldLoop);
-    int SoundIsLooping(int idx);
+    int soundLoad(const char* path);
+    void soundPlay(int idx);
+    void soundPause(int idx);
+    void soundStop(int idx);
+    bool soundIsPlaying(int idx);
+    void soundSetVolume(int idx, double volume);
+    double soundGetVolume(int idx);
+    void soundLoop(int idx, bool shouldLoop);
+    bool soundIsLooping(int idx);
     bool initalized = false;
     ma_engine audioEngine;
     Store<ma_sound> soundStore;
     private:
+    bool validIdx(int idx);
 };

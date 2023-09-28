@@ -14,12 +14,12 @@ void Audio::init(bool* hasError){
         *hasError = true;
         return;  // Failed to initialize the engine.
     }
-    int idx = loadSound("Jump__001.wav");
-    playSound(idx);
+    int idx = soundLoad("Jump__001.wav");
+    soundPlay(idx);
     initalized = true;
 }
 
-int Audio::loadSound(const char* path){
+int Audio::soundLoad(const char* path){
     ma_result result;
     auto sound = new ma_sound();
     result = ma_sound_init_from_file(&audioEngine, path, 
@@ -32,11 +32,47 @@ int Audio::loadSound(const char* path){
     return soundStore.add(sound);
 }
 
-void Audio::playSound(int idx){
+void Audio::soundPlay(int idx){
+    if(!validIdx(idx)) return;
+    ma_sound_start(soundStore.get(idx));
+}
+void Audio::soundPause(int idx){
+    if(!validIdx(idx)) return;
+    ma_sound_stop(soundStore.get(idx));
+}
+void Audio::soundStop(int idx){
+    if(!validIdx(idx)) return;
     auto sound = soundStore.get(idx);
-    if(sound == nullptr){
+    ma_sound_stop(sound);
+    ma_sound_seek_to_pcm_frame(sound, 0);
+}
+bool Audio::soundIsPlaying(int idx){
+    if(!validIdx(idx)) return false;
+    return ma_sound_is_playing(soundStore.get(idx));
+}
+void Audio::soundSetVolume(int idx, double volume){
+    if(!validIdx(idx)) return;
+    ma_sound_set_volume(soundStore.get(idx), (float)volume);
+}
+
+double Audio::soundGetVolume(int idx){
+    if(!validIdx(idx)) return 0.0;
+    return (double)ma_sound_get_volume(soundStore.get(idx));
+}
+
+void Audio::soundLoop(int idx, bool shouldLoop){
+    if(!validIdx(idx)) return;
+    ma_sound_set_looping(soundStore.get(idx), (ma_bool32) shouldLoop);
+}
+bool Audio::soundIsLooping(int idx){
+    if(!validIdx(idx)) return 0;
+    return (int)ma_sound_is_looping(soundStore.get(idx));
+}
+
+bool Audio::validIdx(int idx){
+    if(!soundStore.has(idx)){
         // TODO: actually handle this error
-        return;
+        return false;
     }
-    ma_sound_start(sound);
+    return true;
 }
