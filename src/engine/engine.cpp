@@ -30,7 +30,9 @@ void Engine::init(){
     window.init(&hasError);
     renderer.init(&hasError);
     if(hasError) return;
+    renderer.enabled = true;
     vm.launch(&hasError);
+    renderer.enabled = false;
     if(!hasError) loop();
     else running = false;
 }

@@ -103,7 +103,7 @@ static JSValue getTextureHeightBind(JSContext* ctx, JSValue thisVal, int argc, J
 }
 
 static JSValue textureFromFileBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
-    if(!rendererInitalized) return JS_EXCEPTION;
+    if(!canRender(ctx)) return JS_EXCEPTION;
     FnHelp help(ctx, argc, argv);
     auto path = help.getString();
     if(help.hasError) return JS_EXCEPTION;
@@ -118,7 +118,7 @@ static JSValue textureFromFileBind(JSContext* ctx, JSValue thisVal, int argc, JS
 }
 
 static JSValue textureConstructorBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
-    if(!rendererInitalized) return JS_EXCEPTION;
+    if(!canRender(ctx)) return JS_EXCEPTION;
     FnHelp help(ctx, argc, argv);
     auto width = help.getFloat64();
     auto height = help.getFloat64();
