@@ -1,26 +1,30 @@
 import {Game, System, Input, Window, Graphics} from 'cleo';
 const {Texture} = Graphics;
 
-Window.setStats("hi", 300, 200);
-
-let tex;
-let spaceDown = false;
-let lastSpaceDown = false;
+const player = {
+    x: 0,
+    y: 0,
+    speed: 100,
+    spr: null,
+    sprOptions:{
+        width: 24*4,
+        height: 24*4,
+        sw:24,
+        sh:24,
+    }
+}
 Game.init = ()=>{
-    tex = Texture.fromFile('characters_packed.png');
+    player.spr = Texture.fromFile('characters_packed.png');
 }
 
 Game.update = (dt)=>{
     if(Input.keyIsDown(256)) Game.quit();
-    lastSpaceDown = spaceDown;
-    spaceDown = Input.mouseButtonIsDown(0);
-    if(spaceDown && !lastSpaceDown){
-        System.println(Input.mouseX, Input.mouseY);
-        // System.println(1/dt);
-        // Window.setStats("yo", 600, 400, "borderless");
-    }
+    if(Input.keyIsDown(262)) player.x += player.speed * dt;
+    if(Input.keyIsDown(263)) player.x -= player.speed * dt;
+    if(Input.joyButtonIsDown(0,12)) player.x += player.speed * dt;
+    if(Input.joyButtonIsDown(0,14)) player.x -= player.speed * dt;
 }
 
 Game.draw = ()=>{
-    tex.draw(100,100);
+    player.spr.draw(player.x,player.y, player.sprOptions);
 }

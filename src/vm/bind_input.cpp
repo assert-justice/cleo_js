@@ -11,7 +11,20 @@ static bool inputInitialized(JSContext* ctx){
     return true;
 }
 
-JSValue keyIsDownBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
+static bool joyValid(JSContext* ctx, int joyIdx){
+    if(!inputInitialized(ctx)) return false;
+    if(!glfwJoystickPresent(joyIdx)){
+        JS_ThrowReferenceError(ctx, "invalid joystick id!");
+        return false;
+    }
+    if(!glfwJoystickIsGamepad(joyIdx)){
+        JS_ThrowReferenceError(ctx, "joystick is not a gamepad!");
+        return false;
+    }
+    return true;
+}
+
+static JSValue keyIsDownBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
     if(!inputInitialized(ctx)) return JS_EXCEPTION;
     FnHelp help(ctx, argc, argv);
     int keyCode = help.getInt();
@@ -20,7 +33,7 @@ JSValue keyIsDownBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
     return JS_NewBool(ctx, state);
 }
 
-JSValue mouseButtonIsDownBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
+static JSValue mouseButtonIsDownBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
     if(!inputInitialized(ctx)) return JS_EXCEPTION;
     FnHelp help(ctx, argc, argv);
     int mouseButtonCode = help.getInt();
@@ -29,18 +42,47 @@ JSValue mouseButtonIsDownBind(JSContext* ctx, JSValue thisVal, int argc, JSValue
     return JS_NewBool(ctx, state);
 }
 
-JSValue mouseGetXBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
+static JSValue mouseGetXBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
     if(!inputInitialized(ctx)) return JS_EXCEPTION;
     double xPos, yPos;
     glfwGetCursorPos(engine.window.window, &xPos, &yPos);
     return JS_NewFloat64(ctx, xPos);
 }
 
-JSValue mouseGetYBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
+static JSValue mouseGetYBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
     if(!inputInitialized(ctx)) return JS_EXCEPTION;
     double xPos, yPos;
     glfwGetCursorPos(engine.window.window, &xPos, &yPos);
     return JS_NewFloat64(ctx, yPos);
+}
+
+static JSValue joyButtonIsDownBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
+    FnHelp help(ctx, argc, argv);
+    int joyIdx = help.getInt();
+    int buttonCode = help.getInt();
+    if(help.hasError) return JS_EXCEPTION;
+    if(!joyValid(ctx, joyIdx)) return JS_EXCEPTION;
+    if(buttonCode < 0 || buttonCode > 14){
+        JS_ThrowReferenceError(ctx, "invalid joyButton code!");
+        return JS_EXCEPTION;
+    }
+    GLFWgamepadstate state;
+    glfwGetGamepadState(joyIdx, &state);
+    return JS_NewBool(ctx, state.buttons[buttonCode]);
+}
+static JSValue joyGetAxisBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
+    FnHelp help(ctx, argc, argv);
+    int joyIdx = help.getInt();
+    int axisCode = help.getInt();
+    if(help.hasError) return JS_EXCEPTION;
+    if(!joyValid(ctx, joyIdx)) return JS_EXCEPTION;
+    if(axisCode < 0 || axisCode > 5){
+        JS_ThrowReferenceError(ctx, "invalid joyAxis code!");
+        return JS_EXCEPTION;
+    }
+    GLFWgamepadstate state;
+    glfwGetGamepadState(joyIdx, &state);
+    return JS_NewFloat64(ctx, state.axes[axisCode]);
 }
 
 void bindInput(){
@@ -64,5 +106,11 @@ void bindInput(){
     JS_DefineProperty(ctx, proto, JS_NewAtom(ctx, "mouseY"), 
         JS_UNDEFINED, fn, JS_UNDEFINED, JS_PROP_HAS_GET);
     JS_FreeValue(ctx, fn);
+    // joyButtonIsDown(joyIdx, buttonCode: number): bool
+    fn = JS_NewCFunction(ctx, &joyButtonIsDownBind, "joyButtonIsDown", 0);
+    JS_DefinePropertyValueStr(ctx, proto, "joyButtonIsDown", fn, 0);
+    // joyGetAxis(joyIdx, axisCode: number): bool
+    fn = JS_NewCFunction(ctx, &joyGetAxisBind, "joyGetAxis", 0);
+    JS_DefinePropertyValueStr(ctx, proto, "joyGetAxis", fn, 0);
     engine.vm.addExport("Input", proto);
 }
