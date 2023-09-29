@@ -2,7 +2,11 @@
 
 A game framework for JavaScript.
 
-## Todo
+## Build Instructions
+
+Good luck.
+
+## Roadmap
 
 ### Completed
 
@@ -16,20 +20,22 @@ A game framework for JavaScript.
 - add draw method
 - fix the timestep
 - mouse input
+- gamepad buttons and axes
 
 ### Current
 
-- gamepad buttons and axes
 
 ### Short Term
 
 - example game (top down shooter probably)
 - clean up c++ api, make stuff private
+- saving/loading
 
 ### Medium Term
 
 - add audio groups
 - text rendering
+- http requests
 - web target with emscripten
 - dev logs
 - transform, mesh, shader api

@@ -169,7 +169,7 @@ void bindAudio(){
     fn2 = JS_NewCFunction(ctx, &soundSetVolumeBind, "soundSetVolume", 0);
     JS_DefinePropertyGetSet(ctx, soundProto, JS_NewAtom(ctx, "volume"), 
         fn, fn2, 0);
-    // get set volume: number
+    // get set isLooping: bool
     fn = JS_NewCFunction(ctx, &soundGetIsLoopingBind, "soundGetIsLooping", 0);
     fn2 = JS_NewCFunction(ctx, &soundSetIsLoopingBind, "soundSetVolume", 0);
     JS_DefinePropertyGetSet(ctx, soundProto, JS_NewAtom(ctx, "isLooping"), 
