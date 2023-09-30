@@ -98,14 +98,17 @@ void VM::launch(bool* hasError){
 
 void VM::update(double dt){
     auto val = JS_NewFloat64(context, dt);
-    JS_Call(context, updateFn, JS_UNDEFINED, 1, &val);
+    val = JS_Call(context, updateFn, JS_UNDEFINED, 1, &val);
+    isException(context, val);
 }
 void VM::draw(){
-    JS_Call(context, drawFn, JS_UNDEFINED, 0, NULL);
+    auto val = JS_Call(context, drawFn, JS_UNDEFINED, 0, NULL);
+    isException(context, val);
 }
 
 bool isException(JSContext* context, JSValue val){
     if(JS_IsException(val)){
+        engine.setError();
         auto exception = JS_GetException(context);
         auto str = JS_ToCString(context, exception);
         std::cerr << str << std::endl;

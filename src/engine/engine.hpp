@@ -3,7 +3,7 @@
 #include "window/window.hpp"
 #include "renderer/renderer.hpp"
 #include "audio/audio.hpp"
-#include <stack>
+#include <string>
 
 class Engine{
     public:
@@ -16,6 +16,10 @@ class Engine{
     ~Engine();
     void init();
     void loop();
+    void setError();
+    private:
+    bool hasError = false;
+    std::string errorMessage;
 };
 
 extern Engine engine;

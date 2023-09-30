@@ -71,4 +71,9 @@ void Engine::loop(){
     }
 }
 
+void Engine::setError(){
+    hasError = true;
+    running = false;
+}
+
 Engine engine;
