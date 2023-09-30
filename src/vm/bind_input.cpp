@@ -12,7 +12,6 @@ static bool inputInitialized(JSContext* ctx){
 }
 
 static bool joyValid(JSContext* ctx, int joyIdx){
-    if(!inputInitialized(ctx)) return false;
     if(!glfwJoystickPresent(joyIdx)){
         JS_ThrowReferenceError(ctx, "invalid joystick id!");
         return false;
@@ -57,11 +56,12 @@ static JSValue mouseGetYBind(JSContext* ctx, JSValue thisVal, int argc, JSValue*
 }
 
 static JSValue joyButtonIsDownBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
+    if(!inputInitialized(ctx)) return JS_EXCEPTION;
     FnHelp help(ctx, argc, argv);
     int joyIdx = help.getInt();
     int buttonCode = help.getInt();
     if(help.hasError) return JS_EXCEPTION;
-    if(!joyValid(ctx, joyIdx)) return JS_EXCEPTION;
+    if(!joyValid(ctx, joyIdx)) return JS_NewBool(ctx, false);
     if(buttonCode < 0 || buttonCode > 14){
         JS_ThrowReferenceError(ctx, "invalid joyButton code!");
         return JS_EXCEPTION;
@@ -71,11 +71,12 @@ static JSValue joyButtonIsDownBind(JSContext* ctx, JSValue thisVal, int argc, JS
     return JS_NewBool(ctx, state.buttons[buttonCode]);
 }
 static JSValue joyGetAxisBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
+    if(!inputInitialized(ctx)) return JS_EXCEPTION;
     FnHelp help(ctx, argc, argv);
     int joyIdx = help.getInt();
     int axisCode = help.getInt();
     if(help.hasError) return JS_EXCEPTION;
-    if(!joyValid(ctx, joyIdx)) return JS_EXCEPTION;
+    if(!joyValid(ctx, joyIdx)) return JS_NewFloat64(ctx, 0);
     if(axisCode < 0 || axisCode > 5){
         JS_ThrowReferenceError(ctx, "invalid joyAxis code!");
         return JS_EXCEPTION;
