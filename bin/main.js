@@ -1,5 +1,6 @@
 import {Game, System, Input, Window, Graphics} from 'cleo';
 const {Texture} = Graphics;
+import {message} from './greet';
 
 const player = {
     x: 0,
@@ -14,6 +15,7 @@ const player = {
     }
 }
 Game.init = ()=>{
+    System.println(message);
     player.spr = Texture.fromFile('characters_packed.png');
 }
 

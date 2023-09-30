@@ -15,11 +15,13 @@ JSModuleDef *jsModuleLoader(JSContext *ctx,
 {
     JSModuleDef *m;
     bool hasError = false;
-    auto src = readFile(&hasError, module_name);
+    std::string fname = module_name;
+    auto ext = getExtension(module_name);
+    if(ext == "") fname += ".js";
+    auto src = readFile(&hasError, fname.c_str());
     if(hasError){
-        JS_ThrowReferenceError(ctx, "could not load module filename '%s'",
-                                   module_name);
-            return NULL;
+        JS_ThrowReferenceError(ctx, "could not load module filename '%s'",module_name);
+        return NULL;
     }
     JSValue func_val = JS_Eval(ctx, src.c_str(), src.length(), module_name, 
         JS_EVAL_TYPE_MODULE | JS_EVAL_FLAG_COMPILE_ONLY);

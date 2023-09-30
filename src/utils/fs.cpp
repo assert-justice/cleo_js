@@ -16,3 +16,11 @@ std::string readFile(bool* hasError, const char* path){
         return "";
     }
 }
+
+std::string getExtension(const char* path){
+    // TODO: make more robust
+    std::string fname = path;
+    auto idx = fname.find_last_of('.');
+    if(idx == std::string::npos) return "";
+    return fname.substr(idx+1);
+}
