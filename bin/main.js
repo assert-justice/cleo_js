@@ -16,6 +16,7 @@ const player = {
 }
 Game.init = ()=>{
     System.println(message);
+    System.writeFile('./message.txt', message);
     const text = System.readFile('./vert.glsl');
     System.println(text);
     player.spr = Texture.fromFile('characters_packed.png');

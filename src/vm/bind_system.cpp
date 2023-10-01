@@ -36,6 +36,20 @@ static JSValue readFileBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* 
     return JS_NewString(ctx, text.c_str());
 }
 
+static JSValue writeFileBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
+    FnHelp fnHelp(ctx, argc, argv);
+    auto path = fnHelp.getString();
+    auto text = fnHelp.getString();
+    if(fnHelp.hasError) return JS_EXCEPTION;
+    bool hasError = false;
+    writeFile(&hasError, path.c_str(), text);
+    if(hasError){
+        JS_ThrowReferenceError(ctx, "unable to write to file at '%s'!", path.c_str());
+        return JS_EXCEPTION;
+    }
+    return JS_UNDEFINED;
+}
+
 void bindSystem(){
     JSValue proto;
     JSValue fn;
@@ -46,5 +60,8 @@ void bindSystem(){
     // readFile(path: string)
     fn = JS_NewCFunction(engine.vm.context, &readFileBind, "readFile", 0);
     JS_DefinePropertyValueStr(engine.vm.context, proto, "readFile", fn, 0);
+    // writeFile(path: string)
+    fn = JS_NewCFunction(engine.vm.context, &writeFileBind, "writeFile", 0);
+    JS_DefinePropertyValueStr(engine.vm.context, proto, "writeFile", fn, 0);
     engine.vm.addExport("System", proto);
 }

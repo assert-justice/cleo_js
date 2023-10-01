@@ -17,6 +17,20 @@ std::string readFile(bool* hasError, const char* path){
     }
 }
 
+void writeFile(bool* hasError, const char* path, std::string text){
+    if(*hasError) return;
+    std::ofstream file(path);
+    if(file.is_open()){
+        file << text;
+        file.close();
+    }
+    else{
+        std::cerr << "unable to open file at '" << path << "'!" << std::endl;
+        *hasError = true;
+        return;
+    }
+}
+
 std::string getExtension(const char* path){
     // TODO: make more robust
     std::string fname = path;
