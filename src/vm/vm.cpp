@@ -94,16 +94,19 @@ void VM::bind(bool* hasError, std::string src){
 
 void VM::launch(bool* hasError){
     // not having an init function is fine
+    if(JS_IsUndefined(initFn)) return;
     auto val = JS_Call(context, initFn, JS_UNDEFINED, 0, NULL);
     if(isException(context, val)) *hasError = true;
 }
 
 void VM::update(double dt){
+    if(JS_IsUndefined(updateFn)) return;
     auto val = JS_NewFloat64(context, dt);
     val = JS_Call(context, updateFn, JS_UNDEFINED, 1, &val);
     isException(context, val);
 }
 void VM::draw(){
+    if(JS_IsUndefined(drawFn)) return;
     auto val = JS_Call(context, drawFn, JS_UNDEFINED, 0, NULL);
     isException(context, val);
 }

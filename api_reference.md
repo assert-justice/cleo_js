@@ -27,7 +27,7 @@
 
 - get width:number
 - get height:number
-- set(name: string, width:number, height:number, mode: string, monitor: number)
+- setStats(name: string, width:number, height:number, mode: string, monitor: number)
 - get set vsync: bool
 
 ## Input
@@ -38,12 +38,6 @@
 - get mouseY: number
 - joyButtonIsDown(joyIdx, buttonCode: number): bool
 - joyGetAxis(joyIdx, axisCode: number): bool
-
-### Mouse
-
-- get x: number
-- get y: number
-- get set mode: string
 
 ## Audio
 
