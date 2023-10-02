@@ -152,8 +152,8 @@ static JSValue drawImageBind(JSContext* ctx, JSValue thisVal, int argc, JSValue*
     sy = objHelp.getNumber("sy", 0.0);
     sw = objHelp.getNumber("sw", tex->width);
     sh = objHelp.getNumber("sh", tex->height);
-    originX = objHelp.getNumber("originX", 0.0);
-    originY = objHelp.getNumber("originY", 0.0);
+    originX = objHelp.getNumber("ox", 0.0);
+    originY = objHelp.getNumber("oy", 0.0);
     angle = objHelp.getNumber("angle", 0.0);
     if(objHelp.hasError) return JS_EXCEPTION;
     // calculate sprite transform
