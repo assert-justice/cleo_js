@@ -137,7 +137,7 @@ static JSValue textureConstructorBind(JSContext* ctx, JSValue thisVal, int argc,
 static JSValue drawImageBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
     if(!canRender(ctx)) return JS_EXCEPTION;
     FnHelp help(ctx, argc, argv);
-    float x,y,width,height,sx,sy,sw,sh,originX, originY, angle;
+    float x,y,width,height,sx,sy,sw,sh,ox, oy, angle;
     x = help.getFloat64();
     y = help.getFloat64();
     auto handle = help.hasArgs() ? help.next() : JS_UNDEFINED;
@@ -152,18 +152,19 @@ static JSValue drawImageBind(JSContext* ctx, JSValue thisVal, int argc, JSValue*
     sy = objHelp.getNumber("sy", 0.0);
     sw = objHelp.getNumber("sw", tex->width);
     sh = objHelp.getNumber("sh", tex->height);
-    originX = objHelp.getNumber("ox", 0.0);
-    originY = objHelp.getNumber("oy", 0.0);
+    ox = objHelp.getNumber("ox", 0.0);
+    oy = objHelp.getNumber("oy", 0.0);
     angle = objHelp.getNumber("angle", 0.0);
     if(objHelp.hasError) return JS_EXCEPTION;
     // calculate sprite transform
-    // scale, offset, scale2, rotate, move
+    // scale, offset, rotate, scale2, move
     // have to do it in reverse because matrix math is Like That
     glm::mat4 spriteTransform = glm::mat4(1.0f);
     spriteTransform = glm::translate(spriteTransform, glm::vec3(x, y, 0.0f));
-    spriteTransform = glm::rotate(spriteTransform, glm::radians(angle), glm::vec3(0.0f, 0.0f, 1.0f));
     // spriteTransform = glm::scale(spriteTransform, glm::vec3(scaleX,scaleY, 0.0f));
-    spriteTransform = glm::translate(spriteTransform, glm::vec3(-originX, -originY, 0.0f));
+    spriteTransform = glm::rotate(spriteTransform, glm::radians(angle), glm::vec3(0.0f, 0.0f, 1.0f));
+    // std::cout << -ox/sw*width << std::endl;
+    spriteTransform = glm::translate(spriteTransform, glm::vec3(-ox/sw*width, -oy/sh*height, 0.0f));
     spriteTransform = glm::scale(spriteTransform, glm::vec3(width,height, 0.0f));
 
     // calculate texture coord transform

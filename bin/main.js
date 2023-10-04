@@ -3,8 +3,8 @@ const {Texture} = Graphics;
 import {message} from './greet';
 
 const player = {
-    x: 0,
-    y: 0,
+    x: 48,
+    y: 48,
     speed: 100,
     spr: null,
     sprOptions:{
@@ -12,13 +12,16 @@ const player = {
         height: 24*4,
         sw:24,
         sh:24,
+        ox: 12,
+        oy: 12,
+        angle: 180,
     }
 }
 Game.init = ()=>{
-    System.println(message);
-    System.writeFile('./message.txt', message);
-    const text = System.readFile('./vert.glsl');
-    System.println(text);
+    // System.println(message);
+    // System.writeFile('./message.txt', message);
+    // const text = System.readFile('./vert.glsl');
+    // System.println(text);
     player.spr = Texture.fromFile('characters_packed.png');
 }
 
