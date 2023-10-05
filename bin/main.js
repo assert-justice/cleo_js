@@ -15,7 +15,7 @@ const player = {
         ox: 12,
         oy: 12,
         angle: 180,
-        visible: false,
+        visible: true,
     }
 }
 Game.init = ()=>{

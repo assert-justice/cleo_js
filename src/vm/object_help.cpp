@@ -41,9 +41,7 @@ bool ObjectHelp::getBool(const char* name, bool defaultVal){
         hasError = true;
         return defaultVal;
     }
-    bool res;
-    JS_ToBool(ctx, val);
-    return res;
+    return JS_ToBool(ctx, val);
 }
 void ObjectHelp::setBool(const char* name, bool val){
     auto num = JS_NewBool(ctx, val);
