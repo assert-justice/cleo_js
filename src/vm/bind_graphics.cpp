@@ -155,7 +155,9 @@ static JSValue drawImageBind(JSContext* ctx, JSValue thisVal, int argc, JSValue*
     ox = objHelp.getNumber("ox", 0.0);
     oy = objHelp.getNumber("oy", 0.0);
     angle = objHelp.getNumber("angle", 0.0);
+    bool visible = objHelp.getBool("visible", true);
     if(objHelp.hasError) return JS_EXCEPTION;
+    if(!visible) return JS_UNDEFINED;
     // calculate sprite transform
     // scale, offset, rotate, scale2, move
     // have to do it in reverse because matrix math is Like That

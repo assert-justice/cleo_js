@@ -33,3 +33,19 @@ void ObjectHelp::setNumber(const char* name, double val){
     auto num = JS_NewFloat64(ctx, val);
     JS_DefinePropertyValueStr(ctx, obj, name, num, 0);
 }
+bool ObjectHelp::getBool(const char* name, bool defaultVal){
+    auto val = getVal(name);
+    if(JS_IsUndefined(val)) return defaultVal;
+    if(!JS_IsBool(val)){
+        JS_ThrowTypeError(ctx, "field '%s' is not a boolean!", name);
+        hasError = true;
+        return defaultVal;
+    }
+    bool res;
+    JS_ToBool(ctx, val);
+    return res;
+}
+void ObjectHelp::setBool(const char* name, bool val){
+    auto num = JS_NewBool(ctx, val);
+    JS_DefinePropertyValueStr(ctx, obj, name, num, 0);
+}
