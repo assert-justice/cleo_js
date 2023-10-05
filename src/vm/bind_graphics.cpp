@@ -64,6 +64,8 @@ static bool rendererInitalized(JSContext* ctx){
 }
 static bool canRender(JSContext* ctx){
     if(!rendererInitalized(ctx)) return false;
+    // TODO: change so you can't render to base framebuffer when not enabled
+    return true;
     if(!engine.renderer.enabled){
         JS_ThrowReferenceError(ctx, "method called outside of draw function!");
         return false;
