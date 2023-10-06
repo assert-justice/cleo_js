@@ -17,6 +17,28 @@ const float quad[] = {
     0.0f, 0.0f, 0.0f,     0.0f, 0.0f, // bottom left
 };
 
+static const char* vertSrc = "#version 330 core\n"
+    "in vec3 aPos;"
+    "in vec2 aTexCoord;"
+    "out vec2 TexCoord;"
+    "uniform mat4 camera;"
+    "uniform mat4 sprite;"
+    "uniform mat4 coord;"
+    "void main()"
+    "{"
+    "    gl_Position = camera * sprite * vec4(aPos, 1.0);"
+    "    TexCoord = (coord * vec4(aTexCoord, 1.0, 1.0)).xy;"
+    "}";
+
+static const char* fragSrc = "#version 330 core\n"
+    "out vec4 FragColor;"
+    "in vec2 TexCoord;"
+    "uniform sampler2D ourTexture;"
+    "void main()"
+    "{"
+    "    FragColor = texture(ourTexture, TexCoord);"
+    "}";
+
 Renderer::Renderer(){}
 Renderer::~Renderer(){
     if(!initalized) return;
@@ -28,8 +50,8 @@ Renderer::~Renderer(){
 }
 void Renderer::init(bool* hasError){
     if(*hasError) return;
-    std::string vertexShaderSource = readFile(hasError, "./vert.glsl");
-    std::string fragmentShaderSource = readFile(hasError, "./frag.glsl");
+    std::string vertexShaderSource = vertSrc; //readFile(hasError, "./vert.glsl");
+    std::string fragmentShaderSource = fragSrc; //readFile(hasError, "./frag.glsl");
     if(*hasError) return;
     imageShader.initialize(hasError, vertexShaderSource, fragmentShaderSource);
     if(*hasError) return;
