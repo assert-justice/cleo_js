@@ -85,6 +85,13 @@ static JSValue joyGetAxisBind(JSContext* ctx, JSValue thisVal, int argc, JSValue
     glfwGetGamepadState(joyIdx, &state);
     return JS_NewFloat64(ctx, state.axes[axisCode]);
 }
+static JSValue gamepadExistsBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
+    if(!inputInitialized(ctx)) return JS_EXCEPTION;
+    FnHelp help(ctx, argc, argv);
+    int joyIdx = help.getInt();
+    if(help.hasError) return JS_EXCEPTION;
+    return JS_NewBool(ctx, joyValid(ctx, joyIdx));
+}
 
 void bindInput(){
     JSValue proto;
@@ -113,5 +120,8 @@ void bindInput(){
     // joyGetAxis(joyIdx, axisCode: number): bool
     fn = JS_NewCFunction(ctx, &joyGetAxisBind, "joyGetAxis", 0);
     JS_DefinePropertyValueStr(ctx, proto, "joyGetAxis", fn, 0);
+    // gamepadExists(joyIdx): bool
+    fn = JS_NewCFunction(ctx, &gamepadExistsBind, "gamepadExists", 0);
+    JS_DefinePropertyValueStr(ctx, proto, "gamepadExists", fn, 0);
     engine.vm.addExport("Input", proto);
 }

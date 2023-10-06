@@ -24,6 +24,7 @@ Game.init = ()=>{
     // const text = System.readFile('./vert.glsl');
     // System.println(text);
     player.spr = Texture.fromFile('characters_packed.png');
+    System.println(Input.gamepadExists(0));
 }
 
 Game.update = (dt)=>{
