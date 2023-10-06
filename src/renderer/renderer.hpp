@@ -30,8 +30,13 @@ class Renderer{
     float camWidth = 800;
     float camHeight = 600;
     Texture* target = nullptr;
-    bool enabled = false;
+    void enable(){enabled = true;}
+    void disable(){enabled = false;}
+    bool isEnabled(){
+        return enabled || target != nullptr;
+    }
     private:
+    bool enabled = false;
     Shader imageShader;
     bool initalized = false;
     unsigned int VBO, VAO;

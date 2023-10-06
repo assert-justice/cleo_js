@@ -30,9 +30,7 @@ void Engine::init(){
     window.init(&hasError);
     renderer.init(&hasError);
     if(hasError) return;
-    renderer.enabled = true;
     vm.launch(&hasError);
-    renderer.enabled = false;
     if(!hasError) loop();
     else running = false;
 }
@@ -63,9 +61,9 @@ void Engine::loop(){
             t += dt;
         }
         renderer.update();
-        renderer.enabled = true;
+        renderer.enable();
         vm.draw();
-        renderer.enabled = false;
+        renderer.disable();
         window.update();
         if(window.shouldClose()) running = false;
     }
