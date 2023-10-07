@@ -2,53 +2,15 @@
 
 A game framework for JavaScript.
 
+See api reference.
+
+## Cli
+
+`-h | --help` print help string including this guide
+`-v | --version` print version information
+`[no arguments]` look for 'main.js' file in current directory and run it
+`[filepath]` run js file at path as root
+
 ## Build Instructions
 
-Good luck.
-
-## Roadmap
-
-### Completed
-
-- setCameraPosition
-- render targets
-- load js modules
-- refactor api with objects
-- working linux build
-- simple audio api
-- widow options including borderless fullscreen
-- add draw method
-- fix the timestep
-- mouse input
-- gamepad buttons and axes
-
-### Current
-
-
-### Short Term
-
-- example game (top down shooter probably)
-- clean up c++ api, make stuff private
-- saving/loading
-
-### Medium Term
-
-- add audio groups
-- text rendering
-- http requests
-- web target with emscripten
-- dev logs
-- transform, mesh, shader api
-- 3d example game (probably doom clone)
-- virtual file system
-- ui system
-- input overhaul/button remapping
-- custom cursors
-
-### Long Term
-
-- multiplayer
-- ecs
-- dll based generic api
-- in engine editors
-- alternate rendering apis especially vulkan
+TODO

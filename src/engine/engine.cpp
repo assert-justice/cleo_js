@@ -9,22 +9,10 @@ static double getTime(){
     gettimeofday(&current_time, NULL);
     return (double)current_time.tv_sec + (double)current_time.tv_usec / 1000000; 
 }
-
-Engine::Engine(){
-    // bool hasError = false;
-    // // vm.init(&hasError);
-    // window.init(&hasError);
-    // renderer.init(&hasError);
-    // if(!hasError) loop();
-    // else running = false;
-}
-Engine::~Engine(){
-    //
-}
-void Engine::init(){
+void Engine::init(const char* path){
     bool hasError = false;
     vm.init(&hasError);
-    auto src = readFile(&hasError, "./main.js");
+    auto src = readFile(&hasError, path);
     vm.bind(&hasError, src);
     audio.init(&hasError);
     window.init(&hasError);

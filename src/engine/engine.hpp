@@ -12,9 +12,7 @@ class Engine{
     Renderer renderer;
     Audio audio;
     bool running = true;
-    Engine();
-    ~Engine();
-    void init();
+    void init(const char* path);
     void loop();
     void setError();
     private:

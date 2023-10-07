@@ -28,6 +28,7 @@ set( CLEO-SRC
      src/extern/miniaudio.c
      # utils
      src/utils/fs.cpp
+     src/utils/cli.cpp
      # engine and subsystems
      src/engine/engine.cpp
      src/vm/vm.cpp
