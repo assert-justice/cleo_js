@@ -40,7 +40,7 @@ set( CLEO-SRC
      src/renderer/texture.cpp
      src/audio/audio.cpp
      # bindings
-     src/vm/bind_game.cpp
+     src/vm/bind_engine.cpp
      src/vm/bind_graphics.cpp
      src/vm/bind_system.cpp
      src/vm/bind_input.cpp

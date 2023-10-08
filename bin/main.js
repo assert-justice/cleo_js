@@ -1,4 +1,4 @@
-import {Game, System, Input, Window, Graphics} from 'cleo';
+import {Engine, System, Input, Window, Graphics} from 'cleo';
 const {Texture} = Graphics;
 import {message} from './greet';
 
@@ -18,7 +18,7 @@ const player = {
         visible: true,
     }
 }
-Game.init = ()=>{
+Engine.init = ()=>{
     // System.println(message);
     // System.writeFile('./message.txt', message);
     // const text = System.readFile('./vert.glsl');
@@ -27,14 +27,14 @@ Game.init = ()=>{
     System.println(Input.gamepadExists(0));
 }
 
-Game.update = (dt)=>{
-    if(Input.keyIsDown(256)) Game.quit();
+Engine.update = (dt)=>{
+    if(Input.keyIsDown(256)) Engine.quit();
     if(Input.keyIsDown(262)) player.x += player.speed * dt;
     if(Input.keyIsDown(263)) player.x -= player.speed * dt;
     if(Input.joyButtonIsDown(0,12)) player.x += player.speed * dt;
     if(Input.joyButtonIsDown(0,14)) player.x -= player.speed * dt;
 }
 
-Game.draw = ()=>{
+Engine.draw = ()=>{
     player.spr.draw(player.x,player.y, player.sprOptions);
 }

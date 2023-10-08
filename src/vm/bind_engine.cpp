@@ -1,4 +1,4 @@
-#include "bind_game.hpp"
+#include "bind_engine.hpp"
 #include "engine/engine.hpp"
 #include "fn_help.hpp"
 #include <iostream>
@@ -20,10 +20,6 @@ JSValue drawBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
 
 JSValue quitBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
     engine.window.quit();
-    // FnHelp help(ctx, argc, argv);
-    // auto fn = help.getFunction();
-    // engine.vm.initFn = JS_DupValue(ctx, fn);
-    // if(help.hasError) return JS_EXCEPTION;
     return JS_UNDEFINED;
 }
 
@@ -35,7 +31,7 @@ JSValue updateBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
     return JS_UNDEFINED;
 }
 
-void bindGame(){
+void bindEngine(){
     JSValue proto;
     JSValue fn;
 
@@ -59,5 +55,5 @@ void bindGame(){
     fn = JS_NewCFunction(engine.vm.context, &quitBind, "quit", 0);
     JS_DefinePropertyValue(engine.vm.context, proto, JS_NewAtom(engine.vm.context, "quit"), 
         fn, 0);
-    engine.vm.addExport("Game", proto);
+    engine.vm.addExport("Engine", proto);
 }

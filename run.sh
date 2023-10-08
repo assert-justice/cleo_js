@@ -1,10 +1,9 @@
-
+#!/usr/bin/env bash
 
 cd build
 ninja
 cd ..
-mv build/cleo bin/cleo
-# mv build/cleo dist/cleo
+cp build/cleo bin/cleo
 cd bin
 ./cleo
 cd ..
