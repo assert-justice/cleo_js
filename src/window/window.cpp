@@ -10,7 +10,6 @@ static void framebufferCallback(GLFWwindow* window, int width, int height){
     engine.renderer.setCameraPosition(0,0);
 }
 
-Window::Window(){}
 Window::~Window(){
     if(!initialized) return;
     initialized = false;

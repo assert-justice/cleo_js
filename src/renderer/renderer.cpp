@@ -39,7 +39,6 @@ static const char* fragSrc = "#version 330 core\n"
     "    FragColor = texture(ourTexture, TexCoord);"
     "}";
 
-Renderer::Renderer(){}
 Renderer::~Renderer(){
     if(!initalized) return;
     initalized = false;
@@ -93,26 +92,7 @@ void Renderer::clear(){
     glClear(GL_COLOR_BUFFER_BIT);
 }
 void Renderer::update(){
-    /* Render here */
-    // glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glClear(GL_COLOR_BUFFER_BIT);
-    // glUseProgram(imageShader.id);
-    // glBindTexture(GL_TEXTURE_2D, fbt);
-    // glBindVertexArray(VAO);
-    // unsigned int cameraLoc = glGetUniformLocation(imageShader.id, "camera");
-    // glUniformMatrix4fv(cameraLoc, 1, GL_FALSE, glm::value_ptr(cameraTransform));
-    // unsigned int spriteLoc = glGetUniformLocation(imageShader.id, "sprite");
-    // glm::mat4 spriteTransform = glm::mat4(1.0f);
-    // // spriteTransform = glm::translate(spriteTransform, glm::vec3(x, y, 0.0f));
-    // spriteTransform = glm::scale(spriteTransform, glm::vec3(800, 600, 0.0f));
-    
-    // glUniformMatrix4fv(spriteLoc, 1, GL_FALSE, glm::value_ptrglBindFramebuffer(GL_FRAMEBUFFER, 0)ader.id, "dimensions");
-    // // glUniform4fv(dimensionsLoc, 1, glm::value_ptr(
-    // //     glm::vec4(sx/tex->width, sy/tex->height, sw/tex->width, sh/tex->height))
-    // // );
-    // glDrawArrays(GL_TRIANGLES, 0, 6);
-    // glBindFramebuffer(GL_FRAMEBUFFER, fbo);
-    
 }
 bool Renderer::isInitialized(){
     return initalized;

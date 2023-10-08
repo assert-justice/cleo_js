@@ -11,11 +11,11 @@ class Engine{
     Window window;
     Renderer renderer;
     Audio audio;
-    bool running = true;
     void init(const char* path);
     void loop();
     void setError();
     private:
+    bool running = true;
     bool hasError = false;
     std::string errorMessage;
 };

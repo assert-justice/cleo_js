@@ -56,7 +56,7 @@ static JSTextureClass* getTexture(JSValue val){
 }
 
 static bool rendererInitalized(JSContext* ctx){
-    if(!engine.window.initialized){
+    if(!engine.window.isInitalized() || !engine.renderer.isInitialized()){
         JS_ThrowReferenceError(ctx, "method referenced before initialization!");
         return false;
     }
@@ -112,7 +112,7 @@ static JSValue textureFromFileBind(JSContext* ctx, JSValue thisVal, int argc, JS
         JS_ThrowReferenceError(ctx, "unable to load image at path!");
         return JS_EXCEPTION;
     }
-    auto texturePtr = engine.renderer.textureStore.get(textureId);
+    auto texturePtr = engine.renderer.getTexture(textureId);
     auto res = newJSTextureHandle(ctx, textureId, texturePtr);
     return res;
 }
@@ -129,7 +129,7 @@ static JSValue textureConstructorBind(JSContext* ctx, JSValue thisVal, int argc,
         JS_ThrowReferenceError(ctx, "unable to load image at path!");
         return JS_EXCEPTION;
     }
-    auto texturePtr = engine.renderer.textureStore.get(textureId);
+    auto texturePtr = engine.renderer.getTexture(textureId);
     auto res = newJSTextureHandle(ctx, textureId, texturePtr);
     return res;
 }

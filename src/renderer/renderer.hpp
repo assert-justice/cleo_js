@@ -9,7 +9,6 @@
 
 class Renderer{
     public:
-    Renderer();
     ~Renderer();
     void init(bool* hasError);
     void update();
@@ -26,16 +25,20 @@ class Renderer{
     );
     void setCameraPosition(float x, float y);
     void setTarget(Texture* target);
-    Store<Texture> textureStore;
-    float camWidth = 800;
-    float camHeight = 600;
-    Texture* target = nullptr;
     void enable(){enabled = true;}
     void disable(){enabled = false;}
+    Texture* getTexture(int id){
+        return textureStore.get(id);
+    }
     bool isEnabled(){
         return enabled || target != nullptr;
     }
+    bool isUsingRenderTarget(){
+        return target != nullptr;
+    }
     private:
+    Store<Texture> textureStore;
+    Texture* target = nullptr;
     bool enabled = false;
     Shader imageShader;
     bool initalized = false;

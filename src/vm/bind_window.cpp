@@ -4,7 +4,7 @@
 #include <iostream>
 
 static JSValue windowInitalized(JSContext* ctx){
-    if(!engine.window.initialized){
+    if(!engine.window.isInitalized()){
         JS_ThrowReferenceError(ctx, "method referenced before initialization!");
         return JS_EXCEPTION;
     }
