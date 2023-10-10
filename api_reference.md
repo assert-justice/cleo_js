@@ -1,6 +1,6 @@
 # Api Reference
 
-## Game
+## Engine
 
 - init: ()=>{}
 - update: (dt:number)=>{}
@@ -54,6 +54,7 @@
 ## System
 
 - println(...string[])
+- input(): string
 
 ### Relatively Safe
 

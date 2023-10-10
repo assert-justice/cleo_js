@@ -1,8 +1,9 @@
+#include <iostream>
+#include <string>
 #include "bind_system.hpp"
 #include "engine/engine.hpp"
 #include "fn_help.hpp"
 #include "utils/fs.hpp"
-#include <iostream>
 
 static void print(JSContext* ctx, JSValue val){
     JSValue str;
@@ -11,6 +12,13 @@ static void print(JSContext* ctx, JSValue val){
     auto cString = JS_ToCString(ctx, str);
     std::cout << cString;
     JS_FreeCString(ctx, cString);
+}
+
+// Needed for user created cli but is blocking. Maybe shouldn't be included?
+static JSValue inputBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
+    std::string str;
+    std::cin >> str;
+    return JS_NewString(ctx, str.c_str());
 }
 
 static JSValue printlnBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
@@ -54,13 +62,16 @@ void bindSystem(){
     JSValue proto;
     JSValue fn;
     proto = JS_NewObject(engine.vm.context);
-    // println(...any[])
+    // println(...any[]): void
     fn = JS_NewCFunction(engine.vm.context, &printlnBind, "println", 0);
     JS_DefinePropertyValueStr(engine.vm.context, proto, "println", fn, 0);
-    // readFile(path: string)
+    // input(): string
+    fn = JS_NewCFunction(engine.vm.context, &inputBind, "input", 0);
+    JS_DefinePropertyValueStr(engine.vm.context, proto, "input", fn, 0);
+    // readFile(path: string): string
     fn = JS_NewCFunction(engine.vm.context, &readFileBind, "readFile", 0);
     JS_DefinePropertyValueStr(engine.vm.context, proto, "readFile", fn, 0);
-    // writeFile(path: string)
+    // writeFile(path: string): string
     fn = JS_NewCFunction(engine.vm.context, &writeFileBind, "writeFile", 0);
     JS_DefinePropertyValueStr(engine.vm.context, proto, "writeFile", fn, 0);
     engine.vm.addExport("System", proto);
