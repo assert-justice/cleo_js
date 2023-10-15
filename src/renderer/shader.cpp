@@ -59,3 +59,7 @@ Shader::~Shader(){
     if(!initialized) return;
     glDeleteProgram(id);
 }
+
+void Shader::use(){
+    glUseProgram(id);
+}
