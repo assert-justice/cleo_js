@@ -126,7 +126,7 @@ int Renderer::newTexture(int width, int height, unsigned char* data){
 
 int Renderer::loadImage(const char* path){
     int width, height, nrChannels;
-    unsigned char* data = stbi_load(path, &width, &height, &nrChannels, 0); 
+    unsigned char* data = stbi_load(path, &width, &height, &nrChannels, 4); 
     if(!data) return -1;
     int id = newTexture(width, height, data);
     stbi_image_free(data);
