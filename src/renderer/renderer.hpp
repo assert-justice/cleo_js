@@ -43,11 +43,11 @@ class Renderer{
     Texture* target = nullptr;
     bool enabled = false;
     Shader imageShader;
-    Shader textShader;
+    // Shader textShader;
     bool initalized = false;
     unsigned int VBO, VAO;
     unsigned int fbo, fbt;
     glm::mat4 cameraTransform;
-    FT_Library ft;
-    FT_Face face;
+    // FT_Library ft;
+    // FT_Face face;
 };

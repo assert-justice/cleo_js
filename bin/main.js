@@ -1,8 +1,5 @@
 import {Engine, System, Input, Window, Graphics} from 'cleo';
 const {Texture} = Graphics;
-// System.println('enter name')
-// const name = System.input();
-// System.println(name);
 
 const player = {
     x: 48,
@@ -21,12 +18,7 @@ const player = {
     }
 }
 Engine.init = ()=>{
-    // System.println(message);
-    // System.writeFile('./message.txt', message);
-    // const text = System.readFile('./vert.glsl');
-    // System.println(text);
     player.spr = Texture.fromFile('characters_packed.png');
-    System.println(Input.gamepadExists(0));
 }
 
 Engine.update = (dt)=>{
