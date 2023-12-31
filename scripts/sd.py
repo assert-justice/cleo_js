@@ -30,7 +30,6 @@ def run(cli: sd_utils.Cli):
 
 def main():
     with sd_utils.Cli() as cli:
-        print(cli.args)
         verb = cli.match(['build','run','add_target'])
         if verb == 'build':
             build(cli)
