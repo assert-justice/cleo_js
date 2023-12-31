@@ -1,0 +1,67 @@
+cmake_minimum_required( VERSION 3.5 )
+
+project(emscripten-glfw3-cmake-example VERSION 0.1.0)
+
+set(CMAKE_CXX_STANDARD 17)
+
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Release)
+endif()
+message("CMAKE_BUILD_TYPE: ${CMAKE_BUILD_TYPE}")
+
+option(USE_LEGACY_OPENGL "Use Legacy OpenGL (fixed function pipeline) or Modern OpenGL (with shaders)" OFF)
+if(USE_LEGACY_OPENGL)
+    add_definitions(-DUSE_LEGACY_OPENGL)
+endif()
+message("USE_LEGACY_OPENGL: ${USE_LEGACY_OPENGL}")
+include_directories( ${OPENGL_INCLUDE_DIRS} ./include quickjs ./src ./glm)
+# add_subdirectory( glfw )
+add_subdirectory( quickjs )
+add_subdirectory( glm )
+add_subdirectory( freetype )
+# add_executable(${PROJECT_NAME} main.cpp GL/src/glad.c)
+set( CLEO-SRC
+     # main
+     src/cleo.cpp
+     # external
+     src/extern/glad.c
+     src/extern/stb_image.c
+     src/extern/miniaudio.c
+     # utils
+     src/utils/fs.cpp
+     src/utils/cli.cpp
+     # engine and subsystems
+     src/engine/engine.cpp
+     src/vm/vm.cpp
+     src/vm/fn_help.cpp
+     src/vm/object_help.cpp
+     src/window/window.cpp
+     src/renderer/renderer.cpp
+     src/renderer/shader.cpp
+     src/renderer/texture.cpp
+     src/audio/audio.cpp
+     # bindings
+     src/vm/bind_engine.cpp
+     src/vm/bind_graphics.cpp
+     src/vm/bind_system.cpp
+     src/vm/bind_input.cpp
+     src/vm/bind_window.cpp
+     src/vm/bind_audio.cpp
+     )
+add_executable( ${PROJECT_NAME} ${CLEO-SRC} )
+
+if(EMSCRIPTEN)
+    set_target_properties(${PROJECT_NAME} PROPERTIES SUFFIX ".html")
+    set(LFLAGS "-s USE_GLFW=3 -s USE_ZLIB=1")
+    if(USE_LEGACY_OPENGL)
+        set(LFLAGS "${LFLAGS} -s LEGACY_GL_EMULATION=1")
+    endif()
+    set_target_properties(${PROJECT_NAME} PROPERTIES LINK_FLAGS "${LFLAGS}")
+else()
+    find_package(glfw3 REQUIRED)
+    message("glfw found with version " ${glfw3_VERSION})
+    target_link_libraries(${PROJECT_NAME} dl)
+endif()
+message("EMSCRIPTEN: ${EMSCRIPTEN}")
+target_include_directories(${PROJECT_NAME} PRIVATE GL/include)
+target_link_libraries(${PROJECT_NAME} glfw)

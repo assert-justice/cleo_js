@@ -9,4 +9,5 @@ class Shader{
     // bool hasError = false;
     // Shader(std::string vertexSrc, std::string fragmentSrc);
     ~Shader();
+    void use();
 };

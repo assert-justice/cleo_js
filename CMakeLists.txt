@@ -14,10 +14,7 @@ set( GLFW_INSTALL OFF CACHE BOOL  "GLFW lib only" )
 add_subdirectory( glfw )
 add_subdirectory( quickjs )
 add_subdirectory( glm )
-
-# if( MSVC )
-#     SET( CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /ENTRY:mainCRTStartup" )
-# endif()
+add_subdirectory( freetype )
 
 set( CLEO-SRC
      # main
@@ -50,12 +47,4 @@ set( CLEO-SRC
 
      
 add_executable( cleo ${CLEO-SRC} )
-target_link_libraries( cleo ${OPENGL_LIBRARIES} glfw quickjs glm )
-# target_link_libraries( cleo quickjspp glfw )
-# if( MSVC )
-#     if(${CMAKE_VERSION} VERSION_LESS "3.6.0") 
-#         message( "\n\t[ WARNING ]\n\n\tCMake version lower than 3.6.\n\n\t - Please update CMake and rerun; OR\n\t - Manually set 'GLFW-CMake-starter' as StartUp Project in Visual Studio.\n" )
-#     else()
-#         set_property( DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT GLFW-CMake-starter )
-#     endif()
-# endif()
+target_link_libraries( cleo ${OPENGL_LIBRARIES} glfw quickjs glm freetype)

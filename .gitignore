@@ -4,6 +4,7 @@
 .vscode
 *.exe
 */cleo
+/__pycache__
 # Prerequisites
 *.d
 

@@ -3,6 +3,8 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <ft2build.h>
+#include FT_FREETYPE_H 
 #include "utils/store.hpp"
 #include "shader.hpp"
 #include "texture.hpp"
@@ -41,8 +43,11 @@ class Renderer{
     Texture* target = nullptr;
     bool enabled = false;
     Shader imageShader;
+    Shader textShader;
     bool initalized = false;
     unsigned int VBO, VAO;
     unsigned int fbo, fbt;
     glm::mat4 cameraTransform;
+    FT_Library ft;
+    FT_Face face;
 };

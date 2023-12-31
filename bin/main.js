@@ -1,6 +1,8 @@
 import {Engine, System, Input, Window, Graphics} from 'cleo';
 const {Texture} = Graphics;
-import {message} from './greet';
+// System.println('enter name')
+// const name = System.input();
+// System.println(name);
 
 const player = {
     x: 48,

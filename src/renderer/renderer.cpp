@@ -42,6 +42,8 @@ static const char* fragSrc = "#version 330 core\n"
 Renderer::~Renderer(){
     if(!initalized) return;
     initalized = false;
+    FT_Done_Face(face);
+    FT_Done_FreeType(ft);
     glDeleteVertexArrays(1, &VAO);
     glDeleteBuffers(1, &VBO);
     glDeleteFramebuffers(1, &fbo); 
@@ -81,6 +83,26 @@ void Renderer::init(bool* hasError){
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);  
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, fbt, 0); 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    textShader.initialize(hasError, 
+        readFile(hasError, "./font_vert.glsl"), 
+        readFile(hasError,  "./font_frag.glsl"));
+    // FT_Library ft;
+    if (FT_Init_FreeType(&ft))
+    {
+        std::cout << "ERROR::FREETYPE: Could not init FreeType Library" << std::endl;
+        *hasError=true;
+        return;
+    }
+
+    // FT_Face face;
+    if (FT_New_Face(ft, "NormalFont.ttf", 0, &face))
+    {
+        std::cout << "ERROR::FREETYPE: Failed to load font" << std::endl;  
+        *hasError=true;
+        return;
+    }
+    // FT_Done_Face(face);
+    // FT_Done_FreeType(ft);
     clear();
     glfwSwapBuffers(engine.window.window);
     initalized = true;
@@ -112,7 +134,8 @@ int Renderer::loadImage(const char* path){
 }
 
 void Renderer::drawImage(int textureId, glm::mat4 spriteTransform, glm::mat4 coordTransform){
-    glUseProgram(imageShader.id);
+    // glUseProgram(imageShader.id);
+    imageShader.use();
     auto tex = textureStore.get(textureId);
     if(tex == nullptr){
         // TODO: actually handle this error
