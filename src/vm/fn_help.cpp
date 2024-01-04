@@ -44,7 +44,22 @@ JSValue FnHelp::getFunction(){
     auto val = next();
     // JS_ValueToAtom
     if(hasError) return JS_EXCEPTION;
-    if(!JS_IsFunction(ctx, val)) {hasError = true; return JS_EXCEPTION;}
+    if(!JS_IsFunction(ctx, val)) {
+        hasError = true;
+        JS_ThrowTypeError(ctx, "type error, expected argument %i to be a function!", argIdx);
+        return JS_EXCEPTION;
+    }
+    return val;
+}
+
+JSValue FnHelp::getArray(){
+    auto val = next();
+    if(hasError) return JS_EXCEPTION;
+    if(!JS_IsArray(ctx, val)) {
+        hasError = true; 
+        JS_ThrowTypeError(ctx, "type error, expected argument %i to be an array!", argIdx);
+        return JS_EXCEPTION;
+    }
     return val;
 }
 
@@ -60,4 +75,8 @@ std::string FnHelp::getString(){
 
 bool FnHelp::hasArgs(){
     return argIdx < argc;
+}
+
+int FnHelp::getArgIndex(){
+    return argIdx;
 }

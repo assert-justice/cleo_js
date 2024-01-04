@@ -62,14 +62,6 @@ static bool rendererInitalized(JSContext* ctx){
     }
     return true;
 }
-// static bool canRender(JSContext* ctx){
-//     if(!rendererInitalized(ctx)) return false;
-//     if(!engine.renderer.isEnabled()){
-//         JS_ThrowReferenceError(ctx, "method called outside of draw function!");
-//         return false;
-//     }
-//     return true;
-// }
 
 static JSValue setClearColorBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
     if(!rendererInitalized(ctx)) return JS_EXCEPTION;
@@ -122,11 +114,56 @@ static JSValue textureConstructorBind(JSContext* ctx, JSValue thisVal, int argc,
     FnHelp help(ctx, argc, argv);
     auto width = help.getFloat64();
     auto height = help.getFloat64();
+    auto array = JS_UNDEFINED;
+    if(help.hasArgs()) array = help.getArray();
     if(help.hasError) return JS_EXCEPTION;
-    auto textureId = engine.renderer.newTexture(width, height, NULL);
-    // auto textureId = engine.renderer.loadImage(path.c_str());
+    int textureId = -1;
+    if(JS_IsUndefined(array)){
+        textureId = engine.renderer.newTexture(width, height, NULL);
+    }
+    else{
+        auto lengthValue = JS_GetProperty(ctx, array, JS_NewAtom(ctx, "length"));
+        auto length = 0;
+        JS_ToInt32(ctx, &length, lengthValue);
+        printf("length: %i\n", length);
+        if(length != width * height * 4){
+            JS_ThrowTypeError(ctx, "type error, invalid array length for texture");
+            return JS_EXCEPTION;
+        }
+        auto data = (unsigned char*)malloc(length);
+        for (int idx = 0; idx < length; idx++)
+        {
+            auto str = std::to_string(idx);
+            auto jsVal = JS_GetProperty(ctx, array, JS_NewAtom(ctx, str.c_str()));
+            // check if val is numeric
+            if(!JS_IsNumber(jsVal)){
+                JS_ThrowTypeError(ctx, "type error, found non-numeric number in image data array!");
+                free(data);
+                return JS_EXCEPTION;
+            }
+            int val = 0;
+            JS_ToInt32(ctx, &val, jsVal);
+            // printf("element %i is %i\n", idx, val);
+            data[idx] = (unsigned char) val;
+        }
+        
+        // size_t size = 0;
+        // auto data = JS_GetArrayBuffer(ctx, &size, array);
+        // if(data == NULL){
+        //     JS_ThrowTypeError(ctx, "type error, expected argument %i to be an array buffer", help.getArgIndex());
+        //     return JS_EXCEPTION;
+        // }
+        // else if(size != width * height * 4){
+        //     JS_ThrowTypeError(ctx, "type error, unexpected array buffer size!");
+        //     JS_GetProperty()
+        //     free(data);
+        //     return JS_EXCEPTION;
+        // }
+        textureId = engine.renderer.newTexture(width, height, data);
+        free(data);
+    }
     if(textureId == -1){
-        JS_ThrowReferenceError(ctx, "unable to load image at path!");
+        JS_ThrowReferenceError(ctx, "unable to create an image!");
         return JS_EXCEPTION;
     }
     auto texturePtr = engine.renderer.getTexture(textureId);

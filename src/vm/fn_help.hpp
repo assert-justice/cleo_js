@@ -12,7 +12,10 @@ class FnHelp{
     int getInt();
     bool getBool();
     JSValue getFunction();
+    JSValue getArray();
     bool hasArgs();
+    int getArgIndex();
+
     private:
     JSContext* ctx;
     int argc;

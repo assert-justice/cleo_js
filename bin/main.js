@@ -18,7 +18,17 @@ const player = {
     }
 }
 Engine.init = ()=>{
-    player.spr = Texture.fromFile('characters_packed.png');
+    const width = 10;
+    const height = 10;
+    const texData = [];
+    for(let i = 0; i < width * height; i++){
+        texData.push(i % 3 === 0 ? 255 : 0);
+        texData.push(0);
+        texData.push(0);
+        texData.push(255);
+    }
+    player.spr = Texture.new(width, height, texData);
+    // player.spr = Texture.fromFile('characters_packed.png');
 }
 
 Engine.update = (dt)=>{
@@ -30,5 +40,6 @@ Engine.update = (dt)=>{
 }
 
 Engine.draw = ()=>{
-    player.spr.draw(player.x,player.y, player.sprOptions);
+    player.spr.draw(0, 0,{width: 100, height: 100});
+    // player.spr.draw(player.x,player.y, player.sprOptions);
 }
