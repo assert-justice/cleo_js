@@ -1,7 +1,10 @@
 import sd_utils
+import platform
 
 def build(cli: sd_utils.Cli):
     target = 'win'
+    if platform.system() == 'Linux':
+        target = 'linux'
     if cli.has_args():
         target = cli.match(['win', 'linux'])
     cli.data['target'] = target
