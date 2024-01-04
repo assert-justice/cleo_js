@@ -115,53 +115,69 @@ static JSValue textureConstructorBind(JSContext* ctx, JSValue thisVal, int argc,
     auto width = help.getFloat64();
     auto height = help.getFloat64();
     auto array = JS_UNDEFINED;
-    if(help.hasArgs()) array = help.getArray();
+    if(help.hasArgs()) array = help.next();
     if(help.hasError) return JS_EXCEPTION;
     int textureId = -1;
     if(JS_IsUndefined(array)){
         textureId = engine.renderer.newTexture(width, height, NULL);
     }
     else{
-        auto lengthValue = JS_GetProperty(ctx, array, JS_NewAtom(ctx, "length"));
-        auto length = 0;
-        JS_ToInt32(ctx, &length, lengthValue);
-        printf("length: %i\n", length);
-        if(length != width * height * 4){
-            JS_ThrowTypeError(ctx, "type error, invalid array length for texture");
+        size_t length;
+        auto data = (unsigned char*)JS_GetArrayBuffer(ctx, &length, array);
+        // note: the data returned by JS_GetArrayBuffer is managed by QuickJS and should not be freed.
+        if(data == NULL){
+            JS_ThrowTypeError(ctx, "Cannot read texture data!");
             return JS_EXCEPTION;
         }
-        auto data = (unsigned char*)malloc(length);
-        for (int idx = 0; idx < length; idx++)
-        {
-            auto str = std::to_string(idx);
-            auto jsVal = JS_GetProperty(ctx, array, JS_NewAtom(ctx, str.c_str()));
-            // check if val is numeric
-            if(!JS_IsNumber(jsVal)){
-                JS_ThrowTypeError(ctx, "type error, found non-numeric number in image data array!");
-                free(data);
-                return JS_EXCEPTION;
-            }
-            int val = 0;
-            JS_ToInt32(ctx, &val, jsVal);
-            // printf("element %i is %i\n", idx, val);
-            data[idx] = (unsigned char) val;
+        else if(length != width * height * 4){
+            JS_ThrowTypeError(ctx, "Invalid buffer length");
+            return JS_EXCEPTION;
         }
-        
-        // size_t size = 0;
-        // auto data = JS_GetArrayBuffer(ctx, &size, array);
-        // if(data == NULL){
-        //     JS_ThrowTypeError(ctx, "type error, expected argument %i to be an array buffer", help.getArgIndex());
-        //     return JS_EXCEPTION;
-        // }
-        // else if(size != width * height * 4){
-        //     JS_ThrowTypeError(ctx, "type error, unexpected array buffer size!");
-        //     JS_GetProperty()
-        //     free(data);
-        //     return JS_EXCEPTION;
-        // }
         textureId = engine.renderer.newTexture(width, height, data);
-        free(data);
     }
+    if(textureId == -1){
+        JS_ThrowReferenceError(ctx, "unable to create an image!");
+        return JS_EXCEPTION;
+    }
+    auto texturePtr = engine.renderer.getTexture(textureId);
+    auto res = newJSTextureHandle(ctx, textureId, texturePtr);
+    return res;
+}
+
+static JSValue textureFromArrayBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
+    if(!rendererInitalized(ctx)) return JS_EXCEPTION;
+    FnHelp help(ctx, argc, argv);
+    auto width = help.getFloat64();
+    auto height = help.getFloat64();
+    auto array = help.getArray();
+    if(help.hasError) return JS_EXCEPTION;
+    int textureId = -1;
+    auto lengthValue = JS_GetProperty(ctx, array, JS_NewAtom(ctx, "length"));
+    auto length = 0;
+    JS_ToInt32(ctx, &length, lengthValue);
+    printf("length: %i\n", length);
+    if(length != width * height * 4){
+        JS_ThrowTypeError(ctx, "type error, invalid array length for texture");
+        return JS_EXCEPTION;
+    }
+    auto data = (unsigned char*)malloc(length);
+    for (int idx = 0; idx < length; idx++)
+    {
+        auto str = std::to_string(idx);
+        auto jsVal = JS_GetProperty(ctx, array, JS_NewAtom(ctx, str.c_str()));
+        // check if val is numeric
+        if(!JS_IsNumber(jsVal)){
+            JS_ThrowTypeError(ctx, "type error, found non-numeric number in image data array!");
+            free(data);
+            return JS_EXCEPTION;
+        }
+        int val = 0;
+        JS_ToInt32(ctx, &val, jsVal);
+        // printf("element %i is %i\n", idx, val);
+        data[idx] = (unsigned char) val;
+    }
+    textureId = engine.renderer.newTexture(width, height, data);
+    free(data);
     if(textureId == -1){
         JS_ThrowReferenceError(ctx, "unable to create an image!");
         return JS_EXCEPTION;
@@ -264,6 +280,7 @@ void bindGraphics(){
     // setTarget()
     fn = JS_NewCFunction(ctx, &setRenderTargetBind, "setRenderTarget", 0);
     JS_DefinePropertyValueStr(ctx, textureProto, "setTarget", fn, 0);
+    // resetTarget()
     fn = JS_NewCFunction(ctx, &resetRenderTargetBind, "resetRenderTarget", 0);
     JS_DefinePropertyValueStr(ctx, textureProto, "resetTarget", fn, 0);
     // constructor(width, height)
@@ -272,9 +289,13 @@ void bindGraphics(){
     // JS_SetConstructorBit(ctx, fn, true);
     // JS_SetConstructor(ctx, fn, textureProto);
     // JS_FreeValue(ctx, fn);
+
     // new(with: number, height: number)
     fn = JS_NewCFunction(ctx, &textureConstructorBind, "textureConstructor", 0);
     JS_DefinePropertyValueStr(ctx, textureProto, "new", fn, 0);
+    // fromArray(with: number, height: number)
+    fn = JS_NewCFunction(ctx, &textureFromArrayBind, "fromArray", 0);
+    JS_DefinePropertyValueStr(ctx, textureProto, "fromArray", fn, 0);
     // setting the class prototype consumes the prototype object so we need to reacquire it
     JS_SetClassProto(ctx, jsTextureClassId, textureProto);
     textureProto = JS_GetClassProto(ctx, jsTextureClassId);

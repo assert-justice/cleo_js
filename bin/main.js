@@ -21,13 +21,24 @@ Engine.init = ()=>{
     const width = 10;
     const height = 10;
     const texData = [];
-    for(let i = 0; i < width * height; i++){
-        texData.push(i % 3 === 0 ? 255 : 0);
-        texData.push(0);
-        texData.push(0);
-        texData.push(255);
+    const buffer = new ArrayBuffer(width * height * 4);
+    const view = new Uint8Array(buffer);
+    for(let x = 0; x < width; x++){
+        for(let y = 0; y < height; y++){
+            const idx = (x * width + y)*4;
+            view[idx] = x === height - y - 1 ? 255 : 0;
+            // view[idx] = 255;
+            view[idx + 1] = 0;
+            view[idx + 2] = 0;
+            view[idx + 3] = 255;
+            texData.push(x === height - y - 1 ? 255 : 0);
+            texData.push(0);
+            texData.push(0);
+            texData.push(255);
+        }
     }
-    player.spr = Texture.new(width, height, texData);
+    player.spr = Texture.new(width, height, view.buffer);
+    // player.spr = Texture.fromArray(width, height, texData);
     // player.spr = Texture.fromFile('characters_packed.png');
 }
 
