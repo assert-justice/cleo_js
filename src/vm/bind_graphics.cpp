@@ -112,8 +112,8 @@ static JSValue textureFromFileBind(JSContext* ctx, JSValue thisVal, int argc, JS
 static JSValue textureConstructorBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
     if(!rendererInitalized(ctx)) return JS_EXCEPTION;
     FnHelp help(ctx, argc, argv);
-    auto width = help.getFloat64();
-    auto height = help.getFloat64();
+    auto width = help.getInt();
+    auto height = help.getInt();
     auto array = JS_UNDEFINED;
     if(help.hasArgs()) array = help.next();
     if(help.hasError) return JS_EXCEPTION;
@@ -147,8 +147,8 @@ static JSValue textureConstructorBind(JSContext* ctx, JSValue thisVal, int argc,
 static JSValue textureFromArrayBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
     if(!rendererInitalized(ctx)) return JS_EXCEPTION;
     FnHelp help(ctx, argc, argv);
-    auto width = help.getFloat64();
-    auto height = help.getFloat64();
+    auto width = help.getInt();
+    auto height = help.getInt();
     auto array = help.getArray();
     if(help.hasError) return JS_EXCEPTION;
     int textureId = -1;
@@ -176,6 +176,29 @@ static JSValue textureFromArrayBind(JSContext* ctx, JSValue thisVal, int argc, J
         // printf("element %i is %i\n", idx, val);
         data[idx] = (unsigned char) val;
     }
+    textureId = engine.renderer.newTexture(width, height, data);
+    free(data);
+    if(textureId == -1){
+        JS_ThrowReferenceError(ctx, "unable to create an image!");
+        return JS_EXCEPTION;
+    }
+    auto texturePtr = engine.renderer.getTexture(textureId);
+    auto res = newJSTextureHandle(ctx, textureId, texturePtr);
+    return res;
+}
+static JSValue textureFromColorBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
+    if(!rendererInitalized(ctx)) return JS_EXCEPTION;
+    FnHelp help(ctx, argc, argv);
+    auto width = help.getInt();
+    auto height = help.getInt();
+    auto red = help.getInt();
+    auto green = help.getInt();
+    auto blue = help.getInt();
+    auto alpha = help.getInt();
+    if(help.hasError) return JS_EXCEPTION;
+    int textureId = -1;
+    int length = width * height * 4;
+    auto data = (unsigned char*)malloc(length);
     textureId = engine.renderer.newTexture(width, height, data);
     free(data);
     if(textureId == -1){
@@ -290,12 +313,15 @@ void bindGraphics(){
     // JS_SetConstructor(ctx, fn, textureProto);
     // JS_FreeValue(ctx, fn);
 
-    // new(with: number, height: number)
+    // new(with: number, height: number, data: ArrayBuffer)
     fn = JS_NewCFunction(ctx, &textureConstructorBind, "textureConstructor", 0);
     JS_DefinePropertyValueStr(ctx, textureProto, "new", fn, 0);
-    // fromArray(with: number, height: number)
+    // fromArray(with: number, height: number, data: number[])
     fn = JS_NewCFunction(ctx, &textureFromArrayBind, "fromArray", 0);
     JS_DefinePropertyValueStr(ctx, textureProto, "fromArray", fn, 0);
+    // fromColor(width: number, height: number, red: number, green: number, blue: number, alpha: number)
+    fn = JS_NewCFunction(ctx, &textureFromColorBind, "fromColor", 0);
+    JS_DefinePropertyValueStr(ctx, textureProto, "fromColor", fn, 0);
     // setting the class prototype consumes the prototype object so we need to reacquire it
     JS_SetClassProto(ctx, jsTextureClassId, textureProto);
     textureProto = JS_GetClassProto(ctx, jsTextureClassId);

@@ -31,6 +31,7 @@ declare module "cleo" {
             draw(x:number, y:number, options?: TextureParams): void;
             static fromFile(path: string): Texture;
             static fromArray(width: number, height: number, data: number[]): Texture;
+            static fromColor(width: number, height: number, red: number, green: number, blue: number, alpha: number): Texture;
             static new(width: number, height: number, data?: ArrayBuffer): Texture;
             setTarget():void;
             resetTarget():void;
