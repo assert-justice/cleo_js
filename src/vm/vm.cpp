@@ -51,6 +51,7 @@ VM::~VM(){
     JS_FreeValue(context, initFn);
     JS_FreeValue(context, updateFn);
     JS_FreeValue(context, drawFn);
+    JS_FreeValue(context, keyCallbackFn);
     JS_FreeContext(context);
     JS_FreeRuntime(runtime);
 }
@@ -91,11 +92,15 @@ void VM::update(double dt){
     if(JS_IsUndefined(updateFn)) return;
     auto val = JS_NewFloat64(context, dt);
     val = JS_Call(context, updateFn, JS_UNDEFINED, 1, &val);
-    isException(context, val);
+    handleIfException(context, val);
 }
 void VM::draw(){
     if(JS_IsUndefined(drawFn)) return;
     auto val = JS_Call(context, drawFn, JS_UNDEFINED, 0, NULL);
+    handleIfException(context, val);
+}
+
+void VM::handleIfException(JSContext* context, JSValue val){
     isException(context, val);
 }
 

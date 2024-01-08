@@ -10,7 +10,6 @@ typedef struct {
 } JSTextureClass;
 
 static JSClassID jsTextureClassId;
-// static JSClassID jsSpriteClassId;
 
 static void jsTextureClassFinalizer(JSRuntime *rt, JSValue val)
 {
@@ -18,7 +17,6 @@ static void jsTextureClassFinalizer(JSRuntime *rt, JSValue val)
     if (s) {
         if(engine.renderer.isInitialized())
             engine.renderer.freeTexture(s->id);
-        // std::cout << "freed texture\n";
         js_free_rt(rt, s);
     }
 }
@@ -94,21 +92,6 @@ static JSValue getTextureHeightBind(JSContext* ctx, JSValue thisVal, int argc, J
     return JS_NewFloat64(engine.vm.context, s->texture->height);
 }
 
-static JSValue textureFromFileBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
-    if(!rendererInitalized(ctx)) return JS_EXCEPTION;
-    FnHelp help(ctx, argc, argv);
-    auto path = help.getString();
-    if(help.hasError) return JS_EXCEPTION;
-    auto textureId = engine.renderer.loadImage(path.c_str());
-    if(textureId == -1){
-        JS_ThrowReferenceError(ctx, "unable to load image at path!");
-        return JS_EXCEPTION;
-    }
-    auto texturePtr = engine.renderer.getTexture(textureId);
-    auto res = newJSTextureHandle(ctx, textureId, texturePtr);
-    return res;
-}
-
 static JSValue textureConstructorBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
     if(!rendererInitalized(ctx)) return JS_EXCEPTION;
     FnHelp help(ctx, argc, argv);
@@ -173,7 +156,6 @@ static JSValue textureFromArrayBind(JSContext* ctx, JSValue thisVal, int argc, J
         }
         int val = 0;
         JS_ToInt32(ctx, &val, jsVal);
-        // printf("element %i is %i\n", idx, val);
         data[idx] = (unsigned char) val;
     }
     textureId = engine.renderer.newTexture(width, height, data);
@@ -199,10 +181,31 @@ static JSValue textureFromColorBind(JSContext* ctx, JSValue thisVal, int argc, J
     int textureId = -1;
     int length = width * height * 4;
     auto data = (unsigned char*)malloc(length);
+    for(int idx = 0; idx < length; idx+=4){
+        data[idx] = red;
+        data[idx+1] = green;
+        data[idx+2] = blue;
+        data[idx+3] = alpha;
+    }
     textureId = engine.renderer.newTexture(width, height, data);
     free(data);
     if(textureId == -1){
         JS_ThrowReferenceError(ctx, "unable to create an image!");
+        return JS_EXCEPTION;
+    }
+    auto texturePtr = engine.renderer.getTexture(textureId);
+    auto res = newJSTextureHandle(ctx, textureId, texturePtr);
+    return res;
+}
+
+static JSValue textureFromFileBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
+    if(!rendererInitalized(ctx)) return JS_EXCEPTION;
+    FnHelp help(ctx, argc, argv);
+    auto path = help.getString();
+    if(help.hasError) return JS_EXCEPTION;
+    auto textureId = engine.renderer.loadImage(path.c_str());
+    if(textureId == -1){
+        JS_ThrowReferenceError(ctx, "unable to load image at path!");
         return JS_EXCEPTION;
     }
     auto texturePtr = engine.renderer.getTexture(textureId);
@@ -239,13 +242,12 @@ static JSValue drawImageBind(JSContext* ctx, JSValue thisVal, int argc, JSValue*
     if(objHelp.hasError) return JS_EXCEPTION;
     if(!visible) return JS_UNDEFINED;
     // calculate sprite transform
-    // scale, offset, rotate, scale2, move
+    // scale, offset, rotate, scale2, translate
     // have to do it in reverse because matrix math is Like That
     glm::mat4 spriteTransform = glm::mat4(1.0f);
     spriteTransform = glm::translate(spriteTransform, glm::vec3(x, y, 0.0f));
     // spriteTransform = glm::scale(spriteTransform, glm::vec3(scaleX,scaleY, 0.0f));
     spriteTransform = glm::rotate(spriteTransform, glm::radians(angle), glm::vec3(0.0f, 0.0f, 1.0f));
-    // std::cout << -ox/sw*width << std::endl;
     spriteTransform = glm::translate(spriteTransform, glm::vec3(-ox/sw*width, -oy/sh*height, 0.0f));
     spriteTransform = glm::scale(spriteTransform, glm::vec3(width,height, 0.0f));
 
@@ -284,6 +286,22 @@ void bindGraphics(){
     /* the class is created once per runtime */
     JS_NewClass(JS_GetRuntime(ctx), jsTextureClassId, &jsTextureClassDef);
     textureProto = JS_NewObject(ctx);
+    // constructor(width, height)
+    // not working, getting 'not a constructor' error for some reason
+    // fn = JS_NewCFunction(ctx, &textureConstructorBind, "textureConstructor", 0);
+    // JS_SetConstructorBit(ctx, fn, true);
+    // JS_SetConstructor(ctx, fn, textureProto);
+    // JS_FreeValue(ctx, fn);
+
+    // static new(with: number, height: number, data: ArrayBuffer)
+    fn = JS_NewCFunction(ctx, &textureConstructorBind, "textureConstructor", 0);
+    JS_DefinePropertyValueStr(ctx, textureProto, "new", fn, 0);
+    // static fromArray(with: number, height: number, data: number[])
+    fn = JS_NewCFunction(ctx, &textureFromArrayBind, "fromArray", 0);
+    JS_DefinePropertyValueStr(ctx, textureProto, "fromArray", fn, 0);
+    // static fromColor(width: number, height: number, red: number, green: number, blue: number, alpha: number)
+    fn = JS_NewCFunction(ctx, &textureFromColorBind, "fromColor", 0);
+    JS_DefinePropertyValueStr(ctx, textureProto, "fromColor", fn, 0);
     // static fromFile(path: string)
     fn = JS_NewCFunction(ctx, &textureFromFileBind, "fromFile", 0);
     JS_DefinePropertyValueStr(ctx, textureProto, "fromFile", fn, 0);
@@ -303,30 +321,15 @@ void bindGraphics(){
     // setTarget()
     fn = JS_NewCFunction(ctx, &setRenderTargetBind, "setRenderTarget", 0);
     JS_DefinePropertyValueStr(ctx, textureProto, "setTarget", fn, 0);
-    // resetTarget()
+    // static resetTarget()
     fn = JS_NewCFunction(ctx, &resetRenderTargetBind, "resetRenderTarget", 0);
     JS_DefinePropertyValueStr(ctx, textureProto, "resetTarget", fn, 0);
-    // constructor(width, height)
-    // not working, getting 'not a constructor' error for some reason
-    // fn = JS_NewCFunction(ctx, &textureConstructorBind, "textureConstructor", 0);
-    // JS_SetConstructorBit(ctx, fn, true);
-    // JS_SetConstructor(ctx, fn, textureProto);
-    // JS_FreeValue(ctx, fn);
-
-    // new(with: number, height: number, data: ArrayBuffer)
-    fn = JS_NewCFunction(ctx, &textureConstructorBind, "textureConstructor", 0);
-    JS_DefinePropertyValueStr(ctx, textureProto, "new", fn, 0);
-    // fromArray(with: number, height: number, data: number[])
-    fn = JS_NewCFunction(ctx, &textureFromArrayBind, "fromArray", 0);
-    JS_DefinePropertyValueStr(ctx, textureProto, "fromArray", fn, 0);
-    // fromColor(width: number, height: number, red: number, green: number, blue: number, alpha: number)
-    fn = JS_NewCFunction(ctx, &textureFromColorBind, "fromColor", 0);
-    JS_DefinePropertyValueStr(ctx, textureProto, "fromColor", fn, 0);
     // setting the class prototype consumes the prototype object so we need to reacquire it
     JS_SetClassProto(ctx, jsTextureClassId, textureProto);
     textureProto = JS_GetClassProto(ctx, jsTextureClassId);
+    auto constructor = JS_GetProperty(ctx, textureProto, JS_NewAtom(ctx, "constructor"));
     JS_DefinePropertyValueStr(ctx, proto, "Texture", textureProto, 0);
-
+    JS_FreeValue(ctx, constructor);
     // standalone functions
     // setClearColor(r: number, g: number, b: number, a: number = 0)
     fn = JS_NewCFunction(ctx, &setClearColorBind, "setClearColor", 0);

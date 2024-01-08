@@ -10,6 +10,24 @@ static void framebufferCallback(GLFWwindow* window, int width, int height){
     engine.renderer.setCameraPosition(0,0);
 }
 
+// needs to be attached with glfwSetKeyCallback *after* the window is initialized
+static void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
+{
+    if(JS_IsUndefined(engine.vm.keyCallbackFn)) return;
+    std::string message = "";
+    if(action == GLFW_PRESS){message = "press";}
+    else if(action == GLFW_RELEASE){message = "release";}
+    else{
+        // GLFW_REPEAT currently not supported
+        return;
+    }
+    auto keyCode = JS_NewInt32(engine.vm.context, key);
+    auto actionMessage = JS_NewString(engine.vm.context, message.c_str());
+    JSValue arr[] = {keyCode, actionMessage};
+    auto res = JS_Call(engine.vm.context, engine.vm.keyCallbackFn, JS_UNDEFINED, 2, arr);
+    engine.vm.handleIfException(engine.vm.context, res);
+}
+
 Window::~Window(){
     if(!initialized) return;
     initialized = false;
@@ -38,6 +56,7 @@ void Window::init(bool* hasError){
         *hasError = true;
         return;
     }
+    glfwSetKeyCallback(window, keyCallback);
     glfwSetFramebufferSizeCallback(window, framebufferCallback);
     glfwSwapInterval(vsync);
     initialized = true;

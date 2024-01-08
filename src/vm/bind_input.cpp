@@ -23,6 +23,14 @@ static bool joyValid(JSContext* ctx, int joyIdx){
     return true;
 }
 
+static JSValue keyCallbackBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
+    FnHelp help(ctx, argc, argv);
+    auto fn = help.getFunction();
+    if(help.hasError) return JS_EXCEPTION;
+    engine.vm.keyCallbackFn = JS_DupValue(ctx, fn);
+    return JS_UNDEFINED;
+}
+
 static JSValue keyIsDownBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
     if(!inputInitialized(ctx)) return JS_EXCEPTION;
     FnHelp help(ctx, argc, argv);
@@ -98,6 +106,11 @@ void bindInput(){
     JSValue fn;
     JSContext* ctx = engine.vm.context;
     proto = JS_NewObject(ctx);
+    // set keyCallback: (keyCode: number, actionType: string)=> void
+    fn = JS_NewCFunction(engine.vm.context, &keyCallbackBind, "keyCallback", 0);
+    JS_DefineProperty(engine.vm.context, proto, JS_NewAtom(engine.vm.context, "keyCallback"), 
+        JS_UNDEFINED, JS_UNDEFINED, fn, JS_PROP_HAS_SET);
+    JS_FreeValue(engine.vm.context, fn);
     // keyIsDown(keyCode: number): bool
     fn = JS_NewCFunction(ctx, &keyIsDownBind, "keyIsDown", 0);
     JS_DefinePropertyValueStr(ctx, proto, "keyIsDown", fn, 0);

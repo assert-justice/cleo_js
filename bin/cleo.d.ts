@@ -45,6 +45,7 @@ declare module "cleo" {
 
     }
     export class Input{
+        static keyCallback(callbackFn: (keyCode: number, actionType: press | release)=>void): void;
         static keyIsDown(keyCode: number): boolean;
         static mouseButtonIsDown(mouseButtonCode: number): boolean;
         static get mouseX(): number;
