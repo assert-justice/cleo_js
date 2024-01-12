@@ -2,6 +2,34 @@
 
 A game framework for JavaScript.
 
+## Build Instructions
+
+Ensure the following are installed and up to date:
+
+- git
+- MinGW on Windows, gcc otherwise
+- Python3
+- CMake
+- Ninja
+
+In your terminal run
+
+```
+git clone --recursive git@github.com:assert-justice/cleo_js.git
+```
+
+To build and install cd into the directory and run
+
+```
+python3 ./scripts/sd.py run
+```
+
+On Windows run 
+
+```
+python .\scripts\sd.py run
+```
+
 See api reference.
 
 ## Cli
