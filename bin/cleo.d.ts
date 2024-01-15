@@ -44,15 +44,25 @@ declare module "cleo" {
         static vsync: boolean;
 
     }
-    export class Input{
-        static keyCallback(callbackFn: (keyCode: number, actionType: press | release)=>void): void;
-        static keyIsDown(keyCode: number): boolean;
-        static mouseButtonIsDown(mouseButtonCode: number): boolean;
-        static get mouseX(): number;
-        static get mouseY(): number;
-        static joyButtonIsDown(joyIdx: number, buttonCode: number): boolean;
-        static joyGetAxis(joyIdx: number, axisCode: number): number;
-        static gamepadExists(joyIdx: number): boolean;
+    export namespace Input{
+        interface InputEvent{
+            type: 'key' | 'mouseMotion' | 'mouseButton' | 'joyButton' | 'joyMotion',
+            device: number,
+            code: number,
+            altCode: number,
+            strength: number,
+            altStrength: number,
+            action: string,
+        }
+        function inputCallback(callbackFn: (event: InputEvent)=>void)
+        function keyCallback(callbackFn: (keyCode: number, actionType: 'press' | 'release')=>void): void;
+        function keyIsDown(keyCode: number): boolean;
+        function mouseButtonIsDown(mouseButtonCode: number): boolean;
+        const mouseX: number;
+        const mouseY: number;
+        function joyButtonIsDown(joyIdx: number, buttonCode: number): boolean;
+        function joyGetAxis(joyIdx: number, axisCode: number): number;
+        function gamepadExists(joyIdx: number): boolean;
     }
     export namespace Audio{
         class Sound{

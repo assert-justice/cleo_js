@@ -246,8 +246,7 @@ static JSValue drawImageBind(JSContext* ctx, JSValue thisVal, int argc, JSValue*
     // have to do it in reverse because matrix math is Like That
     glm::mat4 spriteTransform = glm::mat4(1.0f);
     spriteTransform = glm::translate(spriteTransform, glm::vec3(x, y, 0.0f));
-    // spriteTransform = glm::scale(spriteTransform, glm::vec3(scaleX,scaleY, 0.0f));
-    spriteTransform = glm::rotate(spriteTransform, glm::radians(angle), glm::vec3(0.0f, 0.0f, 1.0f));
+    spriteTransform = glm::rotate(spriteTransform, angle, glm::vec3(0.0f, 0.0f, 1.0f));
     spriteTransform = glm::translate(spriteTransform, glm::vec3(-ox/sw*width, -oy/sh*height, 0.0f));
     spriteTransform = glm::scale(spriteTransform, glm::vec3(width,height, 0.0f));
 
