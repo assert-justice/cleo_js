@@ -160,30 +160,6 @@ void Renderer::drawImage(int textureId, glm::mat4 spriteTransform, glm::mat4 coo
 
 }
 
-// void Renderer::drawImage(
-//     int textureId, 
-//     float x, float y, float width, float height,
-//     float sx, float sy, float sw, float sh)
-// {
-//     glUseProgram(imageShader.id);
-//     auto tex = textureStore.get(textureId);
-//     tex->use();
-//     glBindVertexArray(VAO);
-//     unsigned int cameraLoc = glGetUniformLocation(imageShader.id, "camera");
-//     glUniformMatrix4fv(cameraLoc, 1, GL_FALSE, glm::value_ptr(cameraTransform));
-//     unsigned int spriteLoc = glGetUniformLocation(imageShader.id, "sprite");
-//     glm::mat4 spriteTransform = glm::mat4(1.0f);
-//     spriteTransform = glm::translate(spriteTransform, glm::vec3(x, y, 0.0f));
-//     spriteTransform = glm::scale(spriteTransform, glm::vec3(width, height, 0.0f));
-    
-//     glUniformMatrix4fv(spriteLoc, 1, GL_FALSE, glm::value_ptr(spriteTransform));
-//     unsigned int dimensionsLoc = glGetUniformLocation(imageShader.id, "dimensions");
-//     glUniform4fv(dimensionsLoc, 1, glm::value_ptr(
-//         glm::vec4(sx/tex->width, sy/tex->height, sw/tex->width, sh/tex->height))
-//     );
-//     glDrawArrays(GL_TRIANGLES, 0, 6);
-// }
-
 void Renderer::freeTexture(int id){
     textureStore.del(id);
 }
@@ -202,10 +178,33 @@ void Renderer::setCameraPosition(float x, float y){
 }
 
 void Renderer::setTarget(Texture* target){
+    // std::cout << target << std::endl;
     this->target = target;
     if(target == nullptr) glBindFramebuffer(GL_FRAMEBUFFER, 0);
     else{
         target->useTarget();
     }
     setCameraPosition(0,0);
+}
+
+bool Renderer::pushRenderTarget(int id){
+    // Returns false if the texture id is invalid, true otherwise.
+    auto fb = getTexture(id);
+    if(fb == nullptr) return false;
+    renderTargetStack.push(std::make_pair(id, fb));
+    setTarget(fb);
+    return true;
+}
+
+int Renderer::popRenderTarget(){
+    // Returns -1 if stack is empty (at the base framebuffer), a valid id otherwise.
+    auto res = -1;
+    auto size = renderTargetStack.size();
+    if(size > 0){
+        auto top = renderTargetStack.top();
+        res = top.first;
+        renderTargetStack.pop();
+        setTarget(size > 1 ? renderTargetStack.top().second : nullptr);
+    }
+    return res;
 }

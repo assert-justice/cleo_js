@@ -13,6 +13,8 @@ declare module "cleo" {
     export namespace Graphics{
         function setClearColor(r: number, g: number, b: number, a:number): void;
         function clear():void;
+        function pushRenderTarget(target: Texture): void;
+        function popRenderTarget(): void;
         interface TextureParams{
             width?: number;
             height?: number;

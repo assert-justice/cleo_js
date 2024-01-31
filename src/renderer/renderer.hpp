@@ -1,5 +1,6 @@
 #pragma once
 #include <unordered_map>
+#include <stack>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -38,9 +39,12 @@ class Renderer{
     bool isUsingRenderTarget(){
         return target != nullptr;
     }
+    bool pushRenderTarget(int id);
+    int popRenderTarget();
     private:
     Store<Texture> textureStore;
     Texture* target = nullptr;
+    std::stack<std::pair<int, Texture*>> renderTargetStack;
     bool enabled = false;
     Shader imageShader;
     // Shader textShader;

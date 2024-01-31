@@ -17,10 +17,14 @@ const player = {
         visible: true,
     }
 }
+let fb = null;
 Engine.init = ()=>{
-    Input.keyCallback = (keyCode, actionType)=>{
-        System.println("code:", keyCode, "type:", actionType);
-    }
+    // Input.keyCallback = (keyCode, actionType)=>{
+    //     System.println("code:", keyCode, "type:", actionType);
+    // }
+    // fb = Graphics.Texture.new(100, 100);
+    fb = Graphics.Texture.fromColor(100, 100, 0, 255, 0, 255);
+    Graphics.pushRenderTarget(fb);
     const width = 10;
     const height = 10;
     const buffer = new ArrayBuffer(width * height * 4);
@@ -29,19 +33,34 @@ Engine.init = ()=>{
         for(let y = 0; y < height; y++){
             const idx = (x * width + y)*4;
             view[idx] = x === height - y - 1 ? 255 : 0;
-            view[idx + 1] = 0;
-            view[idx + 2] = 0;
+            view[idx + 1] = 255;
+            view[idx + 2] = 255;
             view[idx + 3] = 255;
         }
     }
+    // fb.setTarget();
     // player.spr = Texture.fromColor(width, height, 255, 0, 0, 255);
     player.spr = Texture.new(width, height, view.buffer);
+    for(let x = 0; x < 10; x++){
+        for(let y = 0; y < 10; y++){
+            player.spr.draw(x * width, y * height);
+        }
+    }
+    Graphics.popRenderTarget();
+    // fb.resetTarget();
     // player.spr = Texture.fromArray(width, height, texData);
     // player.spr = Texture.fromFile('characters_packed.png');
 }
 
 Engine.update = (dt)=>{
     if(Input.keyIsDown(256)) Engine.quit();
+    if(Input.keyIsDown(32)){
+        // globalThis.setTimeout(()=>System.println('yo'), 500);
+        // System.println(OS);
+        for (const [key, value] of Object.entries(globalThis)) {
+            System.println(key, value);
+        }
+    }
     // if(Input.keyIsDown(262)) player.x += player.speed * dt;
     // if(Input.keyIsDown(263)) player.x -= player.speed * dt;
     // if(Input.joyButtonIsDown(0,12)) player.x += player.speed * dt;
@@ -49,6 +68,8 @@ Engine.update = (dt)=>{
 }
 
 Engine.draw = ()=>{
-    player.spr.draw(0, 0,{width: 100, height: 100});
+    fb.draw(0, 0);
+    // player.spr.draw(0, 0);
+    // player.spr.draw(0, 0,{width: 100, height: 100});
     // player.spr.draw(player.x,player.y, player.sprOptions);
 }

@@ -93,6 +93,15 @@ void VM::update(double dt){
     auto val = JS_NewFloat64(context, dt);
     val = JS_Call(context, updateFn, JS_UNDEFINED, 1, &val);
     handleIfException(context, val);
+    // handle pending jobs
+    while(true){
+        JSContext* pendingContext;
+        int result = JS_ExecutePendingJob(runtime, &pendingContext);
+        if(result == 0) break; // no further jobs
+        else if(result < 0){
+            handleIfException(pendingContext, JS_EXCEPTION);
+        }
+    }
 }
 void VM::draw(){
     if(JS_IsUndefined(drawFn)) return;

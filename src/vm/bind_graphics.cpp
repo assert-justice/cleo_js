@@ -119,7 +119,7 @@ static JSValue textureConstructorBind(JSContext* ctx, JSValue thisVal, int argc,
         textureId = engine.renderer.newTexture(width, height, data);
     }
     if(textureId == -1){
-        JS_ThrowReferenceError(ctx, "unable to create an image!");
+        JS_ThrowReferenceError(ctx, "Unable to create an image!");
         return JS_EXCEPTION;
     }
     auto texturePtr = engine.renderer.getTexture(textureId);
@@ -273,6 +273,31 @@ static JSValue resetRenderTargetBind(JSContext* ctx, JSValue thisVal, int argc, 
     return JS_UNDEFINED;
 }
 
+static JSValue pushRenderTargetBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
+    if(!rendererInitalized(ctx)) return JS_EXCEPTION;
+    FnHelp help(ctx, argc, argv);
+    auto texture = help.next();
+    if(help.hasError) return JS_EXCEPTION;
+    auto s = getTexture(texture);
+    if(!s) return JS_EXCEPTION;
+    bool pushSucceeded = engine.renderer.pushRenderTarget(s->id);
+    if(!pushSucceeded) {
+        JS_ThrowReferenceError(ctx, "Invalid texture handle.");
+        return JS_EXCEPTION;
+    }
+    return JS_UNDEFINED;
+}
+
+static JSValue popRenderTargetBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
+    if(!rendererInitalized(ctx)) return JS_EXCEPTION;
+    auto id = engine.renderer.popRenderTarget();
+    if(id == -1) {
+        JS_ThrowReferenceError(ctx, "Cannot pop render target, stack empty.");
+        return JS_EXCEPTION;
+    }
+    return JS_UNDEFINED;
+}
+
 void bindGraphics(){
     JSValue proto, textureProto;
     JSValue fn;
@@ -330,11 +355,17 @@ void bindGraphics(){
     JS_DefinePropertyValueStr(ctx, proto, "Texture", textureProto, 0);
     JS_FreeValue(ctx, constructor);
     // standalone functions
-    // setClearColor(r: number, g: number, b: number, a: number = 0)
+    // setClearColor(r: number, g: number, b: number, a: number = 0): void
     fn = JS_NewCFunction(ctx, &setClearColorBind, "setClearColor", 0);
     JS_DefinePropertyValueStr(ctx, proto, "setClearColor", fn, 0);
-    // clear
+    // clear(): void
     fn = JS_NewCFunction(ctx, &clearBind, "clear", 0);
     JS_DefinePropertyValueStr(ctx, proto, "clear", fn, 0);
+    // pushRenderTarget(fb: Texture): void
+    fn = JS_NewCFunction(ctx, &pushRenderTargetBind, "pushRenderTarget", 0);
+    JS_DefinePropertyValueStr(ctx, proto, "pushRenderTarget", fn, 0);
+    // popRenderTarget(): void
+    fn = JS_NewCFunction(ctx, &popRenderTargetBind, "popRenderTarget", 0);
+    JS_DefinePropertyValueStr(ctx, proto, "popRenderTarget", fn, 0);
     engine.vm.addExport("Graphics", proto);
 }
