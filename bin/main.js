@@ -23,8 +23,6 @@ Engine.init = ()=>{
     //     System.println("code:", keyCode, "type:", actionType);
     // }
     // fb = Graphics.Texture.new(100, 100);
-    fb = Graphics.Texture.fromColor(100, 100, 0, 255, 0, 255);
-    Graphics.pushRenderTarget(fb);
     const width = 10;
     const height = 10;
     const buffer = new ArrayBuffer(width * height * 4);
@@ -40,6 +38,8 @@ Engine.init = ()=>{
     }
     // fb.setTarget();
     // player.spr = Texture.fromColor(width, height, 255, 0, 0, 255);
+    fb = Graphics.Texture.fromColor(100, 100, 0, 255, 0, 255);
+    Graphics.pushRenderTarget(fb);
     player.spr = Texture.new(width, height, view.buffer);
     for(let x = 0; x < 10; x++){
         for(let y = 0; y < 10; y++){

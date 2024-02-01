@@ -120,7 +120,11 @@ bool Renderer::isInitialized(){
     return initalized;
 }
 int Renderer::newTexture(int width, int height, unsigned char* data){
+    // save render target state
+    Texture* fb = nullptr;
+    if(renderTargetStack.size() > 0) fb = renderTargetStack.top().second;
     auto ptr = new Texture(width, height, data);
+    if(fb != nullptr) setTarget(fb);
     return textureStore.add(ptr);
 }
 
