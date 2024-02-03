@@ -65,8 +65,10 @@ static JSValue soundFromFileBind(JSContext* ctx, JSValue thisVal, int argc, JSVa
     if(JS_IsException(audioInitalized(ctx))) return JS_EXCEPTION;
     FnHelp help(ctx, argc, argv);
     auto path = help.getString();
+    bool streamingEnabled = true;
+    if(help.hasArgs()) streamingEnabled = help.getBool();
     if(help.hasError) return JS_EXCEPTION;
-    auto soundId = engine.audio.soundLoad(path.c_str());
+    auto soundId = engine.audio.soundLoad(path.c_str(), streamingEnabled, -1);
     if(soundId == -1){
         JS_ThrowReferenceError(ctx, "unable to load sound at path!");
         return JS_EXCEPTION;

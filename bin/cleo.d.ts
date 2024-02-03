@@ -77,7 +77,7 @@ declare module "cleo" {
     }
     export namespace Audio{
         class Sound{
-            static fromFile(path: string);
+            static fromFile(path: string, streamingEnabled = true);
             play();
             pause();
             stop();

@@ -20,15 +20,38 @@ void Audio::init(bool* hasError){
     initalized = true;
 }
 
-int Audio::soundLoad(const char* path){
+int Audio::newGroup(){
     ma_result result;
+    auto group = new ma_sound_group();
+    result = ma_sound_group_init(&audioEngine, 0, NULL, group);
+    if (result != MA_SUCCESS) {
+        std::cout << "Failed to init sound group." << std::endl; 
+        return -1;
+    }
+    return groupStore.add(group);
+}
+
+void Audio::freeGroup(int groupId){
+    groupStore.del(groupId);
+}
+
+int Audio::soundLoad(const char* path, bool streamingEnabled, int groupId){
+    ma_result result;
+    ma_sound_group* group = NULL;
+    if(groupId != -1){
+        if(!groupStore.has(groupId)){
+            std::cout << "Failed to load sound '" << path << "', invalid group." << std::endl;
+            return -1;
+        }
+        group = groupStore.get(groupId);
+    }
     auto sound = new ma_sound();
     result = ma_sound_init_from_file(&audioEngine, path, 
         MA_SOUND_FLAG_NO_SPATIALIZATION | 
-        MA_SOUND_FLAG_STREAM, NULL, NULL, 
+        streamingEnabled, group, NULL, 
         sound);
     if (result != MA_SUCCESS) {
-        std::cout << "Failed to load sound '" << path << "'\n";
+        std::cout << "Failed to load sound '" << path << "'" << std::endl;
         return -1;
     }
     return soundStore.add(sound);

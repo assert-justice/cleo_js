@@ -7,7 +7,9 @@ class Audio{
     // Audio();
     ~Audio();
     void init(bool* hasError);
-    int soundLoad(const char* path);
+    int newGroup();
+    void freeGroup(int groupId);
+    int soundLoad(const char* path, bool streamingEnabled, int groupId);
     void soundFree(int idx);
     void soundPlay(int idx);
     void soundPause(int idx);
@@ -20,6 +22,7 @@ class Audio{
     bool initalized = false;
     ma_engine audioEngine;
     Store<ma_sound> soundStore;
+    Store<ma_sound_group> groupStore;
     private:
     bool validIdx(int idx);
 };
