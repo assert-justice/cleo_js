@@ -7,7 +7,8 @@ static void framebufferCallback(GLFWwindow* window, int width, int height){
     glViewport(0, 0, width, height);
     engine.window.width = width;
     engine.window.height = height;
-    engine.renderer.setCameraPosition(0,0);
+    // engine.renderer.setCameraPosition(0,0);
+    engine.renderer.setDimensions(width, height);
 }
 
 // needs to be attached with glfwSetKeyCallback *after* the window is initialized

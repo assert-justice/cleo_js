@@ -39,8 +39,12 @@ Engine.init = ()=>{
     // fb.setTarget();
     // player.spr = Texture.fromColor(width, height, 255, 0, 0, 255);
     fb = Graphics.Texture.fromColor(100, 100, 0, 255, 0, 255);
-    Graphics.pushRenderTarget(fb);
     player.spr = Texture.new(width, height, view.buffer);
+    const temp = Texture.fromColor(5, 5, 255, 0, 0, 255);
+    Graphics.pushRenderTarget(player.spr);
+    temp.draw(0,0);
+    Graphics.popRenderTarget();
+    Graphics.pushRenderTarget(fb);
     for(let x = 0; x < 10; x++){
         for(let y = 0; y < 10; y++){
             player.spr.draw(x * width, y * height);
@@ -68,6 +72,13 @@ Engine.update = (dt)=>{
 }
 
 Engine.draw = ()=>{
+    // Graphics.pushRenderTarget(fb);
+    // for(let x = 0; x < 10; x++){
+    //     for(let y = 0; y < 10; y++){
+    //         player.spr.draw(x * 10, y * 10);
+    //     }
+    // }
+    // Graphics.popRenderTarget();
     fb.draw(0, 0);
     // player.spr.draw(0, 0);
     // player.spr.draw(0, 0,{width: 100, height: 100});

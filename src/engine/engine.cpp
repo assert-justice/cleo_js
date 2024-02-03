@@ -48,10 +48,9 @@ void Engine::loop(){
             acc -= dt;
             t += dt;
         }
-        renderer.update();
-        renderer.enable();
+        renderer.startRender();
         vm.draw();
-        renderer.disable();
+        renderer.endRender();
         window.update();
         if(window.shouldClose()) running = false;
     }

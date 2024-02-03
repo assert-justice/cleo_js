@@ -35,8 +35,8 @@ declare module "cleo" {
             static fromArray(width: number, height: number, data: number[]): Texture;
             static fromColor(width: number, height: number, red: number, green: number, blue: number, alpha: number): Texture;
             static new(width: number, height: number, data?: ArrayBuffer): Texture;
-            setTarget():void;
-            resetTarget():void;
+            // setTarget():void;
+            // resetTarget():void;
         }
     }
     export class Window{

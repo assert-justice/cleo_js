@@ -70,19 +70,20 @@ void Renderer::init(bool* hasError){
     glEnableVertexAttribArray(positionLoc);
     glVertexAttribPointer(textureLoc, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(textureLoc);
-    setCameraPosition(0.0f, 0.0f);
+    // setCameraPosition(0.0f, 0.0f);
+    setDimensions(engine.window.width, engine.window.height);
 
-    glGenFramebuffers(1, &fbo);
-    glBindFramebuffer(GL_FRAMEBUFFER, fbo);   
-    glGenTextures(1, &fbt);
-    glBindTexture(GL_TEXTURE_2D, fbt);
+    // glGenFramebuffers(1, &fbo);
+    // glBindFramebuffer(GL_FRAMEBUFFER, fbo);   
+    // glGenTextures(1, &fbt);
+    // glBindTexture(GL_TEXTURE_2D, fbt);
     
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 800, 600, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+    // glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 800, 600, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
 
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);  
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, fbt, 0); 
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);  
+    // glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, fbt, 0); 
+    // glBindFramebuffer(GL_FRAMEBUFFER, 0);
     // textShader.initialize(hasError, 
     //     readFile(hasError, "./font_vert.glsl"), 
     //     readFile(hasError,  "./font_frag.glsl"));
@@ -113,18 +114,35 @@ void Renderer::setClearColor(float r, float g, float b, float a){
 void Renderer::clear(){
     glClear(GL_COLOR_BUFFER_BIT);
 }
-void Renderer::update(){
-    glClear(GL_COLOR_BUFFER_BIT);
+void Renderer::startRender(){
+    enabled = true;
+    // glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    // glClear(GL_COLOR_BUFFER_BIT);
+    // clear();
+    getTarget()->useTarget();
+    // setClearColor(255, 0, 0, 255);
+    clear();
+    // setClearColor(0, 0, 0, 255);
+}
+void Renderer::endRender(){
+    enabled = false;
+    // Draw root render target
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    Texture* tex = renderTargetStack[0].second;
+    auto spriteTransform = glm::mat4(1.0f);
+    spriteTransform = glm::scale(spriteTransform, glm::vec3(tex->width ,tex->height, 0.0f));
+    drawImageInternal(
+        tex,
+        rootTransform,
+        spriteTransform,
+        glm::mat4(1.0f)  
+    );
 }
 bool Renderer::isInitialized(){
     return initalized;
 }
 int Renderer::newTexture(int width, int height, unsigned char* data){
-    // save render target state
-    Texture* fb = nullptr;
-    if(renderTargetStack.size() > 0) fb = renderTargetStack.top().second;
     auto ptr = new Texture(width, height, data);
-    if(fb != nullptr) setTarget(fb);
     return textureStore.add(ptr);
 }
 
@@ -138,29 +156,19 @@ int Renderer::loadImage(const char* path){
 }
 
 void Renderer::drawImage(int textureId, glm::mat4 spriteTransform, glm::mat4 coordTransform){
-    // glUseProgram(imageShader.id);
-    imageShader.use();
+    getTarget()->useTarget();
+    // std::cout<<renderTargetStack.size()<<std::endl;
     auto tex = textureStore.get(textureId);
     if(tex == nullptr){
         // TODO: actually handle this error
         return;
     }
-    tex->use();
-    glBindVertexArray(VAO);
-    unsigned int cameraLoc = glGetUniformLocation(imageShader.id, "camera");
-    glUniformMatrix4fv(cameraLoc, 1, GL_FALSE, glm::value_ptr(cameraTransform));
-    unsigned int spriteLoc = glGetUniformLocation(imageShader.id, "sprite");
-    glUniformMatrix4fv(spriteLoc, 1, GL_FALSE, glm::value_ptr(spriteTransform));
-    unsigned int coordLoc = glGetUniformLocation(imageShader.id, "coord");
-    glUniformMatrix4fv(coordLoc, 1, GL_FALSE, glm::value_ptr(coordTransform));
-    // spriteTransform = glm::translate(spriteTransform, glm::vec3(x, y, 0.0f));
-    // spriteTransform = glm::scale(spriteTransform, glm::vec3(width, height, 0.0f));
-    
-    // unsigned int dimensionsLoc = glGetUniformLocation(imageShader.id, "dimensions");
-    // glUniform4fv(dimensionsLoc, 1, glm::value_ptr(
-    //     glm::vec4(sx/tex->width, sy/tex->height, sw/tex->width, sh/tex->height))
-    // );
-    glDrawArrays(GL_TRIANGLES, 0, 6);
+    drawImageInternal(tex, 
+        // glm::mat4(1.0f),
+        getCurrentTransform(), 
+        // rootTransform,
+        spriteTransform, 
+        coordTransform);
 
 }
 
@@ -168,47 +176,63 @@ void Renderer::freeTexture(int id){
     textureStore.del(id);
 }
 
-void Renderer::setCameraPosition(float x, float y){
-    // intentionally flipped
-    float top = (float)engine.window.height;
-    float bottom = 0.0f;
-    if(target != nullptr){
-        bottom = top;
-        top = 0.0f;
-    }
-    // cameraTransform = glm::ortho(0.0f, camWidth, camHeight, 0.0f, -0.1f, 100.0f);
-    cameraTransform = glm::ortho(0.0f, (float)engine.window.width, top, bottom, -0.1f, 100.0f);
-    cameraTransform = glm::translate(cameraTransform, glm::vec3(-x, -y, 0.0f));
-}
-
-void Renderer::setTarget(Texture* target){
-    // std::cout << target << std::endl;
-    this->target = target;
-    if(target == nullptr) glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    else{
-        target->useTarget();
-    }
-    setCameraPosition(0,0);
-}
-
 bool Renderer::pushRenderTarget(int id){
     // Returns false if the texture id is invalid, true otherwise.
     auto fb = getTexture(id);
     if(fb == nullptr) return false;
-    renderTargetStack.push(std::make_pair(id, fb));
-    setTarget(fb);
+    renderTargetStack.push_back(std::make_pair(id, fb));
+    // std::cout << "push\n";
     return true;
 }
 
 int Renderer::popRenderTarget(){
-    // Returns -1 if stack is empty (at the base framebuffer), a valid id otherwise.
+    // Returns -1 if stack is empty (actually contains one element, at the base framebuffer), a valid id otherwise.
     auto res = -1;
     auto size = renderTargetStack.size();
-    if(size > 0){
-        auto top = renderTargetStack.top();
+    // Stack must always contain at least one element, the root that is drawn to the window.
+    if(size > 1){
+        // std::cout << "pop\n";
+        auto top = renderTargetStack[renderTargetStack.size()-1];
         res = top.first;
-        renderTargetStack.pop();
-        setTarget(size > 1 ? renderTargetStack.top().second : nullptr);
+        renderTargetStack.pop_back();
     }
     return res;
+}
+
+void Renderer::setDimensions(int width, int height){
+    // If the root render target hasn't been set yet, create it
+    // Otherwise resize and clear the root render target.
+    if(renderTargetStack.size() == 0){
+        int id = newTexture(width, height, NULL);
+        pushRenderTarget(id);
+        // auto transform = glm::ortho(0.0f, (float)width, (float)height, 0.0f, -0.1f, 100.0f);
+        auto transform = glm::ortho(0.0f, (float)width, 0.0f, (float)height, -0.1f, 100.0f);
+        transformStack.push_back(transform);
+    }
+    else{
+        auto root = renderTargetStack[0];
+        freeTexture(root.first);
+        root.first = newTexture(width, height, NULL);
+        root.second = getTexture(root.first);
+    }
+    // Reset the root transform.
+    rootTransform = glm::ortho(0.0f, (float)width, float(height), 0.0f, -0.1f, 100.0f);
+    // rootTransform = glm::ortho(0.0f, (float)width, 0.0f, float(height), -0.1f, 100.0f);
+}
+
+void Renderer::drawImageInternal(Texture* tex, 
+    glm::mat4 baseTransform,
+    glm::mat4 spriteTransform, 
+    glm::mat4 coordTransform){
+    tex->use();
+    imageShader.use();
+    glBindVertexArray(VAO);
+    unsigned int cameraLoc = glGetUniformLocation(imageShader.id, "camera");
+    glUniformMatrix4fv(cameraLoc, 1, GL_FALSE, glm::value_ptr(baseTransform));
+    unsigned int spriteLoc = glGetUniformLocation(imageShader.id, "sprite");
+    glUniformMatrix4fv(spriteLoc, 1, GL_FALSE, glm::value_ptr(spriteTransform));
+    unsigned int coordLoc = glGetUniformLocation(imageShader.id, "coord");
+    glUniformMatrix4fv(coordLoc, 1, GL_FALSE, glm::value_ptr(coordTransform));
+    glDrawArrays(GL_TRIANGLES, 0, 6);
+
 }

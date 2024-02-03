@@ -260,18 +260,18 @@ static JSValue drawImageBind(JSContext* ctx, JSValue thisVal, int argc, JSValue*
     return JS_UNDEFINED;
 }
 
-static JSValue setRenderTargetBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
-    if(!rendererInitalized(ctx)) return JS_EXCEPTION;
-    auto s = getTexture(thisVal);
-    if(!s) return JS_EXCEPTION;
-    engine.renderer.setTarget(s->texture);
-    return JS_UNDEFINED;
-}
-static JSValue resetRenderTargetBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
-    if(!rendererInitalized(ctx)) return JS_EXCEPTION;
-    engine.renderer.setTarget(nullptr);
-    return JS_UNDEFINED;
-}
+// static JSValue setRenderTargetBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
+//     if(!rendererInitalized(ctx)) return JS_EXCEPTION;
+//     auto s = getTexture(thisVal);
+//     if(!s) return JS_EXCEPTION;
+//     engine.renderer.setTarget(s->texture);
+//     return JS_UNDEFINED;
+// }
+// static JSValue resetRenderTargetBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
+//     if(!rendererInitalized(ctx)) return JS_EXCEPTION;
+//     engine.renderer.setTarget(nullptr);
+//     return JS_UNDEFINED;
+// }
 
 static JSValue pushRenderTargetBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
     if(!rendererInitalized(ctx)) return JS_EXCEPTION;
@@ -343,11 +343,11 @@ void bindGraphics(){
     fn = JS_NewCFunction(ctx, &drawImageBind, "drawImage", 0);
     JS_DefinePropertyValueStr(ctx, textureProto, "draw", fn, 0);
     // setTarget()
-    fn = JS_NewCFunction(ctx, &setRenderTargetBind, "setRenderTarget", 0);
-    JS_DefinePropertyValueStr(ctx, textureProto, "setTarget", fn, 0);
+    // fn = JS_NewCFunction(ctx, &setRenderTargetBind, "setRenderTarget", 0);
+    // JS_DefinePropertyValueStr(ctx, textureProto, "setTarget", fn, 0);
     // static resetTarget()
-    fn = JS_NewCFunction(ctx, &resetRenderTargetBind, "resetRenderTarget", 0);
-    JS_DefinePropertyValueStr(ctx, textureProto, "resetTarget", fn, 0);
+    // fn = JS_NewCFunction(ctx, &resetRenderTargetBind, "resetRenderTarget", 0);
+    // JS_DefinePropertyValueStr(ctx, textureProto, "resetTarget", fn, 0);
     // setting the class prototype consumes the prototype object so we need to reacquire it
     JS_SetClassProto(ctx, jsTextureClassId, textureProto);
     textureProto = JS_GetClassProto(ctx, jsTextureClassId);
