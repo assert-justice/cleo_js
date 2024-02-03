@@ -70,7 +70,6 @@ void Renderer::init(bool* hasError){
     glEnableVertexAttribArray(positionLoc);
     glVertexAttribPointer(textureLoc, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(textureLoc);
-    // setCameraPosition(0.0f, 0.0f);
     setDimensions(engine.window.width, engine.window.height);
 
     // glGenFramebuffers(1, &fbo);
@@ -116,13 +115,8 @@ void Renderer::clear(){
 }
 void Renderer::startRender(){
     enabled = true;
-    // glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    // glClear(GL_COLOR_BUFFER_BIT);
-    // clear();
     getTarget()->useTarget();
-    // setClearColor(255, 0, 0, 255);
     clear();
-    // setClearColor(0, 0, 0, 255);
 }
 void Renderer::endRender(){
     enabled = false;
@@ -157,16 +151,13 @@ int Renderer::loadImage(const char* path){
 
 void Renderer::drawImage(int textureId, glm::mat4 spriteTransform, glm::mat4 coordTransform){
     getTarget()->useTarget();
-    // std::cout<<renderTargetStack.size()<<std::endl;
     auto tex = textureStore.get(textureId);
     if(tex == nullptr){
         // TODO: actually handle this error
         return;
     }
     drawImageInternal(tex, 
-        // glm::mat4(1.0f),
-        getCurrentTransform(), 
-        // rootTransform,
+        getTransform(),
         spriteTransform, 
         coordTransform);
 
@@ -191,7 +182,6 @@ int Renderer::popRenderTarget(){
     auto size = renderTargetStack.size();
     // Stack must always contain at least one element, the root that is drawn to the window.
     if(size > 1){
-        // std::cout << "pop\n";
         auto top = renderTargetStack[renderTargetStack.size()-1];
         res = top.first;
         renderTargetStack.pop_back();
@@ -205,7 +195,6 @@ void Renderer::setDimensions(int width, int height){
     if(renderTargetStack.size() == 0){
         int id = newTexture(width, height, NULL);
         pushRenderTarget(id);
-        // auto transform = glm::ortho(0.0f, (float)width, (float)height, 0.0f, -0.1f, 100.0f);
         auto transform = glm::ortho(0.0f, (float)width, 0.0f, (float)height, -0.1f, 100.0f);
         transformStack.push_back(transform);
     }
@@ -217,7 +206,6 @@ void Renderer::setDimensions(int width, int height){
     }
     // Reset the root transform.
     rootTransform = glm::ortho(0.0f, (float)width, float(height), 0.0f, -0.1f, 100.0f);
-    // rootTransform = glm::ortho(0.0f, (float)width, 0.0f, float(height), -0.1f, 100.0f);
 }
 
 void Renderer::drawImageInternal(Texture* tex, 
@@ -234,5 +222,4 @@ void Renderer::drawImageInternal(Texture* tex,
     unsigned int coordLoc = glGetUniformLocation(imageShader.id, "coord");
     glUniformMatrix4fv(coordLoc, 1, GL_FALSE, glm::value_ptr(coordTransform));
     glDrawArrays(GL_TRIANGLES, 0, 6);
-
 }

@@ -27,39 +27,35 @@ class Renderer{
         glm::mat4 spriteTransform,
         glm::mat4 coordTransform
     );
-    // void setCameraPosition(float x, float y);
     Texture* getTexture(int id){
         return textureStore.get(id);
     }
     bool isEnabled(){
         return enabled || isAtRoot();
     }
-    // bool isUsingRenderTarget(){
-    //     return target != nullptr;
-    // }
     bool pushRenderTarget(int id);
     int popRenderTarget();
-    void pushTransform(glm::mat4 transform){
+    void setTransform(glm::mat4 transform){
         transformStack.push_back(transform);
     }
-    void saveTransform(){
+    void pushTransform(){
         // duplicates the top of the transform stack
-        transformStack.push_back(getCurrentTransform());
+        transformStack.push_back(getTransform());
     }
     void popTransform(){
         if(transformStack.size() > 0) transformStack.pop_back();
     }
-    glm::mat4 getCurrentTransform(){
+    glm::mat4 getTransform(){
         return transformStack[transformStack.size()-1];
     }
     void translate(glm::vec3 vector){
-        setCurrentTransform(glm::translate(getCurrentTransform(), vector));
+        setCurrentTransform(glm::translate(getTransform(), vector));
     }
     void scale(glm::vec3 vector){
-        setCurrentTransform(glm::scale(getCurrentTransform(), vector));
+        setCurrentTransform(glm::scale(getTransform(), vector));
     }
     void rotate(float angle, glm::vec3 axis){
-        setCurrentTransform(glm::rotate(getCurrentTransform(), angle, axis));
+        setCurrentTransform(glm::rotate(getTransform(), angle, axis));
     }
     void setOrthoProjection(float left, float right, float top, float bottom, float near, float far){
         setCurrentTransform(glm::ortho(left, right, bottom, top, near, far));
@@ -82,7 +78,6 @@ class Renderer{
     // The transform used when rendering the last render target to the view
     glm::mat4 rootTransform; 
     std::vector<glm::mat4> transformStack;
-    // glm::mat4 cameraTransform;
     // FT_Library ft;
     // FT_Face face;
     // void setTarget(Texture* target);

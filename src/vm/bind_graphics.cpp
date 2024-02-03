@@ -107,7 +107,7 @@ static JSValue textureConstructorBind(JSContext* ctx, JSValue thisVal, int argc,
     else{
         size_t length;
         auto data = (unsigned char*)JS_GetArrayBuffer(ctx, &length, array);
-        // note: the data returned by JS_GetArrayBuffer is managed by QuickJS and should not be freed.
+        // Note: the data returned by JS_GetArrayBuffer is managed by QuickJS and should not be freed.
         if(data == NULL){
             JS_ThrowTypeError(ctx, "Cannot read texture data!");
             return JS_EXCEPTION;
@@ -148,7 +148,6 @@ static JSValue textureFromArrayBind(JSContext* ctx, JSValue thisVal, int argc, J
     {
         auto str = std::to_string(idx);
         auto jsVal = JS_GetProperty(ctx, array, JS_NewAtom(ctx, str.c_str()));
-        // check if val is numeric
         if(!JS_IsNumber(jsVal)){
             JS_ThrowTypeError(ctx, "type error, found non-numeric number in image data array!");
             free(data);
@@ -260,19 +259,6 @@ static JSValue drawImageBind(JSContext* ctx, JSValue thisVal, int argc, JSValue*
     return JS_UNDEFINED;
 }
 
-// static JSValue setRenderTargetBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
-//     if(!rendererInitalized(ctx)) return JS_EXCEPTION;
-//     auto s = getTexture(thisVal);
-//     if(!s) return JS_EXCEPTION;
-//     engine.renderer.setTarget(s->texture);
-//     return JS_UNDEFINED;
-// }
-// static JSValue resetRenderTargetBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
-//     if(!rendererInitalized(ctx)) return JS_EXCEPTION;
-//     engine.renderer.setTarget(nullptr);
-//     return JS_UNDEFINED;
-// }
-
 static JSValue pushRenderTargetBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
     if(!rendererInitalized(ctx)) return JS_EXCEPTION;
     FnHelp help(ctx, argc, argv);
@@ -298,8 +284,81 @@ static JSValue popRenderTargetBind(JSContext* ctx, JSValue thisVal, int argc, JS
     return JS_UNDEFINED;
 }
 
+static JSValue setTransformBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
+    if(!rendererInitalized(ctx)) return JS_EXCEPTION;
+    FnHelp help(ctx, argc, argv);
+    auto array = help.getArray();
+    if(help.hasError) return JS_EXCEPTION;
+    ObjectHelp objHelp(ctx, array);
+    // JS_GetProperty()
+    auto length = objHelp.getNumber("length");
+    if(length != 16){
+        JS_ThrowRangeError(ctx, "Transform matrices must have sixteen elements!");
+        return JS_EXCEPTION;
+    }
+    float data[16];
+    for (size_t idx = 0; idx < length; idx++)
+    {
+        data[idx] = (float)objHelp.getNumber(std::to_string(idx).c_str());
+    }
+    if(objHelp.hasError){
+        JS_ThrowTypeError(ctx, "Error creating transform array.");
+        return JS_EXCEPTION;
+    }
+    auto transform = glm::make_mat4(data);
+    engine.renderer.setTransform(transform);
+    return JS_UNDEFINED;
+}
+
+static JSValue getTransformBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
+    auto trans = engine.renderer.getTransform();
+    auto data = glm::value_ptr(trans);
+    auto array = JS_NewArray(ctx);
+    ObjectHelp objHelp(ctx, array);
+    objHelp.setNumber("length", 16);
+    for (size_t idx = 0; idx < 16; idx++)
+    {
+        objHelp.setNumber(std::to_string(idx).c_str(), data[idx]);
+    }
+    return array;
+}
+static JSValue pushTransformBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
+    engine.renderer.pushTransform();
+    return JS_UNDEFINED;
+}
+static JSValue popTransformBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
+    engine.renderer.popTransform();
+    return JS_UNDEFINED;
+}
+static JSValue translateBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
+    FnHelp help(ctx, argc, argv);
+    float x = help.getFloat64();
+    float y = help.getFloat64();
+    float z = 0.0f;
+    if(help.hasError) return JS_EXCEPTION;
+    engine.renderer.translate(glm::vec3(x, y, z));
+    return JS_UNDEFINED;
+}
+static JSValue scaleBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
+    FnHelp help(ctx, argc, argv);
+    float x = help.getFloat64();
+    float y = help.getFloat64();
+    float z = 0.0f;
+    if(help.hasError) return JS_EXCEPTION;
+    engine.renderer.scale(glm::vec3(x, y, z));
+    return JS_UNDEFINED;
+}
+static JSValue rotateBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
+    FnHelp help(ctx, argc, argv);
+    auto angle = help.getFloat64();
+    if(help.hasError) return JS_EXCEPTION;
+    engine.renderer.rotate(angle, glm::vec3(0.0f, 0.0f, 1.0f));
+    return JS_UNDEFINED;
+}
+
+
 void bindGraphics(){
-    JSValue proto, textureProto;
+    JSValue proto, textureProto, cameraProto;
     JSValue fn;
     auto ctx = engine.vm.context;
     proto = JS_NewObject(ctx);
@@ -342,18 +401,13 @@ void bindGraphics(){
     // draw()
     fn = JS_NewCFunction(ctx, &drawImageBind, "drawImage", 0);
     JS_DefinePropertyValueStr(ctx, textureProto, "draw", fn, 0);
-    // setTarget()
-    // fn = JS_NewCFunction(ctx, &setRenderTargetBind, "setRenderTarget", 0);
-    // JS_DefinePropertyValueStr(ctx, textureProto, "setTarget", fn, 0);
-    // static resetTarget()
-    // fn = JS_NewCFunction(ctx, &resetRenderTargetBind, "resetRenderTarget", 0);
-    // JS_DefinePropertyValueStr(ctx, textureProto, "resetTarget", fn, 0);
     // setting the class prototype consumes the prototype object so we need to reacquire it
     JS_SetClassProto(ctx, jsTextureClassId, textureProto);
     textureProto = JS_GetClassProto(ctx, jsTextureClassId);
     auto constructor = JS_GetProperty(ctx, textureProto, JS_NewAtom(ctx, "constructor"));
     JS_DefinePropertyValueStr(ctx, proto, "Texture", textureProto, 0);
     JS_FreeValue(ctx, constructor);
+
     // standalone functions
     // setClearColor(r: number, g: number, b: number, a: number = 0): void
     fn = JS_NewCFunction(ctx, &setClearColorBind, "setClearColor", 0);
@@ -367,5 +421,26 @@ void bindGraphics(){
     // popRenderTarget(): void
     fn = JS_NewCFunction(ctx, &popRenderTargetBind, "popRenderTarget", 0);
     JS_DefinePropertyValueStr(ctx, proto, "popRenderTarget", fn, 0);
+    // getTransform(): void
+    fn = JS_NewCFunction(ctx, &getTransformBind, "getTransform", 0);
+    JS_DefinePropertyValueStr(ctx, proto, "getTransform", fn, 0);
+    // setTransform(): void
+    fn = JS_NewCFunction(ctx, &setTransformBind, "setTransform", 0);
+    JS_DefinePropertyValueStr(ctx, proto, "setTransform", fn, 0);
+    // pushTransform(): void
+    fn = JS_NewCFunction(ctx, &pushTransformBind, "pushTransform", 0);
+    JS_DefinePropertyValueStr(ctx, proto, "pushTransform", fn, 0);
+    // popTransform(): void
+    fn = JS_NewCFunction(ctx, &popTransformBind, "popTransform", 0);
+    JS_DefinePropertyValueStr(ctx, proto, "popTransform", fn, 0);
+    // translate(x: number, y: number): void
+    fn = JS_NewCFunction(ctx, &translateBind, "translate", 0);
+    JS_DefinePropertyValueStr(ctx, proto, "translate", fn, 0);
+    // scale(x: number, y: number): void
+    fn = JS_NewCFunction(ctx, &scaleBind, "scale", 0);
+    JS_DefinePropertyValueStr(ctx, proto, "scale", fn, 0);
+    // rotate(x: number, y: number): void
+    fn = JS_NewCFunction(ctx, &rotateBind, "rotate", 0);
+    JS_DefinePropertyValueStr(ctx, proto, "rotate", fn, 0);
     engine.vm.addExport("Graphics", proto);
 }

@@ -12,9 +12,18 @@ declare module "cleo" {
     }
     export namespace Graphics{
         function setClearColor(r: number, g: number, b: number, a:number): void;
-        function clear():void;
+        function clear(): void;
         function pushRenderTarget(target: Texture): void;
         function popRenderTarget(): void;
+        function getTransform(): ArrayBuffer;
+        function setTransform(data: ArrayBuffer): void;
+        function pushTransform(): void;
+        function popTransform(): void;
+        function translate(x: number, y: number): void;
+        function scale(x: number, y: number): void;
+        function rotate(angle: number): void;
+        // function setOrthoProjection(left: number, right: number, top: number, bottom: number, near: number, far: number): void;
+        // function setPerspectiveProjection(fov: number, aspect: number, near: number, far: number): void;
         interface TextureParams{
             width?: number;
             height?: number;

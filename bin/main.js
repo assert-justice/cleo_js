@@ -23,6 +23,7 @@ Engine.init = ()=>{
     //     System.println("code:", keyCode, "type:", actionType);
     // }
     // fb = Graphics.Texture.new(100, 100);
+    // System.println(Graphics.getTransform());
     const width = 10;
     const height = 10;
     const buffer = new ArrayBuffer(width * height * 4);
@@ -40,9 +41,12 @@ Engine.init = ()=>{
     // player.spr = Texture.fromColor(width, height, 255, 0, 0, 255);
     fb = Graphics.Texture.fromColor(100, 100, 0, 255, 0, 255);
     player.spr = Texture.new(width, height, view.buffer);
-    const temp = Texture.fromColor(5, 5, 255, 0, 0, 255);
+    const temp = Texture.fromColor(10, 10, 255, 0, 0, 255);
     Graphics.pushRenderTarget(player.spr);
+    Graphics.pushTransform();
+    Graphics.scale(0.5, 0.5);
     temp.draw(0,0);
+    Graphics.popTransform();
     Graphics.popRenderTarget();
     Graphics.pushRenderTarget(fb);
     for(let x = 0; x < 10; x++){
@@ -51,6 +55,9 @@ Engine.init = ()=>{
         }
     }
     Graphics.popRenderTarget();
+    // Graphics.translate(30, 0, 0);
+    // Graphics.scale(2, 2);
+    // Graphics.rotate(Math.PI/4);
     // fb.resetTarget();
     // player.spr = Texture.fromArray(width, height, texData);
     // player.spr = Texture.fromFile('characters_packed.png');
