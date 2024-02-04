@@ -26,6 +26,7 @@ set( CLEO-SRC
      # utils
      src/utils/fs.cpp
      src/utils/cli.cpp
+     src/utils/path.cpp
      # engine and subsystems
      src/engine/engine.cpp
      src/vm/vm.cpp

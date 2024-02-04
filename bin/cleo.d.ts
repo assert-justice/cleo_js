@@ -1,9 +1,15 @@
 declare module "cleo" {
     export namespace System {
         function println(...args: any[]): void;
+        function input(): string;
         function readFile(path: string): string;
         function writeFile(path: string,text: string): void;
         function getSavePath(appname: string): string;
+        function joinPath(...args: string[]): string;
+        function createDirectory(path: string): boolean;
+        function isPath(path: string): boolean;
+        function isFile(path: string): boolean;
+        function isDirectory(path: string): boolean;
     }
     export class Engine{
         static init: ()=>void;

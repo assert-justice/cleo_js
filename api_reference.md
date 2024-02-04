@@ -55,19 +55,11 @@
 
 - println(...string[])
 - input(): string
-
-### Relatively Safe
-
 - readFile(path: string): string
 - writeFile(path: string, text: string)
-
-### Annoying but doable
-
+- getSavePath(appname: string): string
 - pathExists(path: string): bool
-- pathIsFile(path: string): bool
-- pathIsDir(path: string): bool
-
-### Yikes
-
-- makeDir(path: string)
+- isFile(path: string): bool
+- isDirectory(path: string): bool
+- createDirectory(path: string)
 - copy(sourcePath: string, destPath: string, recursive: bool = true)

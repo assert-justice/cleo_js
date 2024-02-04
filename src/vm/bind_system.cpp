@@ -1,9 +1,11 @@
 #include <iostream>
 #include <string>
+#include <sstream>
 #include "bind_system.hpp"
 #include "engine/engine.hpp"
 #include "fn_help.hpp"
 #include "utils/fs.hpp"
+#include "utils/path.hpp"
 
 static void print(JSContext* ctx, JSValue val){
     JSValue str;
@@ -67,6 +69,44 @@ static JSValue getSavePathBind(JSContext* ctx, JSValue thisVal, int argc, JSValu
     return res;
 }
 
+static JSValue joinPathBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
+    FnHelp fnHelp(ctx, argc, argv);
+    auto separator = getPathSeparator();
+    std::stringstream stream;
+    stream << fnHelp.getString();
+    while(!fnHelp.hasError && fnHelp.hasArgs()){
+        stream << separator << fnHelp.getString();
+    }
+    if(fnHelp.hasError) return JS_EXCEPTION;
+    auto res = JS_NewString(ctx, stream.str().c_str());
+    return res;
+}
+
+static JSValue createDirectoryBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
+    FnHelp fnHelp(ctx, argc, argv);
+    auto path = fnHelp.getString();
+    if(fnHelp.hasError) return JS_EXCEPTION;
+    return JS_NewBool(ctx, createDirectory(path));
+}
+static JSValue isPathBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
+    FnHelp fnHelp(ctx, argc, argv);
+    auto pathStr = fnHelp.getString();
+    if(fnHelp.hasError) return JS_EXCEPTION;
+    return JS_NewBool(ctx, Path(pathStr).exists());
+}
+static JSValue isFileBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
+    FnHelp fnHelp(ctx, argc, argv);
+    auto pathStr = fnHelp.getString();
+    if(fnHelp.hasError) return JS_EXCEPTION;
+    return JS_NewBool(ctx, Path(pathStr).isFile());
+}
+static JSValue isDirectoryBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
+    FnHelp fnHelp(ctx, argc, argv);
+    auto pathStr = fnHelp.getString();
+    if(fnHelp.hasError) return JS_EXCEPTION;
+    return JS_NewBool(ctx, Path(pathStr).isDirectory());
+}
+
 void bindSystem(){
     JSValue proto;
     JSValue fn;
@@ -86,5 +126,20 @@ void bindSystem(){
     // getSavePath(appname: string): string
     fn = JS_NewCFunction(engine.vm.context, &getSavePathBind, "getSavePath", 0);
     JS_DefinePropertyValueStr(engine.vm.context, proto, "getSavePath", fn, 0);
+    // joinPath(...string[]): string
+    fn = JS_NewCFunction(engine.vm.context, &joinPathBind, "joinPath", 0);
+    JS_DefinePropertyValueStr(engine.vm.context, proto, "joinPath", fn, 0);
+    // createDirectory(...string[]): bool
+    fn = JS_NewCFunction(engine.vm.context, &createDirectoryBind, "createDirectory", 0);
+    JS_DefinePropertyValueStr(engine.vm.context, proto, "createDirectory", fn, 0);
+    // isPath(path: string): bool
+    fn = JS_NewCFunction(engine.vm.context, &isPathBind, "isPath", 0);
+    JS_DefinePropertyValueStr(engine.vm.context, proto, "isPath", fn, 0);
+    // isFile(path: string): bool
+    fn = JS_NewCFunction(engine.vm.context, &isFileBind, "isFile", 0);
+    JS_DefinePropertyValueStr(engine.vm.context, proto, "isFile", fn, 0);
+    // isDirectory(path: string): bool
+    fn = JS_NewCFunction(engine.vm.context, &isDirectoryBind, "isDirectory", 0);
+    JS_DefinePropertyValueStr(engine.vm.context, proto, "isDirectory", fn, 0);
     engine.vm.addExport("System", proto);
 }

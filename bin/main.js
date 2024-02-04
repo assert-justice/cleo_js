@@ -19,7 +19,18 @@ const player = {
 }
 let fb = null;
 Engine.init = ()=>{
-    System.println(System.getSavePath("my_app"));
+    const appPath = System.getSavePath('test_app');
+    // System.println(System.isPath('C:\\Users\\Riley\\AppData\\Roaming'));
+    // C:\Users\Riley\AppData\Roaming\cleo\test_app
+    // System.createDirectory(appPath);
+    const path = System.joinPath(appPath, 'data.json');
+    // System.println(path);
+    // System.println(System.isPath(path));
+    if(!System.isFile(path)) System.writeFile(path, "1");
+    const count = +System.readFile(path) + 1;
+    System.println(count);
+    System.writeFile(path, ''+count);
+    // System.println(System.readFile(path));
     // Input.keyCallback = (keyCode, actionType)=>{
     //     System.println("code:", keyCode, "type:", actionType);
     // }
