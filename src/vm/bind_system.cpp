@@ -58,6 +58,15 @@ static JSValue writeFileBind(JSContext* ctx, JSValue thisVal, int argc, JSValue*
     return JS_UNDEFINED;
 }
 
+static JSValue getSavePathBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
+    FnHelp fnHelp(ctx, argc, argv);
+    auto appname = fnHelp.getString();
+    if(fnHelp.hasError) return JS_EXCEPTION;
+    auto path = getSavePath(appname);
+    auto res = JS_NewString(ctx, path.c_str());
+    return res;
+}
+
 void bindSystem(){
     JSValue proto;
     JSValue fn;
@@ -74,5 +83,8 @@ void bindSystem(){
     // writeFile(path: string): string
     fn = JS_NewCFunction(engine.vm.context, &writeFileBind, "writeFile", 0);
     JS_DefinePropertyValueStr(engine.vm.context, proto, "writeFile", fn, 0);
+    // getSavePath(appname: string): string
+    fn = JS_NewCFunction(engine.vm.context, &getSavePathBind, "getSavePath", 0);
+    JS_DefinePropertyValueStr(engine.vm.context, proto, "getSavePath", fn, 0);
     engine.vm.addExport("System", proto);
 }

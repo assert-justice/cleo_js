@@ -19,6 +19,7 @@ const player = {
 }
 let fb = null;
 Engine.init = ()=>{
+    System.println(System.getSavePath("my_app"));
     // Input.keyCallback = (keyCode, actionType)=>{
     //     System.println("code:", keyCode, "type:", actionType);
     // }

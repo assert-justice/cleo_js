@@ -1,8 +1,9 @@
 declare module "cleo" {
     export namespace System {
-        function println(...args:any[]):void;
-        function readFile(path:string):string;
-        function writeFile(path:string,text:string):void;
+        function println(...args: any[]): void;
+        function readFile(path: string): string;
+        function writeFile(path: string,text: string): void;
+        function getSavePath(appname: string): string;
     }
     export class Engine{
         static init: ()=>void;
@@ -77,7 +78,7 @@ declare module "cleo" {
     }
     export namespace Audio{
         class Sound{
-            static fromFile(path: string, streamingEnabled = true);
+            static fromFile(path: string, streamingEnabled: boolean = true);
             play();
             pause();
             stop();
