@@ -17,7 +17,7 @@ class Renderer{
     void startRender();
     void endRender();
     bool isInitialized();
-    void setClearColor(float r, float g, float b, float a);
+    void setClearColor(float r, float g, float b);
     void clear();
     int newTexture(int width, int height, unsigned char* data);
     void freeTexture(int id);

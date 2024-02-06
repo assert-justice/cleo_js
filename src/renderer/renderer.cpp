@@ -56,7 +56,7 @@ void Renderer::init(bool* hasError){
     if(*hasError) return;
     imageShader.initialize(hasError, vertexShaderSource, fragmentShaderSource);
     if(*hasError) return;
-    // glClearColor( 0.4f, 0.3f, 0.4f, 0.0f );
+    setClearColor(0.0f, 0.0f, 0.0f);
 
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
@@ -107,15 +107,17 @@ void Renderer::init(bool* hasError){
     glfwSwapBuffers(engine.window.window);
     initalized = true;
 }
-void Renderer::setClearColor(float r, float g, float b, float a){
-    glClearColor(r, g, b, a);
+void Renderer::setClearColor(float r, float g, float b){
+    glClearColor(r, g, b, 1.0f);
 }
 void Renderer::clear(){
+    getTarget()->useTarget();
     glClear(GL_COLOR_BUFFER_BIT);
 }
 void Renderer::startRender(){
     enabled = true;
-    getTarget()->useTarget();
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glClear(GL_COLOR_BUFFER_BIT);
     clear();
 }
 void Renderer::endRender(){

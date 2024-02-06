@@ -64,12 +64,11 @@ static bool rendererInitalized(JSContext* ctx){
 static JSValue setClearColorBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
     if(!rendererInitalized(ctx)) return JS_EXCEPTION;
     FnHelp help(ctx, argc, argv);
-    auto r = help.getFloat64();
-    auto g = help.getFloat64();
-    auto b = help.getFloat64();
-    auto a = help.hasArgs() ? help.getFloat64() : 0.0;
+    auto r = help.getFloat64() / 255;
+    auto g = help.getFloat64() / 255;
+    auto b = help.getFloat64() / 255;
     if(help.hasError) return JS_EXCEPTION;
-    engine.renderer.setClearColor(r, g, b, a);
+    engine.renderer.setClearColor(r, g, b);
     return JS_UNDEFINED;
 }
 

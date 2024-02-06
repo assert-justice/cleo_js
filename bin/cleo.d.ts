@@ -18,7 +18,7 @@ declare module "cleo" {
         static quit():void;
     }
     export namespace Graphics{
-        function setClearColor(r: number, g: number, b: number, a:number): void;
+        function setClearColor(r: number, g: number, b: number): void;
         function clear(): void;
         function pushRenderTarget(target: Texture): void;
         function popRenderTarget(): void;
