@@ -22,6 +22,7 @@ set( CLEO-SRC
      # external
      src/extern/glad.c
      src/extern/stb_image.c
+     src/extern/stb_image_write.c
      src/extern/miniaudio.c
      # utils
      src/utils/fs.cpp

@@ -29,6 +29,7 @@ declare module "cleo" {
         function translate(x: number, y: number): void;
         function scale(x: number, y: number): void;
         function rotate(angle: number): void;
+        function saveTexture(path: string, texture?: Texture): void;
         // function setOrthoProjection(left: number, right: number, top: number, bottom: number, near: number, far: number): void;
         // function setPerspectiveProjection(fov: number, aspect: number, near: number, far: number): void;
         interface TextureParams{

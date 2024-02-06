@@ -22,6 +22,7 @@ class Renderer{
     int newTexture(int width, int height, unsigned char* data);
     void freeTexture(int id);
     int loadImage(const char* path);
+    bool saveTexture(const char* path, int id);
     void drawImage(
         int textureId,
         glm::mat4 spriteTransform,

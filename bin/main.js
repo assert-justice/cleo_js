@@ -11,6 +11,13 @@ const player = {
 Engine.init = ()=>{
     playerSpr = Graphics.Texture.fromFile('character_0000.png');
     backgroundSpr = Graphics.Texture.new(1920/4, 1080/4);
+    Graphics.pushRenderTarget(backgroundSpr);
+    Graphics.clear();
+    playerSpr.draw(player.x, player.y);
+    playerSpr.draw(player.x+100, player.y);
+    playerSpr.draw(player.x+200, player.y);
+    Graphics.popRenderTarget();
+    Graphics.saveTexture("test.png", backgroundSpr);
 }
 
 Engine.update = (dt)=>{
@@ -22,9 +29,9 @@ Engine.update = (dt)=>{
 }
 
 Engine.draw = ()=>{
-    Graphics.pushRenderTarget(backgroundSpr);
-    Graphics.clear();
-    playerSpr.draw(player.x, player.y);
-    Graphics.popRenderTarget();
+    // Graphics.pushRenderTarget(backgroundSpr);
+    // Graphics.clear();
+    // playerSpr.draw(player.x, player.y);
+    // Graphics.popRenderTarget();
     backgroundSpr.draw(0,0);
 }

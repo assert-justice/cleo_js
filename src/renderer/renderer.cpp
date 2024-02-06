@@ -1,10 +1,12 @@
 #include "renderer.hpp"
 #include <iostream>
 #include <string>
+#include <cstdlib>
 #include <glad/glad.h> 
 #include <GLFW/glfw3.h>
 #include "utils/fs.hpp"
 #include "stb_image.h"
+#include "stb_image_write.h"
 #include "engine/engine.hpp"
 
 const float quad[] = {
@@ -149,6 +151,19 @@ int Renderer::loadImage(const char* path){
     int id = newTexture(width, height, data);
     stbi_image_free(data);
     return id;
+}
+
+bool Renderer::saveTexture(const char* path, int id){
+    Texture* tex = nullptr;
+    if(id == -1) tex = renderTargetStack[0].second;
+    else tex = textureStore.get(id);
+    stbi_flip_vertically_on_write(id == -1);
+    if(tex == nullptr) return false;
+    auto data = (uint8_t*)calloc(tex->width * tex->height * 4, sizeof(uint8_t));
+    glReadPixels(0, 0, tex->width, tex->height, GL_RGBA, GL_UNSIGNED_BYTE, data);
+    stbi_write_png(path, tex->width, tex->height, 4, data, 4 * tex->width);
+    free(data);
+    return true;
 }
 
 void Renderer::drawImage(int textureId, glm::mat4 spriteTransform, glm::mat4 coordTransform){

@@ -354,6 +354,19 @@ static JSValue rotateBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* ar
     engine.renderer.rotate(angle, glm::vec3(0.0f, 0.0f, 1.0f));
     return JS_UNDEFINED;
 }
+static JSValue saveTextureBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
+    FnHelp help(ctx, argc, argv);
+    auto path = help.getString();
+    int id = -1;
+    if(help.hasArgs()){
+        auto s = getTexture(help.next());
+        if(!s) return JS_EXCEPTION;
+        id = s->id;
+    }
+    if(help.hasError) return JS_EXCEPTION;
+    engine.renderer.saveTexture(path.c_str(), id);
+    return JS_UNDEFINED;
+}
 
 
 void bindGraphics(){
@@ -441,5 +454,8 @@ void bindGraphics(){
     // rotate(x: number, y: number): void
     fn = JS_NewCFunction(ctx, &rotateBind, "rotate", 0);
     JS_DefinePropertyValueStr(ctx, proto, "rotate", fn, 0);
+    // saveTexture(path: string, texture?: Texture): void
+    fn = JS_NewCFunction(ctx, &saveTextureBind, "saveTexture", 0);
+    JS_DefinePropertyValueStr(ctx, proto, "saveTexture", fn, 0);
     engine.vm.addExport("Graphics", proto);
 }
