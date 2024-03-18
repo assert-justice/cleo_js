@@ -8,6 +8,10 @@ const player = {
     speed: 100,
 }
 
+let fullscreen = false;
+let wasToggleDown = false;
+Window.setStats("test", 1920, 1080, "windowed");
+
 Engine.init = ()=>{
     playerSpr = Graphics.Texture.fromFile('character_0000.png');
     backgroundSpr = Graphics.Texture.new(1920/4, 1080/4);
@@ -21,6 +25,15 @@ Engine.init = ()=>{
 }
 
 Engine.update = (dt)=>{
+    if(!wasToggleDown && Input.keyIsDown(257)){
+        fullscreen = !fullscreen;
+        Window.setStats("test", 1920, 1080, fullscreen ? "borderless": "windowed");
+    }
+    wasToggleDown = Input.keyIsDown(257);
+    // if(!fullscreen){
+    //     fullscreen = true;
+    //     Window.setStats("test", 1920, 1080, "borderless");
+    // }
     if(Input.keyIsDown(256)) Engine.quit();
     if(Input.keyIsDown(262)) player.x += player.speed * dt;
     if(Input.keyIsDown(263)) player.x -= player.speed * dt;

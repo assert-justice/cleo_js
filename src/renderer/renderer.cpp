@@ -220,6 +220,8 @@ void Renderer::setDimensions(int width, int height){
         freeTexture(root.first);
         root.first = newTexture(width, height, NULL);
         root.second = getTexture(root.first);
+        auto transform = glm::ortho(0.0f, (float)width, 0.0f, (float)height, -0.1f, 100.0f);
+        transformStack[0] = transform;
     }
     // Reset the root transform.
     rootTransform = glm::ortho(0.0f, (float)width, float(height), 0.0f, -0.1f, 100.0f);

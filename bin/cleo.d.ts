@@ -56,12 +56,12 @@ declare module "cleo" {
             // resetTarget():void;
         }
     }
+    export type WindowMode = "windowed" | "borderless" | "fullscreen";
     export class Window{
         static get width():number;
         static get height():number;
-        static setStats(name: string, width:number, height:number, mode?: string, monitor?: number)
+        static setStats(name: string, width:number, height:number, mode?: WindowMode, monitor?: number)
         static vsync: boolean;
-
     }
     export namespace Input{
         interface InputEvent{
@@ -85,7 +85,7 @@ declare module "cleo" {
     }
     export namespace Audio{
         class Sound{
-            static fromFile(path: string, streamingEnabled: boolean = true);
+            static fromFile(path: string, streamingEnabled?: boolean);
             play();
             pause();
             stop();
