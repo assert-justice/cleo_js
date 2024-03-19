@@ -43,6 +43,7 @@ set( CLEO-SRC
      src/renderer/renderer.cpp
      src/renderer/shader.cpp
      src/renderer/texture.cpp
+     src/renderer/mesh.cpp
      src/audio/audio.cpp
      # bindings
      src/vm/bind_engine.cpp

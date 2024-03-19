@@ -265,8 +265,8 @@ static JSValue shaderConstructorBind(JSContext* ctx, JSValue thisVal, int argc, 
         JS_ThrowReferenceError(ctx, "unable to compile shader!");
         return JS_EXCEPTION;
     }
-    auto shaderPtr = engine.renderer.getTexture(shaderId);
-    auto res = newJSTextureHandle(ctx, shaderId, shaderPtr);
+    auto shaderPtr = engine.renderer.getShader(shaderId);
+    auto res = newJSShaderHandle(ctx, shaderId, shaderPtr);
     return res;
 }
 

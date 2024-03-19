@@ -219,6 +219,10 @@ void Renderer::freeShader(int id){
     shaderStore.del(id);
 }
 
+Shader* Renderer::getShader(int id){
+    return shaderStore.get(id);
+}
+
 void Renderer::setDimensions(int width, int height){
     // If the root render target hasn't been set yet, create it
     // Otherwise resize and clear the root render target.
