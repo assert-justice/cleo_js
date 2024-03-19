@@ -63,3 +63,10 @@ Shader::~Shader(){
 void Shader::use(){
     glUseProgram(id);
 }
+
+unsigned int Shader::getUniformLocation(const char* name){
+    return glGetUniformLocation(id, name);
+}
+unsigned int Shader::getAttribLocation(const char* name){
+    return glGetAttribLocation(id, name);
+}

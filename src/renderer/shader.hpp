@@ -10,4 +10,6 @@ class Shader{
     // Shader(std::string vertexSrc, std::string fragmentSrc);
     ~Shader();
     void use();
+    unsigned int getUniformLocation(const char* name);
+    unsigned int getAttribLocation(const char* name);
 };

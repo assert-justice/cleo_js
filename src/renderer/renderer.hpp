@@ -12,32 +12,44 @@
 
 class Renderer{
     public:
+    // Engine utilities
     ~Renderer();
     void init(bool* hasError);
     void startRender();
     void endRender();
     bool isInitialized();
+    bool isEnabled(){
+        return enabled || isAtRoot();
+    }
     void setClearColor(float r, float g, float b);
+    void setDimensions(int width, int height);
+    // Direct rendering
     void clear();
-    int newTexture(int width, int height, unsigned char* data);
-    void freeTexture(int id);
-    int loadImage(const char* path);
-    bool saveTexture(const char* path, int id);
     void drawImage(
         int textureId,
         glm::mat4 spriteTransform,
         glm::mat4 coordTransform
     );
+    // Textures
+    int newTexture(int width, int height, unsigned char* data);
+    void freeTexture(int id);
+    int loadImage(const char* path);
+    bool saveTexture(const char* path, int id);
     Texture* getTexture(int id){
         return textureStore.get(id);
     }
-    bool isEnabled(){
-        return enabled || isAtRoot();
-    }
     bool pushRenderTarget(int id);
     int popRenderTarget();
+    // Shaders
+    int newShader(const char* vertexSource, const char* fragmentSource);
+    void freeShader(int id);
+    Shader* getShader(int id);
+    // Transforms
     void setTransform(glm::mat4 transform){
-        transformStack.push_back(transform);
+        setCurrentTransform(transform);
+    }
+    glm::mat4 getTransform(){
+        return transformStack[transformStack.size()-1];
     }
     void pushTransform(){
         // duplicates the top of the transform stack
@@ -45,9 +57,6 @@ class Renderer{
     }
     void popTransform(){
         if(transformStack.size() > 0) transformStack.pop_back();
-    }
-    glm::mat4 getTransform(){
-        return transformStack[transformStack.size()-1];
     }
     void translate(glm::vec3 vector){
         setCurrentTransform(glm::translate(getTransform(), vector));
@@ -64,10 +73,12 @@ class Renderer{
     void setPerspectiveProjection(float fov, float aspect, float near, float far){
         setCurrentTransform(glm::perspective(fov, aspect, near, far));
     }
-    
-    void setDimensions(int width, int height);
+    void setIdentity(){
+        setCurrentTransform(glm::mat4(1.0f));
+    }
     private:
     Store<Texture> textureStore;
+    Store<Shader> shaderStore;
     // Texture* target = nullptr;
     std::vector<std::pair<int, Texture*>> renderTargetStack;
     bool enabled = true;

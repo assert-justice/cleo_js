@@ -9,7 +9,12 @@ typedef struct {
     Texture* texture;
 } JSTextureClass;
 
-static JSClassID jsTextureClassId;
+typedef struct {
+    int id;
+    Shader* shader;
+} JSShaderClass;
+
+static JSClassID jsTextureClassId, jsShaderClassId;
 
 static void jsTextureClassFinalizer(JSRuntime *rt, JSValue val)
 {
@@ -20,10 +25,23 @@ static void jsTextureClassFinalizer(JSRuntime *rt, JSValue val)
         js_free_rt(rt, s);
     }
 }
+static void jsShaderClassFinalizer(JSRuntime *rt, JSValue val)
+{
+    JSShaderClass* s = (JSShaderClass*)JS_GetOpaque(val, jsShaderClassId);
+    if (s) {
+        if(engine.renderer.isInitialized())
+            engine.renderer.freeShader(s->id);
+        js_free_rt(rt, s);
+    }
+}
 
 static JSClassDef jsTextureClassDef = {
     "Texture",
     .finalizer = jsTextureClassFinalizer,
+}; 
+static JSClassDef jsShaderClassDef = {
+    "Shader",
+    .finalizer = jsShaderClassFinalizer,
 }; 
 
 static JSValue newJSTextureHandle(JSContext *ctx, int id, Texture* texture)
@@ -43,11 +61,36 @@ static JSValue newJSTextureHandle(JSContext *ctx, int id, Texture* texture)
     JS_SetOpaque(obj, s);
     return obj;
 }
+static JSValue newJSShaderHandle(JSContext *ctx, int id, Shader* shader)
+{
+    JSShaderClass* s;
+    JSValue obj;
+    obj = JS_NewObjectClass(ctx, jsShaderClassId);
+    if (JS_IsException(obj))
+        return obj;
+    s = (JSShaderClass*)js_mallocz(ctx, sizeof(*s));
+    if (!s) {
+        JS_FreeValue(ctx, obj);
+        return JS_EXCEPTION;
+    }
+    s->id = id;
+    s->shader = shader;
+    JS_SetOpaque(obj, s);
+    return obj;
+}
 
 static JSTextureClass* getTexture(JSValue val){
     auto s = (JSTextureClass*)JS_GetOpaque(val, jsTextureClassId);
     if(!s){
         JS_ThrowReferenceError(engine.vm.context, "invalid texture handle!");
+        return nullptr;
+    }
+    return s;
+}
+static JSShaderClass* getShader(JSValue val){
+    auto s = (JSShaderClass*)JS_GetOpaque(val, jsShaderClassId);
+    if(!s){
+        JS_ThrowReferenceError(engine.vm.context, "invalid shader handle!");
         return nullptr;
     }
     return s;
@@ -211,6 +254,43 @@ static JSValue textureFromFileBind(JSContext* ctx, JSValue thisVal, int argc, JS
     return res;
 }
 
+static JSValue shaderConstructorBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
+    if(!rendererInitalized(ctx)) return JS_EXCEPTION;
+    FnHelp help(ctx, argc, argv);
+    auto vertexSource = help.getString();
+    auto fragmentSource = help.getString();
+    if(help.hasError) return JS_EXCEPTION;
+    auto shaderId = engine.renderer.newShader(vertexSource.c_str(), fragmentSource.c_str());
+    if(shaderId == -1){
+        JS_ThrowReferenceError(ctx, "unable to compile shader!");
+        return JS_EXCEPTION;
+    }
+    auto shaderPtr = engine.renderer.getTexture(shaderId);
+    auto res = newJSTextureHandle(ctx, shaderId, shaderPtr);
+    return res;
+}
+
+static JSValue shaderGetUniformLocationBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
+    FnHelp help(ctx, argc, argv);
+    auto name = help.getString();
+    if(help.hasError) return JS_EXCEPTION;
+    auto s = getShader(thisVal);
+    if(!s) return JS_EXCEPTION; // Error message handled in getShader
+    auto shader = s->shader;
+    auto location = shader->getUniformLocation(name.c_str());
+    return JS_NewInt32(ctx, location);
+}
+static JSValue shaderGetAttribLocationBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
+    FnHelp help(ctx, argc, argv);
+    auto name = help.getString();
+    if(help.hasError) return JS_EXCEPTION;
+    auto s = getShader(thisVal);
+    if(!s) return JS_EXCEPTION; // Error message handled in getShader
+    auto shader = s->shader;
+    auto location = shader->getAttribLocation(name.c_str());
+    return JS_NewInt32(ctx, location);
+}
+
 static JSValue drawImageBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
     if(!rendererInitalized(ctx)) return JS_EXCEPTION;
     if(!engine.renderer.isEnabled()){
@@ -223,7 +303,7 @@ static JSValue drawImageBind(JSContext* ctx, JSValue thisVal, int argc, JSValue*
     y = help.getFloat64();
     auto handle = help.hasArgs() ? help.next() : JS_UNDEFINED;
     auto s = getTexture(thisVal);
-    if(!s) return JS_EXCEPTION;
+    if(!s) return JS_EXCEPTION; // Error message handled in getTexture
     auto tex = s->texture;
     if(help.hasError) return JS_EXCEPTION;
     ObjectHelp objHelp(ctx, handle);
@@ -354,6 +434,10 @@ static JSValue rotateBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* ar
     engine.renderer.rotate(angle, glm::vec3(0.0f, 0.0f, 1.0f));
     return JS_UNDEFINED;
 }
+static JSValue setIdentityBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
+    engine.renderer.setIdentity();
+    return JS_UNDEFINED;
+}
 static JSValue saveTextureBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
     FnHelp help(ctx, argc, argv);
     auto path = help.getString();
@@ -370,7 +454,7 @@ static JSValue saveTextureBind(JSContext* ctx, JSValue thisVal, int argc, JSValu
 
 
 void bindGraphics(){
-    JSValue proto, textureProto, cameraProto;
+    JSValue proto, textureProto, shaderProto;
     JSValue fn;
     auto ctx = engine.vm.context;
     proto = JS_NewObject(ctx);
@@ -416,9 +500,25 @@ void bindGraphics(){
     // setting the class prototype consumes the prototype object so we need to reacquire it
     JS_SetClassProto(ctx, jsTextureClassId, textureProto);
     textureProto = JS_GetClassProto(ctx, jsTextureClassId);
-    auto constructor = JS_GetProperty(ctx, textureProto, JS_NewAtom(ctx, "constructor"));
     JS_DefinePropertyValueStr(ctx, proto, "Texture", textureProto, 0);
-    JS_FreeValue(ctx, constructor);
+
+    // Create shader class
+    JS_NewClassID(&jsShaderClassId);
+    JS_NewClass(JS_GetRuntime(ctx), jsShaderClassId, &jsShaderClassDef);
+    shaderProto = JS_NewObject(ctx);
+    // static new(vertexSource: string, fragmentSource: string): Shader
+    fn = JS_NewCFunction(ctx, &shaderConstructorBind, "shaderConstructor", 0);
+    JS_DefinePropertyValueStr(ctx, shaderProto, "new", fn, 0);
+    // getUniformLocation(name: string): number
+    fn = JS_NewCFunction(ctx, &shaderGetUniformLocationBind, "shaderGetUniformLocation", 0);
+    JS_DefinePropertyValueStr(ctx, shaderProto, "getUniformLocation", fn, 0);
+    // getAttribLocation(name: string): number
+    fn = JS_NewCFunction(ctx, &shaderGetAttribLocationBind, "shaderGetAttribLocation", 0);
+    JS_DefinePropertyValueStr(ctx, shaderProto, "getAttribLocation", fn, 0);
+    // setting the class prototype consumes the prototype object so we need to reacquire it
+    JS_SetClassProto(ctx, jsShaderClassId, shaderProto);
+    shaderProto = JS_GetClassProto(ctx, jsShaderClassId);
+    JS_DefinePropertyValueStr(ctx, proto, "Shader", shaderProto, 0);
 
     // standalone functions
     // setClearColor(r: number, g: number, b: number, a: number = 0): void
@@ -454,6 +554,9 @@ void bindGraphics(){
     // rotate(x: number, y: number): void
     fn = JS_NewCFunction(ctx, &rotateBind, "rotate", 0);
     JS_DefinePropertyValueStr(ctx, proto, "rotate", fn, 0);
+    // setIdentity(): void
+    fn = JS_NewCFunction(ctx, &setIdentityBind, "setIdentity", 0);
+    JS_DefinePropertyValueStr(ctx, proto, "setIdentity", fn, 0);
     // saveTexture(path: string, texture?: Texture): void
     fn = JS_NewCFunction(ctx, &saveTextureBind, "saveTexture", 0);
     JS_DefinePropertyValueStr(ctx, proto, "saveTexture", fn, 0);

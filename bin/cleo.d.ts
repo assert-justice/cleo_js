@@ -29,9 +29,10 @@ declare module "cleo" {
         function translate(x: number, y: number): void;
         function scale(x: number, y: number): void;
         function rotate(angle: number): void;
-        function saveTexture(path: string, texture?: Texture): void;
+        function setIdentity(): void;
         // function setOrthoProjection(left: number, right: number, top: number, bottom: number, near: number, far: number): void;
         // function setPerspectiveProjection(fov: number, aspect: number, near: number, far: number): void;
+        function saveTexture(path: string, texture?: Texture): void;
         interface TextureParams{
             width?: number;
             height?: number;
@@ -52,8 +53,11 @@ declare module "cleo" {
             static fromArray(width: number, height: number, data: number[]): Texture;
             static fromColor(width: number, height: number, red: number, green: number, blue: number, alpha: number): Texture;
             static new(width: number, height: number, data?: ArrayBuffer): Texture;
-            // setTarget():void;
-            // resetTarget():void;
+        }
+        class Shader{
+            static new(vertexSource, fragmentSource): Shader;
+            getUniformLocation(name: string): number;
+            getAttribLocation(name: string): number;
         }
     }
     export type WindowMode = "windowed" | "borderless" | "fullscreen";

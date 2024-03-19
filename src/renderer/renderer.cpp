@@ -66,8 +66,10 @@ void Renderer::init(bool* hasError){
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(quad), quad, GL_STATIC_DRAW);
     unsigned int positionLoc, textureLoc;
-    positionLoc = glGetAttribLocation(imageShader.id, "aPos");
-    textureLoc = glGetAttribLocation(imageShader.id, "aTexCoord");
+    // positionLoc = glGetAttribLocation(imageShader.id, "aPos");
+    positionLoc = imageShader.getAttribLocation("aPos");
+    // textureLoc = glGetAttribLocation(imageShader.id, "aTexCoord");
+    textureLoc = imageShader.getAttribLocation("aTexCoord");
     glVertexAttribPointer(positionLoc, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(positionLoc);
     glVertexAttribPointer(textureLoc, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
@@ -206,6 +208,17 @@ int Renderer::popRenderTarget(){
     return res;
 }
 
+int Renderer::newShader(const char* vertexSource, const char* fragmentSource){
+    auto shader = new Shader();
+    bool hasError;
+    shader->initialize(&hasError, vertexSource, fragmentSource);
+    if(hasError) return -1;
+    return shaderStore.add(shader);
+}
+void Renderer::freeShader(int id){
+    shaderStore.del(id);
+}
+
 void Renderer::setDimensions(int width, int height){
     // If the root render target hasn't been set yet, create it
     // Otherwise resize and clear the root render target.
@@ -234,11 +247,15 @@ void Renderer::drawImageInternal(Texture* tex,
     tex->use();
     imageShader.use();
     glBindVertexArray(VAO);
-    unsigned int cameraLoc = glGetUniformLocation(imageShader.id, "camera");
+    unsigned int cameraLoc, spriteLoc, coordLoc;
+    // unsigned int cameraLoc = glGetUniformLocation(imageShader.id, "camera");
+    cameraLoc = imageShader.getUniformLocation("camera");
     glUniformMatrix4fv(cameraLoc, 1, GL_FALSE, glm::value_ptr(baseTransform));
-    unsigned int spriteLoc = glGetUniformLocation(imageShader.id, "sprite");
+    // unsigned int spriteLoc = glGetUniformLocation(imageShader.id, "sprite");
+    spriteLoc = imageShader.getUniformLocation("sprite");
     glUniformMatrix4fv(spriteLoc, 1, GL_FALSE, glm::value_ptr(spriteTransform));
-    unsigned int coordLoc = glGetUniformLocation(imageShader.id, "coord");
+    // unsigned int coordLoc = glGetUniformLocation(imageShader.id, "coord");
+    coordLoc = imageShader.getUniformLocation("coord");
     glUniformMatrix4fv(coordLoc, 1, GL_FALSE, glm::value_ptr(coordTransform));
     glDrawArrays(GL_TRIANGLES, 0, 6);
 }
