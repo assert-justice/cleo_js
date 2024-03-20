@@ -47,3 +47,17 @@ void ObjectHelp::setBool(const char* name, bool val){
     auto num = JS_NewBool(ctx, val);
     JS_DefinePropertyValueStr(ctx, obj, name, num, 0);
 }
+std::string ObjectHelp::getString(const char* name){
+    auto val = getVal(name);
+    if(JS_IsUndefined(val)) return "";
+    if(!JS_IsString(val)){
+        JS_ThrowTypeError(ctx, "field '%s' is not a string!", name);
+        hasError = true;
+        return "";
+    }
+    auto str = JS_ToCString(ctx, val);
+    std::string res(str);
+    JS_FreeCString(ctx, str);
+    return res;
+}
+void ObjectHelp::setString(const char* name, const char* string){}

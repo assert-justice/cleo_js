@@ -14,7 +14,12 @@ typedef struct {
     Shader* shader;
 } JSShaderClass;
 
-static JSClassID jsTextureClassId, jsShaderClassId;
+typedef struct {
+    int id;
+    Mesh* mesh;
+} JSMeshClass;
+
+static JSClassID jsTextureClassId, jsShaderClassId, jsMeshClassId;
 
 static void jsTextureClassFinalizer(JSRuntime *rt, JSValue val)
 {
@@ -34,6 +39,15 @@ static void jsShaderClassFinalizer(JSRuntime *rt, JSValue val)
         js_free_rt(rt, s);
     }
 }
+static void jsMeshClassFinalizer(JSRuntime *rt, JSValue val)
+{
+    JSMeshClass* s = (JSMeshClass*)JS_GetOpaque(val, jsMeshClassId);
+    if (s) {
+        if(engine.renderer.isInitialized())
+            engine.renderer.freeMesh(s->id);
+        js_free_rt(rt, s);
+    }
+}
 
 static JSClassDef jsTextureClassDef = {
     "Texture",
@@ -42,6 +56,10 @@ static JSClassDef jsTextureClassDef = {
 static JSClassDef jsShaderClassDef = {
     "Shader",
     .finalizer = jsShaderClassFinalizer,
+}; 
+static JSClassDef jsMeshClassDef = {
+    "Mesh",
+    .finalizer = jsMeshClassFinalizer,
 }; 
 
 static JSValue newJSTextureHandle(JSContext *ctx, int id, Texture* texture)
@@ -78,6 +96,23 @@ static JSValue newJSShaderHandle(JSContext *ctx, int id, Shader* shader)
     JS_SetOpaque(obj, s);
     return obj;
 }
+static JSValue newJSMeshHandle(JSContext *ctx, int id, Mesh* mesh)
+{
+    JSMeshClass* s;
+    JSValue obj;
+    obj = JS_NewObjectClass(ctx, jsMeshClassId);
+    if (JS_IsException(obj))
+        return obj;
+    s = (JSMeshClass*)js_mallocz(ctx, sizeof(*s));
+    if (!s) {
+        JS_FreeValue(ctx, obj);
+        return JS_EXCEPTION;
+    }
+    s->id = id;
+    s->mesh = mesh;
+    JS_SetOpaque(obj, s);
+    return obj;
+}
 
 static JSTextureClass* getTexture(JSValue val){
     auto s = (JSTextureClass*)JS_GetOpaque(val, jsTextureClassId);
@@ -91,6 +126,14 @@ static JSShaderClass* getShader(JSValue val){
     auto s = (JSShaderClass*)JS_GetOpaque(val, jsShaderClassId);
     if(!s){
         JS_ThrowReferenceError(engine.vm.context, "invalid shader handle!");
+        return nullptr;
+    }
+    return s;
+}
+static JSMeshClass* getMesh(JSValue val){
+    auto s = (JSMeshClass*)JS_GetOpaque(val, jsMeshClassId);
+    if(!s){
+        JS_ThrowReferenceError(engine.vm.context, "invalid mesh handle!");
         return nullptr;
     }
     return s;
@@ -291,6 +334,62 @@ static JSValue shaderGetAttribLocationBind(JSContext* ctx, JSValue thisVal, int 
     return JS_NewInt32(ctx, location);
 }
 
+static JSValue meshConstructorBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
+    if(!rendererInitalized(ctx)) return JS_EXCEPTION;
+    FnHelp help(ctx, argc, argv);
+    auto s = getShader(help.next());
+    if(!s) return JS_EXCEPTION;
+    Shader* shader = s->shader;
+    int vertexCount = help.getInt();
+    int vertexSize = help.getInt();
+    auto attribArray = help.getArray();
+    auto vertexArray = help.getArray();
+    if(help.hasError) return JS_EXCEPTION;
+    std::vector<std::pair<int, const char*>> attributes;
+    ObjectHelp arrHelp(ctx, attribArray);
+    int length = arrHelp.getNumber("length");
+    // TODO: Set some maximum mesh size
+    auto errMessage = "All elements of attribute array must be of the form [number, string]";
+    int offset = 0;
+    for(int idx = 0; idx < length; idx++){
+        auto obj = arrHelp.getVal(std::to_string(idx).c_str());
+        if(!JS_IsArray(ctx, obj)){
+            JS_ThrowTypeError(ctx, errMessage);
+            return JS_EXCEPTION;
+        }
+        ObjectHelp entryHelp(ctx, obj);
+        bool hasError = false;
+        if(entryHelp.getNumber("length") != 2) hasError = true;
+        else if(!JS_IsNumber(entryHelp.getValRequired("0"))) hasError = true;
+        else if(!JS_IsString(entryHelp.getValRequired("1"))) hasError = true;
+        if(hasError){
+            JS_ThrowTypeError(ctx, errMessage);
+            return JS_EXCEPTION;
+        }
+        if(entryHelp.hasError) return JS_EXCEPTION;
+        int size = entryHelp.getNumber("0");
+        offset += size;
+        if(offset > vertexSize){
+            JS_ThrowRangeError(ctx, "The combined size of the attributes is greater than the vertex size!");
+            return JS_EXCEPTION;
+        }
+        attributes.push_back(std::pair<int, const char*>(size, entryHelp.getString("1").c_str()));
+        JS_FreeValue(ctx, obj);
+    }
+    // return JS_UNDEFINED;
+    ObjectHelp dataHelp(ctx, vertexArray);
+    int dataLength = dataHelp.getNumber("length");
+    std::vector<float> data;
+    for(int idx = 0; idx < dataLength; idx++){
+        float val = dataHelp.getNumber(std::to_string(idx).c_str());
+        if(dataHelp.hasError){}
+        data.push_back(val); 
+    }
+    int meshId = engine.renderer.newMesh(shader, data.data(), vertexCount, vertexSize, attributes);
+    Mesh* mesh = engine.renderer.getMesh(meshId);
+    return newJSMeshHandle(ctx, meshId, mesh);
+}
+
 static JSValue drawImageBind(JSContext* ctx, JSValue thisVal, int argc, JSValue* argv){
     if(!rendererInitalized(ctx)) return JS_EXCEPTION;
     if(!engine.renderer.isEnabled()){
@@ -454,7 +553,7 @@ static JSValue saveTextureBind(JSContext* ctx, JSValue thisVal, int argc, JSValu
 
 
 void bindGraphics(){
-    JSValue proto, textureProto, shaderProto;
+    JSValue proto, textureProto, shaderProto, meshProto;
     JSValue fn;
     auto ctx = engine.vm.context;
     proto = JS_NewObject(ctx);
@@ -519,6 +618,18 @@ void bindGraphics(){
     JS_SetClassProto(ctx, jsShaderClassId, shaderProto);
     shaderProto = JS_GetClassProto(ctx, jsShaderClassId);
     JS_DefinePropertyValueStr(ctx, proto, "Shader", shaderProto, 0);
+
+    // Create mesh class
+    JS_NewClassID(&jsMeshClassId);
+    JS_NewClass(JS_GetRuntime(ctx), jsMeshClassId, &jsMeshClassDef);
+    meshProto = JS_NewObject(ctx);
+    //static new(shader: Shader, vertexCount: number, vertexSize: number, attributes: [number,string][], data: number[]);
+    fn = JS_NewCFunction(ctx, &meshConstructorBind, "meshConstructor", 0);
+    JS_DefinePropertyValueStr(ctx, meshProto, "new", fn, 0);
+
+    JS_SetClassProto(ctx, jsMeshClassId, meshProto);
+    meshProto = JS_GetClassProto(ctx, jsMeshClassId);
+    JS_DefinePropertyValueStr(ctx, proto, "Mesh", meshProto, 0);
 
     // standalone functions
     // setClearColor(r: number, g: number, b: number, a: number = 0): void

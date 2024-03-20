@@ -9,6 +9,7 @@
 #include "utils/store.hpp"
 #include "shader.hpp"
 #include "texture.hpp"
+#include "mesh.hpp"
 
 class Renderer{
     public:
@@ -44,6 +45,10 @@ class Renderer{
     int newShader(const char* vertexSource, const char* fragmentSource);
     void freeShader(int id);
     Shader* getShader(int id);
+    // Meshes
+    int newMesh(Shader* shader, const float* data, int vertexCount, int vertexSize, std::vector<std::pair<int,const char*>> attributes);
+    void freeMesh(int id);
+    Mesh* getMesh(int id);
     // Transforms
     void setTransform(glm::mat4 transform){
         setCurrentTransform(transform);
@@ -79,6 +84,7 @@ class Renderer{
     private:
     Store<Texture> textureStore;
     Store<Shader> shaderStore;
+    Store<Mesh> meshStore;
     // Texture* target = nullptr;
     std::vector<std::pair<int, Texture*>> renderTargetStack;
     bool enabled = true;

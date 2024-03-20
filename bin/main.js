@@ -34,6 +34,16 @@ void main()
     FragColor = texture(ourTexture, TexCoord);
 }`;
 
+const quad = [
+    1.0, 1.0, 0.0,     1.0, 1.0, // top right
+    1.0, 0.0, 0.0,     1.0, 0.0, // bottom right
+    0.0, 1.0, 0.0,     0.0, 1.0, // top left
+
+    1.0, 0.0, 0.0,     1.0, 0.0, // bottom right
+    0.0, 1.0, 0.0,     0.0, 1.0, // top left
+    0.0, 0.0, 0.0,     0.0, 0.0, // bottom left
+];
+
 Engine.init = ()=>{
     playerSpr = Graphics.Texture.fromFile('character_0000.png');
     backgroundSpr = Graphics.Texture.new(1920/4, 1080/4);
@@ -44,6 +54,7 @@ Engine.init = ()=>{
     playerSpr.draw(player.x+200, player.y);
     Graphics.popRenderTarget();
     const shader = Graphics.Shader.new(vertSrc, fragSrc);
+    const mesh = Graphics.Mesh.new(shader, 6, 5, [[3, "aPos"], [2, "aTexCoord"]], quad);
     // Graphics.saveTexture("test.png", backgroundSpr);
 }
 

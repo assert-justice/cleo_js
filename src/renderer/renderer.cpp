@@ -223,6 +223,17 @@ Shader* Renderer::getShader(int id){
     return shaderStore.get(id);
 }
 
+int Renderer::newMesh(Shader* shader, const float* data, int vertexCount, int vertexSize, std::vector<std::pair<int,const char*>> attributes){
+    Mesh* mesh = new Mesh(shader, data, vertexCount, vertexSize, attributes);
+    return meshStore.add(mesh);
+}
+void Renderer::freeMesh(int id){
+    meshStore.del(id);
+}
+Mesh* Renderer::getMesh(int id){
+    return meshStore.get(id);
+}
+
 void Renderer::setDimensions(int width, int height){
     // If the root render target hasn't been set yet, create it
     // Otherwise resize and clear the root render target.

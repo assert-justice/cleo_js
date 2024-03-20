@@ -59,6 +59,11 @@ declare module "cleo" {
             getUniformLocation(name: string): number;
             getAttribLocation(name: string): number;
         }
+        class Mesh{
+            static new(shader: Shader, vertexCount: number, vertexSize: number, attributes: [number,string][], data: number[]);
+            static newStandard(data: number[]);
+            draw(transform: number[]);
+        }
     }
     export type WindowMode = "windowed" | "borderless" | "fullscreen";
     export class Window{

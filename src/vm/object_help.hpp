@@ -1,5 +1,6 @@
 #pragma once
 #include "quickjs.h"
+#include <string>
 
 class ObjectHelp{
     public:
@@ -11,6 +12,8 @@ class ObjectHelp{
     void setNumber(const char* name, double val);
     bool getBool(const char* name, bool defaultVal = false);
     void setBool(const char* name, bool val);
+    std::string getString(const char* name);
+    void setString(const char* name, const char* string);
     private:
     JSContext* ctx;
     JSValue obj;
