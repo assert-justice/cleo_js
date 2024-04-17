@@ -70,7 +70,7 @@ static JSValue soundFromFileBind(JSContext* ctx, JSValue thisVal, int argc, JSVa
     if(help.hasError) return JS_EXCEPTION;
     auto soundId = engine.audio.soundLoad(path.c_str(), streamingEnabled, -1);
     if(soundId == -1){
-        JS_ThrowReferenceError(ctx, "unable to load sound at path!");
+        JS_ThrowReferenceError(ctx, "unable to load sound at path '%s'!", path.c_str());
         return JS_EXCEPTION;
     }
     auto soundPtr = engine.audio.soundStore.get(soundId);

@@ -1,4 +1,4 @@
-import {Engine, System, Input, Window, Graphics} from 'cleo';
+import {Engine, System, Input, Window, Graphics, Audio} from 'cleo';
 
 let playerSpr, backgroundSpr;
 
@@ -44,6 +44,7 @@ const quad = [
     0.0, 0.0, 0.0,     0.0, 0.0, // bottom left
 ];
 
+let audio;
 Engine.init = ()=>{
     playerSpr = Graphics.Texture.fromFile('character_0000.png');
     backgroundSpr = Graphics.Texture.new(1920/4, 1080/4);
@@ -56,9 +57,12 @@ Engine.init = ()=>{
     const shader = Graphics.Shader.new(vertSrc, fragSrc);
     const mesh = Graphics.Mesh.new(shader, 6, 5, [[3, "aPos"], [2, "aTexCoord"]], quad);
     // Graphics.saveTexture("test.png", backgroundSpr);
+    audio = Audio.Sound.fromFile("boss.mp3");
+    audio.play();
 }
 
 Engine.update = (dt)=>{
+    if(!audio.isPlaying) Engine.quit();
     if(!wasToggleDown && Input.keyIsDown(257)){
         fullscreen = !fullscreen;
         Window.setStats("test", 1920, 1080, fullscreen ? "borderless": "windowed");

@@ -46,12 +46,11 @@ int Audio::soundLoad(const char* path, bool streamingEnabled, int groupId){
         group = groupStore.get(groupId);
     }
     auto sound = new ma_sound();
-    result = ma_sound_init_from_file(&audioEngine, path, 
-        MA_SOUND_FLAG_NO_SPATIALIZATION | 
-        streamingEnabled, group, NULL, 
-        sound);
+    auto flags = MA_SOUND_FLAG_NO_SPATIALIZATION;
+    if(streamingEnabled) flags = (ma_sound_flags)(flags | MA_SOUND_FLAG_STREAM);
+    result = ma_sound_init_from_file(&audioEngine, path, flags, NULL, NULL, sound);
     if (result != MA_SUCCESS) {
-        std::cout << "Failed to load sound '" << path << "'" << std::endl;
+        std::cout << "Failed to load sound '" << path << "'. Errcode " << result << std::endl;
         return -1;
     }
     return soundStore.add(sound);
