@@ -51,6 +51,7 @@ int Audio::soundLoad(const char* path, bool streamingEnabled, int groupId){
     result = ma_sound_init_from_file(&audioEngine, path, flags, NULL, NULL, sound);
     if (result != MA_SUCCESS) {
         std::cout << "Failed to load sound '" << path << "'. Errcode " << result << std::endl;
+        // Apparently miniaudio doesn't support .ogg files?
         return -1;
     }
     return soundStore.add(sound);

@@ -428,9 +428,11 @@ static JSValue drawImageBind(JSContext* ctx, JSValue thisVal, int argc, JSValue*
     spriteTransform = glm::scale(spriteTransform, glm::vec3(width,height, 0.0f));
 
     // calculate texture coord transform
+    // add a tiny offset to texture sampling to prevent bleed
+    float sigma = 0.001;
     // scale, translate
     glm::mat4 coordTransform = glm::mat4(1.0f);
-    coordTransform = glm::translate(coordTransform, glm::vec3(glm::vec3(sx/tex->width, sy/tex->height, 0.0)));
+    coordTransform = glm::translate(coordTransform, glm::vec3(glm::vec3(sx/tex->width+sigma, sy/tex->height+sigma, 0.0)));
     coordTransform = glm::scale(coordTransform, glm::vec3(sw/tex->width, sh/tex->height, 0.0));
 
     engine.renderer.drawImage(s->id,spriteTransform,coordTransform);

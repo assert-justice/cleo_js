@@ -14,7 +14,7 @@ declare module "cleo" {
     export class Engine{
         static init: ()=>void;
         static update: (dt:number)=>void;
-        static draw: ()=>void;
+        static draw: (dt:number)=>void;
         static quit():void;
     }
     export namespace Graphics{

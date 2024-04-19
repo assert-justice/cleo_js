@@ -103,9 +103,11 @@ void VM::update(double dt){
         }
     }
 }
-void VM::draw(){
+void VM::draw(double dt){
     if(JS_IsUndefined(drawFn)) return;
-    auto val = JS_Call(context, drawFn, JS_UNDEFINED, 0, NULL);
+    auto val = JS_NewFloat64(context, dt);
+    // val = JS_Call(context, drawFn, JS_UNDEFINED, 1, &val);
+    val = JS_Call(context, drawFn, JS_UNDEFINED, 1, &val);
     handleIfException(context, val);
 }
 

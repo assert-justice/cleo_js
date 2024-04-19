@@ -79,7 +79,8 @@ Engine.update = (dt)=>{
     // if(Input.joyButtonIsDown(0,14)) player.x -= player.speed * dt;
 }
 
-Engine.draw = ()=>{
+Engine.draw = (dt)=>{
+    // System.println(dt)
     // Graphics.pushRenderTarget(backgroundSpr);
     // Graphics.clear();
     // playerSpr.draw(player.x, player.y);

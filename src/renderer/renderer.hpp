@@ -20,7 +20,7 @@ class Renderer{
     void endRender();
     bool isInitialized();
     bool isEnabled(){
-        return enabled || isAtRoot();
+        return enabled || !isAtRoot();
     }
     void setClearColor(float r, float g, float b);
     void setDimensions(int width, int height);

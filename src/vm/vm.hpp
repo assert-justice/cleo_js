@@ -16,7 +16,7 @@ class VM{
     void bind(bool* hasError, std::string src);
     void launch(bool* hasError);
     void update(double dt);
-    void draw();
+    void draw(double dt);
     void addExport(std::string name, JSValue value);
     void handleIfException(JSContext* context, JSValue val);
     std::vector<std::pair<std::string, JSValue>> exports;

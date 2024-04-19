@@ -49,7 +49,7 @@ void Engine::loop(){
             t += dt;
         }
         renderer.startRender();
-        vm.draw();
+        vm.draw(frameTime);
         renderer.endRender();
         window.update();
         if(window.shouldClose()) running = false;
