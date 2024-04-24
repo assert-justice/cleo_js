@@ -210,7 +210,7 @@ int Renderer::popRenderTarget(){
 
 int Renderer::newShader(const char* vertexSource, const char* fragmentSource){
     auto shader = new Shader();
-    bool hasError;
+    bool hasError = false;
     shader->initialize(&hasError, vertexSource, fragmentSource);
     if(hasError) return -1;
     return shaderStore.add(shader);

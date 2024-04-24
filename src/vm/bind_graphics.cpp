@@ -349,12 +349,12 @@ static JSValue meshConstructorBind(JSContext* ctx, JSValue thisVal, int argc, JS
     ObjectHelp arrHelp(ctx, attribArray);
     int length = arrHelp.getNumber("length");
     // TODO: Set some maximum mesh size
-    auto errMessage = "All elements of attribute array must be of the form [number, string]";
+    // auto errMessage = "All elements of attribute array must be of the form [number, string]";
     int offset = 0;
     for(int idx = 0; idx < length; idx++){
         auto obj = arrHelp.getVal(std::to_string(idx).c_str());
         if(!JS_IsArray(ctx, obj)){
-            JS_ThrowTypeError(ctx, errMessage);
+            JS_ThrowTypeError(ctx, "All elements of attribute array must be of the form [number, string]");
             return JS_EXCEPTION;
         }
         ObjectHelp entryHelp(ctx, obj);
@@ -363,7 +363,7 @@ static JSValue meshConstructorBind(JSContext* ctx, JSValue thisVal, int argc, JS
         else if(!JS_IsNumber(entryHelp.getValRequired("0"))) hasError = true;
         else if(!JS_IsString(entryHelp.getValRequired("1"))) hasError = true;
         if(hasError){
-            JS_ThrowTypeError(ctx, errMessage);
+            JS_ThrowTypeError(ctx, "All elements of attribute array must be of the form [number, string]");
             return JS_EXCEPTION;
         }
         if(entryHelp.hasError) return JS_EXCEPTION;

@@ -54,8 +54,8 @@ Engine.init = ()=>{
     playerSpr.draw(player.x+100, player.y);
     playerSpr.draw(player.x+200, player.y);
     Graphics.popRenderTarget();
-    const shader = Graphics.Shader.new(vertSrc, fragSrc);
-    const mesh = Graphics.Mesh.new(shader, 6, 5, [[3, "aPos"], [2, "aTexCoord"]], quad);
+    // const shader = Graphics.Shader.new(vertSrc, fragSrc);
+    // const mesh = Graphics.Mesh.new(shader, 6, 5, [[3, "aPos"], [2, "aTexCoord"]], quad);
     // Graphics.saveTexture("test.png", backgroundSpr);
     audio = Audio.Sound.fromFile("boss.mp3");
     audio.play();
