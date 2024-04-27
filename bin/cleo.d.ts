@@ -14,7 +14,7 @@ declare module "cleo" {
     export class Engine{
         static init: ()=>void;
         static update: (dt:number)=>void;
-        static draw: (dt:number)=>void;
+        static draw: ()=>void;
         static quit():void;
     }
     export namespace Graphics{
@@ -94,10 +94,10 @@ declare module "cleo" {
     }
     export namespace Audio{
         class Sound{
-            static fromFile(path: string, streamingEnabled?: boolean);
-            play();
-            pause();
-            stop();
+            static fromFile(path: string, streamingEnabled?: boolean): Sound;
+            play(): void;
+            pause(): void;
+            stop(): void;
             get isPlaying(): boolean;
             volume: number;
             isLooping: boolean;
