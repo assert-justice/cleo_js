@@ -55,7 +55,7 @@ void Renderer::init(bool* hasError){
     if(*hasError) return;
     std::string vertexShaderSource = vertSrc; //readFile(hasError, "./vert.glsl");
     std::string fragmentShaderSource = fragSrc; //readFile(hasError, "./frag.glsl");
-    if(*hasError) return;
+    // if(*hasError) return;
     imageShader.initialize(hasError, vertexShaderSource, fragmentShaderSource);
     if(*hasError) return;
     setClearColor(0.0f, 0.0f, 0.0f);
@@ -261,7 +261,6 @@ void Renderer::drawImageInternal(Texture* tex,
     glm::mat4 coordTransform){
     tex->use();
     imageShader.use();
-    glBindVertexArray(VAO);
     unsigned int cameraLoc, spriteLoc, coordLoc;
     // unsigned int cameraLoc = glGetUniformLocation(imageShader.id, "camera");
     cameraLoc = imageShader.getUniformLocation("camera");
@@ -272,5 +271,6 @@ void Renderer::drawImageInternal(Texture* tex,
     // unsigned int coordLoc = glGetUniformLocation(imageShader.id, "coord");
     coordLoc = imageShader.getUniformLocation("coord");
     glUniformMatrix4fv(coordLoc, 1, GL_FALSE, glm::value_ptr(coordTransform));
+    glBindVertexArray(VAO);
     glDrawArrays(GL_TRIANGLES, 0, 6);
 }
