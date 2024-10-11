@@ -223,8 +223,8 @@ Shader* Renderer::getShader(int id){
     return shaderStore.get(id);
 }
 
-int Renderer::newMesh(Shader* shader, const float* data, int vertexCount, int vertexSize, std::vector<std::pair<int,const char*>> attributes){
-    Mesh* mesh = new Mesh(shader, data, vertexCount, vertexSize, attributes);
+int Renderer::newMesh(std::vector<float> data, std::vector<int> attributes){
+    Mesh* mesh = new Mesh(data, attributes);
     return meshStore.add(mesh);
 }
 void Renderer::freeMesh(int id){

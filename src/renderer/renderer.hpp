@@ -46,7 +46,7 @@ class Renderer{
     void freeShader(int id);
     Shader* getShader(int id);
     // Meshes
-    int newMesh(Shader* shader, const float* data, int vertexCount, int vertexSize, std::vector<std::pair<int,const char*>> attributes);
+    int newMesh(std::vector<float> data, std::vector<int> attributes);
     void freeMesh(int id);
     Mesh* getMesh(int id);
     // Transforms

@@ -340,43 +340,20 @@ static JSValue meshConstructorBind(JSContext* ctx, JSValue thisVal, int argc, JS
     auto s = getShader(help.next());
     if(!s) return JS_EXCEPTION;
     Shader* shader = s->shader;
-    int vertexCount = help.getInt();
-    int vertexSize = help.getInt();
-    auto attribArray = help.getArray();
+    // int vertexCount = help.getInt();
+    // int vertexSize = help.getInt();
     auto vertexArray = help.getArray();
+    auto attribArray = help.getArray();
     if(help.hasError) return JS_EXCEPTION;
-    std::vector<std::pair<int, const char*>> attributes;
+    std::vector<int> attributes;
     ObjectHelp arrHelp(ctx, attribArray);
     int length = arrHelp.getNumber("length");
     // TODO: Set some maximum mesh size
-    // auto errMessage = "All elements of attribute array must be of the form [number, string]";
-    int offset = 0;
     for(int idx = 0; idx < length; idx++){
-        auto obj = arrHelp.getVal(std::to_string(idx).c_str());
-        if(!JS_IsArray(ctx, obj)){
-            JS_ThrowTypeError(ctx, "All elements of attribute array must be of the form [number, string]");
-            return JS_EXCEPTION;
-        }
-        ObjectHelp entryHelp(ctx, obj);
-        bool hasError = false;
-        if(entryHelp.getNumber("length") != 2) hasError = true;
-        else if(!JS_IsNumber(entryHelp.getValRequired("0"))) hasError = true;
-        else if(!JS_IsString(entryHelp.getValRequired("1"))) hasError = true;
-        if(hasError){
-            JS_ThrowTypeError(ctx, "All elements of attribute array must be of the form [number, string]");
-            return JS_EXCEPTION;
-        }
-        if(entryHelp.hasError) return JS_EXCEPTION;
-        int size = entryHelp.getNumber("0");
-        offset += size;
-        if(offset > vertexSize){
-            JS_ThrowRangeError(ctx, "The combined size of the attributes is greater than the vertex size!");
-            return JS_EXCEPTION;
-        }
-        attributes.push_back(std::pair<int, const char*>(size, entryHelp.getString("1").c_str()));
-        JS_FreeValue(ctx, obj);
+        auto size = arrHelp.getNumber(std::to_string(idx).c_str());
+        if(arrHelp.hasError) return JS_EXCEPTION;
+        attributes.push_back(size);
     }
-    // return JS_UNDEFINED;
     ObjectHelp dataHelp(ctx, vertexArray);
     int dataLength = dataHelp.getNumber("length");
     std::vector<float> data;
@@ -385,7 +362,7 @@ static JSValue meshConstructorBind(JSContext* ctx, JSValue thisVal, int argc, JS
         if(dataHelp.hasError){}
         data.push_back(val); 
     }
-    int meshId = engine.renderer.newMesh(shader, data.data(), vertexCount, vertexSize, attributes);
+    int meshId = engine.renderer.newMesh(data, attributes);
     Mesh* mesh = engine.renderer.getMesh(meshId);
     return newJSMeshHandle(ctx, meshId, mesh);
 }

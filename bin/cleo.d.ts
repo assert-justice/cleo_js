@@ -60,8 +60,8 @@ declare module "cleo" {
             getAttribLocation(name: string): number;
         }
         class Mesh{
-            static new(shader: Shader, vertexCount: number, vertexSize: number, attributes: [number,string][], data: number[]);
-            static newStandard(data: number[]);
+            static new(data: number[], attributes: number[]);
+            // static newStandard(data: number[]);
             draw(transform: number[]);
         }
     }

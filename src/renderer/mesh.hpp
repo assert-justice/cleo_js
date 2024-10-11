@@ -4,7 +4,7 @@
 
 class Mesh{
     public:
-    Mesh(Shader* shader, const float* data, int vertexCount, int vertexSize, std::vector<std::pair<int,const char*>> attributes);
+    Mesh(std::vector<float> data, std::vector<int> attributes);
     ~Mesh();
     // void addVertexAttrib(int size, const char* name);
     // void attachShader(Shader* shader, std::vector<std::pair<int,const char*>> attributes);
